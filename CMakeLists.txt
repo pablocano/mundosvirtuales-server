@@ -1,0 +1,83 @@
+cmake_minimum_required(VERSION 2.8) 
+
+PROJECT (SeverPlant)
+
+set( SERVER_SRC
+	src/main.cpp
+	src/ServerPlant.cpp
+	src/ServerPlant.h
+)
+
+set( UTILS_SRC
+	src/utils/Loader.cpp
+	src/utils/network/TcpComm.cpp
+	src/utils/network/UdpComm.cpp
+	src/utils/SystemCall.cpp
+	src/utils/security/Cryptography.cpp
+	src/plant/Machine.cpp
+	src/plant/MachinePart.cpp
+)
+
+set ( UTILS_INCLUDE
+	src/utils/Loader.h
+	src/utils/network/UdpComm.h
+	src/utils/network/TcpComm.h
+	src/utils/SystemCall.h
+	src/utils/Queue.h
+	src/utils/Runnable.h
+	src/utils/util.h
+	src/utils/security/Cryptography.h
+	src/utils/serialization/json.h
+	src/utils/PacketComm.h
+	src/plant/Machine.h
+	src/plant/MachinePart.h
+)
+
+if (WIN32)
+    set(LIBSOCI "${CMAKE_CURRENT_SOURCE_DIR}/utils/SOCI/Windows")
+endif (WIN32)
+
+include_directories("${LIBSOCI}/include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/utils/PostgreSQL/include")
+
+if("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+	set(LIBSOCI_LIB "${LIBSOCI}/lib/x64")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/x64)
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/x64)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/x64)
+else("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+	set(LIBSOCI_LIB "${LIBSOCI}/lib/x86")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/x86)
+	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/x86)
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/x86)
+endif("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CONFIGURATION_TYPES "Debug;Release")
+
+find_package (Threads REQUIRED)
+
+add_library( utilsCore ${UTILS_SRC} ${UTILS_INCLUDE})
+if(WIN32)
+	# Include winmm for timeGetTime function, wsock32 and ws2_32 for socket windows.
+	target_link_libraries( utilsCore "${LIBSOCI_LIB}/Debug/soci_core_4_0.lib" "${LIBSOCI_LIB}/Release/soci_core_4_0.lib" wsock32 ws2_32 winmm)
+else()
+	target_link_libraries( utilsCore "${LIBSOCI_LIB}/Debug/soci_core_4_0.lib" "${LIBSOCI_LIB}/Release/soci_core_4_0.lib" )
+endif()
+
+add_executable ( ServerPlant ${SERVER_SRC} ${UTILS_INCLUDE} ${CORE_INCLUDE})
+target_link_libraries( ServerPlant utilsCore )
+
+add_executable ( test_server src/test/test_server.cpp ${UTILS_INCLUDE} ${CORE_INCLUDE})
+target_link_libraries( test_server utilsCore )
+
+if(WIN32)
+	string(REPLACE "/" "\\" LIBSOCI_DLL "${LIBSOCI_LIB}")
+	add_custom_command(TARGET ServerPlant
+					   POST_BUILD
+					   COMMAND xcopy "${LIBSOCI_DLL}\\$(Configuration)\\*.dll" "$(TargetDir)" /D /K /Y
+					   COMMENT "Copy DLLs ..."
+					   VERBATIM
+					   )
+endif()
