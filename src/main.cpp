@@ -7,15 +7,15 @@ int main()
 {
 	ServerPlant server;
 	
-	std::cout << "Se inicia el servidor" << std::endl;
+	std::cout << "Starting Server" << std::endl;
 
 	server.start();
 
-	SystemCall::sleep(10 * 60 * 1000);
+	SystemCall::sleep(10 * 1000);
 	
     server.stop(); // wait until server ends last connection
 	
-	std::cout << "Presiona cualquier tecla para terminar" << endl;
+	std::cout << "Press enter to finish" << endl;
 	std::getchar();
 
 	return 0;

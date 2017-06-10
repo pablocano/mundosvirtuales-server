@@ -62,6 +62,8 @@ SocketServerTCP::SocketServerTCP(int port) : m_socket(0)
 			std::cerr << "Problem Binding" << std::endl;
 		if (listenSocket())
 			std::cerr << "Problem Listening" << std::endl;
+
+		NON_BLOCK(m_socket); // switch socket to nonblocking
 	}
 }
 

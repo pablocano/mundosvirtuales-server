@@ -11,21 +11,20 @@
 
 using namespace std;
 
-class CommClient : public Runnable
+class ServerPlant;
+
+class CommClient : public Runnable, public std::enable_shared_from_this<CommClient>
 {
 protected:
 	SocketClientTcp m_tcpComm;
-	std::mutex* m_lpmutexLoader;
-	std::condition_variable* m_lpcondvLoader;
-	Loader* m_lpLoader;
+	Queue<std::shared_ptr<CommClient>>* m_lpQueue;
+	ServerPlant* m_lpServerPlant;
 
 	void run();
 	
 public:
-	CommClient(SocketClientTcp TcpComm, Loader* lpLoader, std::mutex* lpMutexLoader, std::condition_variable* lpCondvLoader);
+	CommClient(int socket, ServerPlant* lpServerPlant, Queue<std::shared_ptr<CommClient>>* lpQueue);
 	~CommClient();
-
-	void processPacket(PacketComm packet);
 };
 
 class ServerPlant : public Runnable
@@ -38,11 +37,15 @@ protected:
 	
 	std::thread m_thServer;
 	
-	Queue<CommClient*> m_queueClients;
+	Queue<std::shared_ptr<CommClient>> m_queueClients;
 
 	void run();
 
 	void closeAllClients();
+
+	std::unique_ptr<PacketComm> processPacket(PacketComm packet, SocketClientTcp& tcpComm);
+
+	friend class CommClient;
 	
 public:
 	ServerPlant();

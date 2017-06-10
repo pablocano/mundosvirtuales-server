@@ -3,6 +3,7 @@
 #include "security\Cryptography.h"
 #include <cstring>
 #include <cstdlib>
+#include <memory>
 
 #define PORT_SERVERPLANT 4321
 #define MAYOR_NUM_VERSION_PACKET 0x1
@@ -59,14 +60,24 @@ typedef struct _PacketComm
 		if (m_lpContent)
 			_sizeContent = ((int)strlen(m_lpContent)) + 1;
 
-		return _sizeContent;
+		return _sizeContent > 1 ? _sizeContent : 0;
 	}
 
-	char* packing()
+	std::unique_ptr<char[]> packing()
 	{
-		char * p = (char *) std::malloc(size());
-		std::memcpy(p, &m_header, SIZE_HEADER_PACKET);
-		std::memcpy(p + SIZE_HEADER_PACKET, m_lpContent, sizeContent());
+		// char *p = (char *) std::malloc(size());
+		std::unique_ptr<char[]> p(new char[size()]);
+		uint32_t key[4] = KEY_CRYPT;
+		m_header.m_size = sizeContent();
+		std::memcpy(p.get(), &m_header, SIZE_HEADER_PACKET);
+		if (m_header.m_size > 0)
+		{
+			char* lpContent = (char *) std::malloc(m_header.m_size);
+			std::memcpy(lpContent, m_lpContent, m_header.m_size);
+			Cryptography::encrypt((uint32_t*)lpContent, (unsigned)(m_header.m_size / 4), key);
+			std::memcpy(p.get() + SIZE_HEADER_PACKET, lpContent, m_header.m_size);
+			std::free(lpContent);
+		}
 
 		return p;
 	}
@@ -78,8 +89,11 @@ typedef struct _PacketComm
 		std::memcpy(&packet.m_header, &header, sizeof(HeaderPacketComm));
 
 		packet.m_lpContent = lpContent;
-		if (lpContent)
-			Cryptography::decrypt((uint32_t*)packet.m_lpContent, (unsigned) (strlen(lpContent) / 4), key);
+		header.m_size = packet.sizeContent();
+		if (packet.m_lpContent)
+		{
+			Cryptography::decrypt((uint32_t*)packet.m_lpContent, (unsigned)(strlen(packet.m_lpContent) / 4), key);
+		}
 
 		return packet;
 	}
