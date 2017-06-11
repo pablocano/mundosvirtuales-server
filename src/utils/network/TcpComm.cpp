@@ -48,7 +48,7 @@ public:
 
 #endif
 
-SocketServerTCP::SocketServerTCP(int port) : m_socket(0)
+SocketServerTCP::SocketServerTCP(int port)
 {
 	m_address.sin_family = AF_INET;
 	m_address.sin_port = htons(port);
@@ -70,12 +70,6 @@ SocketServerTCP::SocketServerTCP(int port) : m_socket(0)
 SocketServerTCP::~SocketServerTCP()
 {
 	closeSocket();
-}
-
-void SocketServerTCP::closeSocket()
-{
-	if (m_socket > 0)
-		CLOSE(m_socket);
 }
 
 int SocketServerTCP::acceptClient()
@@ -100,7 +94,6 @@ bool SocketServerTCP::listenSocket()
 }
 
 SocketClientTcp::SocketClientTcp(const char* ip, int port) :
-	m_socket(0),
 	m_bWasConnected(false)
 {
 	m_address.sin_family = AF_INET;
@@ -118,9 +111,10 @@ SocketClientTcp::SocketClientTcp(const char* ip, int port) :
 }
 
 SocketClientTcp::SocketClientTcp(int socketClient) :
-	m_socket(socketClient),
 	m_bWasConnected(false)
 {
+	m_socket = socketClient;
+
 	if (connected())
 	{
 #ifndef WIN32
@@ -275,15 +269,4 @@ bool SocketClientTcp::send(const char* buffer, int size)
 		closeSocket();
 		return false;
 	}
-}
-
-void SocketClientTcp::closeSocket()
-{
-	CLOSE(m_socket);
-	m_socket = 0;
-}
-
-char* SocketClientTcp::getInfo()
-{
-	return inet_ntoa(m_address.sin_addr);
 }

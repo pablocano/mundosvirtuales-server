@@ -14,14 +14,46 @@
 #include <netinet/in.h>
 #endif
 
+#ifdef WIN32
+	#define CLOSE(socket) closesocket(socket)
+#else
+	#define CLOSE(socket) close(socket)
+#endif
+
 class SocketClientTcp;
 
-class SocketServerTCP
+class SocketTCP
 {
 protected:
 	sockaddr_in m_address; /**< The socket m_address. */
 	int m_socket; /**< The handle of the basic socket. */
 
+public:
+	/**
+	* Constructor
+	*/
+	SocketTCP() : m_socket(0) {}
+
+	/**
+	* The function closes the transfer socket.
+	*/
+	void closeSocket()
+	{
+		if (m_socket > 0)
+			CLOSE(m_socket);
+		m_socket = 0;
+	}
+
+	char* getInfo()
+	{
+		return inet_ntoa(m_address.sin_addr);
+	}
+
+	int getSocket() { return m_socket; }
+};
+
+class SocketServerTCP : public SocketTCP
+{
 public:
 	/**
 	* Constructor.
@@ -47,11 +79,6 @@ public:
 	*/
 	bool connected() const { return m_socket > 0; }
 
-	/**
-	* The function closes the transfer socket.
-	*/
-	void closeSocket();
-
 protected:
 	/**
 	* Binds the socket to an m_address and port number a server call
@@ -71,11 +98,9 @@ protected:
  * @class SocketClientTcp
  * The class implements a tcp connection.
  */
-class SocketClientTcp
+class SocketClientTcp : public SocketTCP
 {
 private:
-	int m_socket; /**< The handle of the actual transfer socket. */
-	sockaddr_in m_address; /**< The socket m_address. */
 	bool m_bWasConnected; /**< Whether a tranfer connection was established or not */
 
 	/**
@@ -141,11 +166,4 @@ public:
 	* @return Was the connection established?
 	*/
 	bool connected() const { return m_socket > 0; }
-
-	/**
-	* The function closes the transfer socket.
-	*/
-	void closeSocket();
-
-	char* getInfo();
 };

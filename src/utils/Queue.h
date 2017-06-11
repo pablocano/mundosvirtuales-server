@@ -19,7 +19,7 @@ public:
 
 	T remove();
 
-	void remove(T item);
+	std::shared_ptr<T> remove(T item);
 
 	int size();
 };
@@ -51,14 +51,25 @@ T Queue<T>::remove()
 }
 
 template<typename T>
-void Queue<T>::remove(T item)
+std::shared_ptr<T> Queue<T>::remove(T item)
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
 	while (m_queue.size() == 0)
 	{
 		m_condv.wait(lock);
 	}
-	m_queue.remove(item);
+	std::list<T>::iterator it = std::find(m_queue.begin(), m_queue.end(), item);
+
+	if (it != m_queue.end())
+	{
+		T t(*it);
+		m_queue.remove(*it);
+		return std::make_shared<T>(t);
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 template<typename T>

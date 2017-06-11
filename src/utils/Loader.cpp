@@ -4,8 +4,8 @@
 #include <sstream>
 
 #include "soci/soci.h"
+#include "soci/soci-config.h"
 #include "soci/postgresql/soci-postgresql.h"
-
 
 Loader::Loader(std::string _db_name, std::string _db_user, std::string _db_host, int _db_port, std::string _db_password, std::string _db_engine) :
 	db_name(_db_name), db_user(_db_user), db_host(_db_host), db_port(_db_port), db_password(_db_password), db_engine(_db_engine), 
