@@ -91,9 +91,10 @@ target_link_libraries( test_server utilsCore clientPlant )
 
 if(WIN32)
 	string(REPLACE "/" "\\" LIBSOCI_DLL "${LIBSOCI_LIB}")
+	string(REPLACE "/" "\\" TARGET_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(Configuration)")
 	add_custom_command(TARGET ServerPlant
 					   POST_BUILD
-					   COMMAND xcopy "${LIBSOCI_DLL}\\$(Configuration)\\*.dll" "$(TargetDir)" /D /K /Y
+					   COMMAND xcopy "${LIBSOCI_DLL}\\$(Configuration)\\*.dll" "${TARGET_DIR}" /D /K /Y
 					   COMMENT "Copy DLLs ..."
 					   VERBATIM
 					   )
