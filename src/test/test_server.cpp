@@ -10,7 +10,7 @@
 
 int main()
 {
-	ClientPlant client("127.0.0.1");
+	ClientPlant client("10.0.42.8");
 	
 	std::cout << "Starting Client" << std::endl;
 
