@@ -5,19 +5,27 @@ PROJECT (SeverPlant)
 set( SERVER_SRC
 	src/main.cpp
 	src/ServerPlant.cpp
+	src/utils/Loader.cpp
+	src/utils/ResponsePacketServer.cpp
+)
+
+set( SERVER_INCLUDE
 	src/ServerPlant.h
+	src/utils/Loader.h
+	src/utils/ResponsePacketServer.h
 )
 
 set( CLIENT_SRC
 	src/ClientPlant.cpp
+	src/utils/ResponsePacketClient.cpp
 )
 
 set( CLIENT_INCLUDE
 	src/ClientPlant.h
+	src/utils/ResponsePacketClient.h
 )
 
 set( UTILS_SRC
-	src/utils/Loader.cpp
 	src/utils/ResponsePacket.cpp
 	src/utils/network/TcpComm.cpp
 	src/utils/network/UdpComm.cpp
@@ -30,7 +38,6 @@ set( UTILS_SRC
 )
 
 set ( UTILS_INCLUDE
-	src/utils/Loader.h
 	src/utils/ResponsePacket.h
 	src/utils/network/UdpComm.h
 	src/utils/network/TcpComm.h
@@ -83,7 +90,7 @@ endif()
 add_library ( clientPlant ${CLIENT_SRC} ${CLIENT_INCLUDE} ${UTILS_INCLUDE} )
 target_link_libraries( clientPlant utilsCore )
 
-add_executable ( ServerPlant ${SERVER_SRC} ${UTILS_INCLUDE} )
+add_executable ( ServerPlant ${SERVER_SRC} ${SERVER_INCLUDE} ${UTILS_INCLUDE} )
 target_link_libraries( ServerPlant utilsCore )
 
 add_executable ( test_server src/test/test_server.cpp ${UTILS_INCLUDE} ${CLIENT_INCLUDE} )

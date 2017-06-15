@@ -4,7 +4,7 @@
 #include "utils/Loader.h"
 #include "utils/network/TcpComm.h"
 #include "utils/network/ClientTCP.h"
-#include "utils/ResponsePacket.h"
+#include "utils/ResponsePacketClient.h"
 
 class ClientPlant : public ClientTCP
 {

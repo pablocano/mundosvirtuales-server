@@ -11,7 +11,7 @@ int main()
 
 	server.start();
 
-	SystemCall::sleep(30 * 1000);
+	SystemCall::sleep(8 * 60 * 60 * 1000);
 	
     server.stop(); // wait until server ends last connection
 	

@@ -4,7 +4,7 @@
 #include "ClientTCP.h"
 #include "../Runnable.h"
 #include "../Queue.h"
-#include "../ResponsePacket.h"
+#include "../ResponsePacketServer.h"
 
 class ServerTCP : public Runnable
 {
