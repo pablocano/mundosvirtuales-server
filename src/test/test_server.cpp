@@ -10,7 +10,7 @@
 
 int main()
 {
-	ClientPlant client("10.0.42.8");
+	ClientPlant client("localhost");
 	
 	std::cout << "Starting Client" << std::endl;
 

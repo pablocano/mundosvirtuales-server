@@ -20,8 +20,6 @@
 	#define CLOSE(socket) close(socket)
 #endif
 
-class SocketClientTcp;
-
 class SocketTCP
 {
 protected:

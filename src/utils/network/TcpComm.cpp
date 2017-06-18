@@ -63,7 +63,7 @@ SocketServerTCP::SocketServerTCP(int port)
 		if (listenSocket())
 			std::cerr << "Problem Listening" << std::endl;
 
-		NON_BLOCK(m_socket); // switch socket to nonblocking
+		// NON_BLOCK(m_socket); // switch socket to nonblocking
 	}
 }
 
@@ -124,7 +124,7 @@ SocketClientTcp::SocketClientTcp(int socketClient) :
 #endif
 		getpeername(m_socket, (sockaddr*)&m_address, &addrlen);
 
-		NON_BLOCK(m_socket); // switch socket to nonblocking
+		// NON_BLOCK(m_socket); // switch socket to nonblocking
 	}
 
 	checkConnection();
@@ -150,7 +150,7 @@ bool SocketClientTcp::checkConnection()
 		if (connected())
 		{
 			m_bWasConnected = true;
-			NON_BLOCK(m_socket); // switch socket to nonblocking
+			// NON_BLOCK(m_socket); // switch socket to nonblocking
 #ifdef MACOSX
 			int yes = 1;
 			if (!setsockopt(m_socket, SOL_SOCKET, SO_NOSIGPIPE, &yes, sizeof(yes)))
