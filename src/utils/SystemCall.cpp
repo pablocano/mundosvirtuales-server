@@ -1,9 +1,12 @@
 #include "SystemCall.h"
-#include "util.h"
+
+#include <thread>
 
 #include <iostream>
 #ifndef WIN32
 #include <unistd.h>
+#include <pthread.h>
+#include <signal.h>
 #else
 
 #ifdef NOMINMAX
@@ -153,5 +156,45 @@ void SystemCall::getLoad(float& mem, float load[3])
     load[2] = float(info.loads[2]) / 65536.f;
     mem = float(info.totalram - info.freeram) / float(info.totalram);
   }
+#endif
+}
+
+
+void SystemCall::killThread(void* lpThread, int exitCode)
+{
+#ifdef WIN32
+	::TerminateThread(lpThread, exitCode);
+	::CloseHandle(lpThread);
+#else
+	pthread_cancel(lpThread);
+#endif
+}
+
+#ifdef WIN32
+unsigned long __stdcall SystemCall::wrapperFunThreadWin(void* fun)
+{
+	((FUN_CALLBACK)fun)();
+	return 0;
+}
+#endif
+
+bool SystemCall::createThread(void* lpThread, FUN_CALLBACK fun_callback)
+{
+#ifdef WIN32
+	unsigned long threadID;
+	lpThread = ::CreateThread(nullptr, 0, &SystemCall::wrapperFunThreadWin, fun_callback, 0, &threadID);
+	return lpThread != nullptr;
+#else
+	int err = pthread_create(lpThread, nullptr, fun_callback, nullptr);
+	return err == 0;
+#endif
+}
+
+void SystemCall::joinThread(void* lpThread)
+{
+#ifdef WIN32
+	WaitForSingleObject(lpThread, false);
+#else
+	pthread_join(lpThread, nullptr);
 #endif
 }

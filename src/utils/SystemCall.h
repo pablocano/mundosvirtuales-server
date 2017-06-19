@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util.h"
+
 class SystemCall
 {
 public:
@@ -47,4 +49,16 @@ public:
 
   /** Returns the load and the physical memory usage in percent */
   static void getLoad(float& mem, float load[3]);
+
+#ifdef WIN32
+  static unsigned long __stdcall wrapperFunThreadWin(void* fun);
+#endif
+
+  /** Kill thread */
+  static bool createThread(void* lpThread, FUN_CALLBACK fun_callback);
+
+  /** Kill thread */
+  static void killThread(void* lpThread, int exitCode = 0);
+
+  static void joinThread(void* lpThread);
 };

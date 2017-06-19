@@ -45,6 +45,7 @@ set ( UTILS_INCLUDE
 	src/utils/network/ClientTCP.h
 	src/utils/SystemCall.h
 	src/utils/Queue.h
+	src/utils/Concurrency.h
 	src/utils/Runnable.h
 	src/utils/util.h
 	src/utils/security/Cryptography.h
