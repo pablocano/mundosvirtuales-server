@@ -173,12 +173,12 @@ void SystemCall::killThread(void* lpThread, int exitCode)
 #ifdef WIN32
 unsigned long __stdcall SystemCall::wrapperFunThreadWin(void* fun)
 {
-	((FUN_CALLBACK)fun)();
+	((FN_CALLBACK)fun)();
 	return 0;
 }
 #endif
 
-bool SystemCall::createThread(void* lpThread, FUN_CALLBACK fun_callback)
+bool SystemCall::createThread(void* lpThread, FN_CALLBACK fun_callback)
 {
 #ifdef WIN32
 	unsigned long threadID;

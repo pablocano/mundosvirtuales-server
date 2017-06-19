@@ -48,7 +48,7 @@ public:
 
 #endif
 
-SocketServerTCP::SocketServerTCP(int port)
+SocketServerTCP::SocketServerTCP(int port) : SocketTCP()
 {
 	m_address.sin_family = AF_INET;
 	m_address.sin_port = htons(port);
@@ -62,8 +62,8 @@ SocketServerTCP::SocketServerTCP(int port)
 			std::cerr << "Problem Binding" << std::endl;
 		if (listenSocket())
 			std::cerr << "Problem Listening" << std::endl;
-
-		// NON_BLOCK(m_socket); // switch socket to nonblocking
+		if (m_isNonBlock)
+			NON_BLOCK(m_socket); // switch socket to nonblocking
 	}
 }
 
@@ -94,8 +94,9 @@ bool SocketServerTCP::listenSocket()
 }
 
 SocketClientTcp::SocketClientTcp(const char* ip, int port) :
-	m_bWasConnected(false)
+	m_bWasConnected(false), SocketTCP()
 {
+	m_isNonBlock = true;
 	m_address.sin_family = AF_INET;
 	m_address.sin_port = htons(port);
 	if (ip) // connect as client?
@@ -123,8 +124,9 @@ SocketClientTcp::SocketClientTcp(int socketClient) :
 		int addrlen = sizeof(sockaddr_in);
 #endif
 		getpeername(m_socket, (sockaddr*)&m_address, &addrlen);
-
-		// NON_BLOCK(m_socket); // switch socket to nonblocking
+		
+		if (m_isNonBlock)
+			NON_BLOCK(m_socket); // switch socket to nonblocking
 	}
 
 	checkConnection();
@@ -150,7 +152,9 @@ bool SocketClientTcp::checkConnection()
 		if (connected())
 		{
 			m_bWasConnected = true;
-			// NON_BLOCK(m_socket); // switch socket to nonblocking
+			
+			if (m_isNonBlock)
+				NON_BLOCK(m_socket); // switch socket to nonblocking
 #ifdef MACOSX
 			int yes = 1;
 			if (!setsockopt(m_socket, SOL_SOCKET, SO_NOSIGPIPE, &yes, sizeof(yes)))

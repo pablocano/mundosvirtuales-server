@@ -12,32 +12,32 @@
 
 void test_server()
 {
-	ClientPlant client("localhost");
+	static ClientPlant client("localhost");
 
 	std::cout << "Starting Client" << std::endl;
 
 	client.start();
 
-	Machines machines = client.requestMachines();
+	static Machines machines;
+	
+	static Concurrency con([]() -> bool { machines = client.requestMachines(); return machines.size() > 0; },
+		[]() { std::cout << "Machines:" << std::endl; for (Machine machine : machines) std::cout << machine.name << std::endl; }, 100);
 
-	for (Machine machine : machines)
-	{
-		std::cout << machine.name << std::endl;
-	}
+	std::cout << "Post concurrency" << std::endl;
+	
+	SystemCall::sleep(3000);
 
-	SystemCall::sleep(1000);
+	std::cout << "Pre sleep" << std::endl;
 
 	client.stop();
 }
 
 void test_concurrency()
 {
-	static Concurrency con(
-		[]() { for (int i = 0; i < 100; i++) { std::cout << "."; SystemCall::sleep(50); } },
+	Concurrency con(
+		[]() -> bool { int i = 0;  std::cout << "."; SystemCall::sleep(50); return ++i > 1000; },
 		[]() { std::cout << "\nFin Thread" << std::endl; },
-		1000);
-
-	con.exec();
+		2000);
 
 	SystemCall::sleep(3000);
 
@@ -46,7 +46,7 @@ void test_concurrency()
 
 int main()
 {
-	test_concurrency();
+	test_server();
 
 	std::cout << "Press enter to finish" << std::endl;
 	std::getchar();

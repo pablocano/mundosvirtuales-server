@@ -55,7 +55,7 @@ public:
 #endif
 
   /** Kill thread */
-  static bool createThread(void* lpThread, FUN_CALLBACK fun_callback);
+  static bool createThread(void* lpThread, FN_CALLBACK fun_callback);
 
   /** Kill thread */
   static void killThread(void* lpThread, int exitCode = 0);

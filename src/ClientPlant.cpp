@@ -17,12 +17,10 @@ Machines ClientPlant::requestMachines()
 		PacketComm packetRequest;
 		packetRequest.m_header.m_command = Command::GET_MACHINES;
 		packetRequest.m_header.m_idResponse = ++ClientPlant::m_indexPacketRequest;
-		packetRequest.m_lpContent = "Test1234";
 
-		std::cout << "Send package ..." << std::endl;
 		std::unique_ptr<char[]> packetTCP = packetRequest.packing();
 		m_tcpComm.send(packetTCP.get(), packetRequest.size());
-		SystemCall::sleep(10);
+
 		PacketComm packetResponse = m_lpResponsePacket->get_response(packetRequest);
 
 		if ((packetResponse.m_header.m_idResponse == packetRequest.m_header.m_idResponse) && packetResponse.sizeContent() > 0)

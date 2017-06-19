@@ -23,14 +23,15 @@
 class SocketTCP
 {
 protected:
-	sockaddr_in m_address; /**< The socket m_address. */
-	int m_socket; /**< The handle of the basic socket. */
+	sockaddr_in m_address; /* The address connection. */
+	int m_socket; /* The handle of the basic socket. */
+	bool m_isNonBlock; /* If it is true the socket is non-blocking. */
 
 public:
 	/**
 	* Constructor
 	*/
-	SocketTCP() : m_socket(0) {}
+	SocketTCP() : m_socket(0), m_isNonBlock(false) {}
 
 	/**
 	* The function closes the transfer socket.
