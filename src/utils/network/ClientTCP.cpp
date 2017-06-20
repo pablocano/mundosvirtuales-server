@@ -47,7 +47,7 @@ void ClientTCP::run()
 					if (header.m_size == 0 || m_tcpComm.receive(contentEncrypted, header.m_size, 0))
 					{
 						PacketComm packet = PacketComm::unpacking(header, contentEncrypted);
-						std::unique_ptr<PacketComm> packetResponse = m_lpResponsePacket->response(packet, m_tcpComm);
+						std::unique_ptr<PacketComm> packetResponse = m_lpResponsePacket->process_packet(packet, m_tcpComm);
 						if (packetResponse.get())
 						{
 							std::unique_ptr<char[]> packetTCP = packetResponse->packing();

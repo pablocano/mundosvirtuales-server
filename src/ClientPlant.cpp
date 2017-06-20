@@ -27,7 +27,7 @@ Machines ClientPlant::requestMachines()
 		{
 			try
 			{
-				auto parseJSON = json::parse(packetResponse.m_lpContent);
+				json parseJSON = json::parse(packetResponse.m_lpContent);
 				machines = parseJSON.at("machines");
 			}
 			catch (std::exception e)

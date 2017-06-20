@@ -5,7 +5,7 @@
 
 using json = nlohmann::json;
 
-ResponsePacketClientPlant::ResponsePacketClientPlant() : m_mutex(), m_condv()
+ResponsePacketClientPlant::ResponsePacketClientPlant()
 {
 	std::cout << "Create client" << std::endl;
 }
@@ -15,7 +15,7 @@ ResponsePacketClientPlant::~ResponsePacketClientPlant()
 	std::cout << "Delete obj client" << std::endl;
 }
 
-std::unique_ptr<PacketComm> ResponsePacketClientPlant::response(PacketComm packet, SocketClientTcp& tcpComm)
+std::unique_ptr<PacketComm> ResponsePacketClientPlant::process_packet(PacketComm packet, SocketClientTcp& tcpComm)
 {
 	std::unique_ptr<PacketComm> responsePacket = nullptr;
 	
@@ -34,9 +34,6 @@ std::unique_ptr<PacketComm> ResponsePacketClientPlant::response(PacketComm packe
 	default:
 		std::cout << "None command" << std::endl;
 	}
-
-	/*if (packet.sizeContent() > 0)
-		std::cout << packet.m_lpContent << std::endl;*/
 
 	return responsePacket;
 }

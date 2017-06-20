@@ -99,7 +99,7 @@ SocketClientTcp::SocketClientTcp(const char* ip, int port) :
 	m_isNonBlock = true;
 	m_address.sin_family = AF_INET;
 	m_address.sin_port = htons(port);
-	if (ip) // connect as client?
+	if (ip)
 	{
 		struct hostent* he;
 		if ((he = gethostbyname(ip)) == NULL)

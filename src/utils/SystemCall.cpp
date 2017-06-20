@@ -99,10 +99,16 @@ const char* SystemCall::getHostAddr()
   {
     static char buf[100];
     hostent* hostAddr = (hostent*) gethostbyname(getHostName());
-    if(hostAddr && *hostAddr->h_addr_list)
-      strcpy(buf, inet_ntoa(*(in_addr*) *hostAddr->h_addr_list)); // TODO: change for strcpy_s
-    else
-      strcpy(buf, "127.0.0.1"); // TODO: change for strcpy_s
+	if (hostAddr && *hostAddr->h_addr_list)
+	{
+		char* ipHost = inet_ntoa(*(in_addr*)*hostAddr->h_addr_list);
+		strcpy_s(buf, strlen(ipHost) + 1, ipHost);
+	}
+	else
+	{
+		const char* ipLocalhost = "127.0.0.1";
+		strcpy_s(buf, sizeof(ipLocalhost), ipLocalhost);
+	}
     hostaddr = buf;
   }
   return hostaddr;

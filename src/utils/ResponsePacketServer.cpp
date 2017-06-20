@@ -11,7 +11,7 @@ ResponsePacketServerPlant::~ResponsePacketServerPlant()
 {
 }
 
-std::unique_ptr<PacketComm> ResponsePacketServerPlant::response(PacketComm packet, SocketClientTcp& tcpComm)
+std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm packet, SocketClientTcp& tcpComm)
 {
 	std::unique_ptr<PacketComm> responsePacket = nullptr;
 
