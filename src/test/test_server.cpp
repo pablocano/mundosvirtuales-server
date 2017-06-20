@@ -28,8 +28,6 @@ void test_server()
 	SystemCall::sleep(3000);
 
 	std::cout << "Pre sleep" << std::endl;
-
-	client.stop();
 }
 
 void test_concurrency()

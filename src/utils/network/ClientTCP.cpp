@@ -2,16 +2,14 @@
 
 #include <iostream>
 
-ClientTCP::ClientTCP(const char* ip, int port, std::shared_ptr<ResponsePacket> lpProcessPacket, std::function<void(std::shared_ptr<ClientTCP>)> closeClientFn) :
+ClientTCP::ClientTCP(const char* ip, int port, std::shared_ptr<ResponsePacket> lpProcessPacket, std::function<void(std::shared_ptr<ClientTCP>)> closeClientFn, bool isDetach) : Runnable(isDetach),
 	m_tcpComm(ip, port), m_lpResponsePacket(lpProcessPacket), m_closeClientFn(closeClientFn)
 {
-	m_isDetach = true;
 }
 
-ClientTCP::ClientTCP(int socket, std::shared_ptr<ResponsePacket> lpProcessPacket, std::function<void(std::shared_ptr<ClientTCP>)> closeClientFn) :
+ClientTCP::ClientTCP(int socket, std::shared_ptr<ResponsePacket> lpProcessPacket, std::function<void(std::shared_ptr<ClientTCP>)> closeClientFn, bool isDetach) : Runnable(isDetach),
 	m_tcpComm(socket), m_lpResponsePacket(lpProcessPacket), m_closeClientFn(closeClientFn)
 {
-	m_isDetach = true;
 }
 
 ClientTCP::~ClientTCP()
@@ -92,6 +90,7 @@ void ClientTCP::run()
 	std::cout << "Stop Communication Client " << m_tcpComm.getInfo() << std::endl;
 	if (lpBuffer)
 		std::free(lpBuffer);
+	
 	if (m_closeClientFn)
 		m_closeClientFn(shared_from_this());
 }
