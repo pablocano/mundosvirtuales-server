@@ -87,7 +87,7 @@ public:
   /// Wrapper for function used for thread library of Windows.
   /// </summary>
   /// <param name="fun">Callback function</param>
-  /// <returns></returns>
+  /// <returns>Always returns zero.</returns>
   static unsigned long __stdcall wrapperFunThreadWin(void* fun);
 #endif
 

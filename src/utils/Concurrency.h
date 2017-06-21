@@ -1,6 +1,7 @@
 #include "SystemCall.h"
 #include "util.h"
 
+#include <functional>
 #include <thread>
 #include <chrono>
 
@@ -11,8 +12,8 @@
 class Concurrency
 {
 protected:
-	FN_BOOL_CALLBACK m_mainTask; /* The principal task. */
-	FN_CALLBACK m_postTask; /* This task runs after principal task was over. */
+	std::function<bool()> m_mainTask; /* The principal task. */
+	std::function<void()> m_postTask; /* This task runs after principal task was over. */
 	unsigned int m_nTimeout; /* Timeout for principal task, in milliseconds. */
 	std::thread m_thread; /* Thread where principal task is executed. */
 	int m_nSleep; /* Interval of time waiting between trials principal task. */
@@ -47,7 +48,7 @@ public:
 	/// <param name="_post">Task executed after when principal task was over.</param>
 	/// <param name="nTimeout">Timeout for principal task. If this argument is zero, then timeout doesn't use.</param>
 	/// <param name="nSleep">Interval of time waiting between trials principal task.</param>
-	Concurrency(FN_BOOL_CALLBACK _main, FN_CALLBACK _post = nullptr, unsigned int nTimeout = 0, unsigned int nSleep = 10) :
+	Concurrency(std::function<bool()> _main, std::function<void()> _post = nullptr, unsigned int nTimeout = 0, unsigned int nSleep = 10) :
 		m_mainTask(_main), m_postTask(_post), m_thread(), m_nTimeout(nTimeout), m_nSleep(nSleep) 
 	{
 		m_thread = std::thread(&Concurrency::run, this);
