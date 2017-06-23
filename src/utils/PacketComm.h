@@ -16,6 +16,14 @@
 #define COMM_ENCRYPTED /* If is defined, the packets are encrypted. */
 #define KEY_CRYPT { 56324394, 73576, 12030122, 56 } /* Private key for encrypted. */
 
+#ifdef WIN32
+	#define STRUCT_PACKET struct
+	#pragma pack(push)
+	#pragma pack(1)
+#else
+	#define STRUCT_PACKET struct __attribute__((packed))
+#endif
+
 /// <summary>
 /// Enum that contain different commands.  
 /// </summary>
@@ -49,13 +57,13 @@ typedef enum _StatusServer
 /// <summary>
 /// Header of Communication Packet.
 /// </summary>
-typedef struct _HeaderPacketComm
+typedef STRUCT_PACKET _HeaderPacketComm
 {
-	uint8_t version; /* Version of packet. */
-	Command m_command; /* Command */
-	StatusServer m_statusComm; /* Status Server */
-	uint32_t m_idResponse; /* Identificator for Response Packet. */
-	uint32_t m_size; /* Size content of packet. */
+	uint8_t version;			/* Version of packet. */
+	Command m_command;			/* Command */
+	StatusServer m_statusComm;	/* Status Server */
+	uint32_t m_idResponse;		/* Identificator for Response Packet. */
+	uint32_t m_size;			/* Size content of packet. */
 
 	/// <summary>
 	/// Constructor
@@ -81,7 +89,7 @@ typedef struct _HeaderPacketComm
 /// <summary>
 /// Packet for communication.
 /// </summary>
-typedef struct _PacketComm
+typedef STRUCT_PACKET _PacketComm
 {
 	HeaderPacketComm m_header; /* Header of Packet. */
 	char* m_lpContent; /* Payload of Packet. */
@@ -174,4 +182,6 @@ typedef struct _PacketComm
 	}
 } PacketComm;
 
-
+#ifdef WIN32
+	#pragma pack(pop)
+#endif

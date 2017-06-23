@@ -7,7 +7,7 @@ int main()
 {
 	ServerPlant server;
 	
-	std::cout << "Starting Server" << std::endl;
+	std::cout << "Starting Server: " << SIZE_HEADER_PACKET << std::endl;
 
 	server.start();
 
