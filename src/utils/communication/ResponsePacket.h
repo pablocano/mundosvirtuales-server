@@ -1,11 +1,8 @@
 #pragma once
 
 #include "PacketComm.h"
-#include "Queue.h"
-#include "network/TcpComm.h"
-
-#include <mutex>
-#include <condition_variable>
+#include "../Queue.h"
+#include "../network/TcpComm.h"
 
 /// <summary>
 /// Abstract class allows to response packet.
@@ -38,17 +35,5 @@ public:
 	/// </summary>
 	/// <param name="request">Request packet.</param>
 	/// <returns>Returns response packet if this exist in queue, otherwise a new packet.</returns>
-	PacketComm get_response(PacketComm &request)
-	{
-		std::shared_ptr<PacketComm> response = m_queueResponsePacket.remove(request); // pop response from queue
-		
-		if (response)
-		{
-			return *response;
-		}
-		else
-		{
-			return PacketComm();
-		}
-	}
+	PacketComm get_response(PacketComm &request);
 };

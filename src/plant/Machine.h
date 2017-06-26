@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../utils/serialization\json.h"
+#include "../utils/serialization/json.h"
+#include "../utils/Position.h"
+#include "ModelControl.h"
 #include "MachinePart.h"
 #include <vector>
 #include <string>
@@ -10,7 +12,7 @@ using json = nlohmann::json;
 /// <summary>
 /// Class that contains all the information about a machine.
 /// </summary>
-class Machine
+class Machine : public ModelControl
 {
 public:
 	/// <summary>
@@ -34,6 +36,18 @@ public:
 	/// Destructor
 	/// </summary>
 	~Machine();
+
+	/// <summary>
+	/// Update state machine.
+	/// </summary>
+	void updateState();
+
+	/// <summary>
+	/// Gets output model machine.
+	/// </summary>
+	/// <param name="dt">Delta time</param>
+	/// <returns>Returns model states.</returns>
+	std::vector<float> getOutput(float dt);
 
 	/// <summary>
 	/// All the part that this machine is made of.
@@ -74,6 +88,11 @@ public:
 	/// The unique identifier of this machine.
 	/// </summary>
 	int machine_id;
+
+	/// <summary>
+	/// Position machine.
+	/// </summary>
+	Position position;
 };
 
 /// <summary>

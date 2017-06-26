@@ -1,4 +1,5 @@
 #include "TcpComm.h"
+#include "../logger/Logger.h"
 
 #include <iostream>
 #ifndef WINCE
@@ -59,9 +60,9 @@ SocketServerTCP::SocketServerTCP(int port) : SocketTCP()
 		setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, (char*)&val, sizeof(val));
 		m_address.sin_addr.s_addr = INADDR_ANY;
 		if (bindSocket())
-			std::cerr << "Problem Binding" << std::endl;
+			LOGGER_ERROR("Response Packet Client", "Problem Binding");
 		if (listenSocket())
-			std::cerr << "Problem Listening" << std::endl;
+			LOGGER_ERROR("Response Packet Client", "Problem Listening");
 		if (m_isNonBlock)
 			NON_BLOCK(m_socket); // switch socket to nonblocking
 	}

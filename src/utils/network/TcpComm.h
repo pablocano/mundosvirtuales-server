@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #ifdef WIN32
 
 #ifdef NOMINMAX
@@ -50,9 +52,9 @@ public:
 	/// Gets information about address connection.
 	/// </summary>
 	/// <returns>Returns string with information.</returns>
-	char* getInfo()
+	std::string getInfo()
 	{
-		return inet_ntoa(m_address.sin_addr);
+		return std::string(inet_ntoa(m_address.sin_addr));
 	}
 
 	/// <summary>

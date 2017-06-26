@@ -1,5 +1,5 @@
-#include "SystemCall.h"
-#include "util.h"
+#include "../platform/SystemCall.h"
+#include "../util.h"
 
 #include <functional>
 #include <thread>

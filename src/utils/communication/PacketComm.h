@@ -1,6 +1,6 @@
 #pragma once
 
-#include "security\Cryptography.h"
+#include "../security/Cryptography.h"
 #include <cstring>
 #include <cstdlib>
 #include <memory>

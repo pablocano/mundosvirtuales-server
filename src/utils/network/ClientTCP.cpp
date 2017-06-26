@@ -1,5 +1,5 @@
 #include "ClientTCP.h"
-
+#include "../logger/Logger.h"
 #include <iostream>
 
 ClientTCP::ClientTCP(const char* ip, int port, std::shared_ptr<ResponsePacket> lpProcessPacket, std::function<void(std::shared_ptr<ClientTCP>)> closeClientFn, bool isDetach) : Runnable(isDetach),
@@ -15,13 +15,13 @@ ClientTCP::ClientTCP(int socket, std::shared_ptr<ResponsePacket> lpProcessPacket
 ClientTCP::~ClientTCP()
 {
 	m_tcpComm.closeSocket();
-	std::cout << "Delete Thread Communication Client " << m_tcpComm.getInfo() << std::endl;
+	LOGGER_DEBUG("Client TCP", "Delete Thread Communication Client " + m_tcpComm.getInfo());
 }
 
 void ClientTCP::run()
 {
 	int count_error = 0;
-	std::cout << "Run Client " << m_tcpComm.getInfo() << std::endl;
+	LOGGER_DEBUG("Client TCP", "Run Client " + m_tcpComm.getInfo());
 	char* lpBuffer = nullptr;
 	while (!m_stop)
 	{
@@ -54,19 +54,19 @@ void ClientTCP::run()
 					}
 					else
 					{
-						std::cerr << "Error received Content of Packet" << std::endl;
+						LOGGER_ERROR("Client TCP", "Error received Content of Packet");
 						count_error++;
 					}
 				}
 				else
 				{
-					std::cerr << "Error received Header of Packet" << std::endl;
+					LOGGER_ERROR("Client TCP", "Error received Header of Packet");
 					count_error++;
 				}
 			}
 			else
 			{
-				std::cerr << "Error Version Packet" << std::endl;
+				LOGGER_ERROR("Client TCP", "Error Version Packet");
 				count_error++;
 
 				PacketComm packet;
@@ -87,7 +87,7 @@ void ClientTCP::run()
 			m_stop = true;
 	}
 
-	std::cout << "Stop Communication Client " << m_tcpComm.getInfo() << std::endl;
+	LOGGER_DEBUG("Client TCP", "Stop Communication Client " + m_tcpComm.getInfo());
 	if (lpBuffer)
 		std::free(lpBuffer);
 	

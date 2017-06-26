@@ -2,9 +2,9 @@
 
 #include "TcpComm.h"
 #include "ClientTCP.h"
-#include "../Runnable.h"
+#include "../communication/ResponsePacketServer.h"
+#include "../concurrency/Runnable.h"
 #include "../Queue.h"
-#include "../ResponsePacketServer.h"
 
 /// <summary>
 /// Server TCP handles tcp communication for each remote client.

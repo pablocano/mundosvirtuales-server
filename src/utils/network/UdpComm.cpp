@@ -1,4 +1,5 @@
 #include "UdpComm.h"
+#include "../logger/Logger.h"
 
 #include <iostream>
 #ifdef WIN32
@@ -38,7 +39,7 @@ UdpComm::UdpComm()
 	m_target = (struct sockaddr*)(new struct sockaddr_in);
 
 	if (-1 == m_sock)
-		std::cerr << "Socket invalid" << std::endl;
+		LOGGER_ERROR("Response Packet Client", "Socket invalid");
 }
 
 UdpComm::~UdpComm()
@@ -60,7 +61,7 @@ bool UdpComm::resolve(const char* addrStr, int port, struct sockaddr_in* addr)
 	addr->sin_port = htons(port);
 	if (1 != inet_pton(AF_INET, addrStr, &(addr->sin_addr.s_addr)))
 	{
-		std::cerr << addrStr << " is not a valid dotted ipv4 m_address" << std::endl;
+		LOGGER_ERROR("Response Packet Client", std::string(addrStr) + " is not a valid dotted ipv4 m_address");
 		return false;
 	}
 	return true;
@@ -106,7 +107,7 @@ bool UdpComm::setTTL(const char ttl)
 	int r = setsockopt(m_sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(unsigned char));
 	if (r < 0)
 	{
-		std::cerr << "could not set TTL to " << ttl << std::endl;
+		LOGGER_ERROR("Response Packet Client", std::string("could not set TTL to ") + ttl);
 		return false;
 	}
 	return true;
@@ -119,7 +120,7 @@ bool UdpComm::setLoopback(bool yesno)
 	int r = setsockopt(m_sock, IPPROTO_IP, IP_MULTICAST_LOOP, &val, sizeof(char));
 	if (r < 0)
 	{
-		std::cerr << "could not set ip_multicast_loop to " << val << std::endl;
+		LOGGER_ERROR("Response Packet Client", std::string("could not set ip_multicast_loop to ") + val);
 		return false;
 	}
 	return true;
@@ -145,7 +146,7 @@ bool UdpComm::joinMulticast(const char* addrStr)
 		ifc.ifc_buf = buf;
 		if (ioctl(m_sock, SIOCGIFCONF, &ifc) < 0)
 		{
-			std::cerr << "cannot get interface list" << std::endl;
+			LOGGER_ERROR("Response Packet Client", "cannot get interface list");
 			return false;
 		}
 		else
@@ -164,7 +165,7 @@ bool UdpComm::joinMulticast(const char* addrStr)
 			}
 			if (!could_join)
 			{
-				std::cerr << "join multicast group failed for interface" << std::endl;
+				LOGGER_ERROR("Response Packet Client", "join multicast group failed for interface");
 				return false;
 			}
 		}
@@ -173,7 +174,7 @@ bool UdpComm::joinMulticast(const char* addrStr)
 		struct hostent* pHost;
 		if (gethostname(host, sizeof(host)) < 0 || !(pHost = (struct hostent*)gethostbyname(host)))
 		{
-			std::cerr << "cannot get interface list" << std::endl;
+			LOGGER_ERROR("Response Packet Client", "cannot get interface list");
 			return false;
 		}
 
@@ -188,14 +189,14 @@ bool UdpComm::joinMulticast(const char* addrStr)
 		}
 		if (!couldJoin)
 		{
-			std::cerr << "join multicast group failed for interface" << std::endl;
+			LOGGER_ERROR("Response Packet Client", "join multicast group failed for interface");
 			return false;
 		}
 #endif
 		return true;
 	}
 	else
-		std::cerr << "not a multicast m_address" << std::endl;
+		LOGGER_ERROR("Response Packet Client", "not a multicast m_address");
 	return false;
 }
 
@@ -212,7 +213,7 @@ bool UdpComm::setBroadcast(bool enable)
 	{
 		char errmsg[256];
 		strerror_s(errmsg, 255, errno);
-		std::cerr << "UdpComm::setBroadcast() failed: " << errmsg << std::endl;
+		LOGGER_ERROR("Response Packet Client", std::string("UdpComm::setBroadcast() failed: ") + errmsg);
 		return false;
 	}
 }
@@ -237,7 +238,7 @@ bool UdpComm::setRcvBufSize(unsigned int rcvbuf)
 		return true;
 	}
 
-	std::cerr << "multicast-socket: could not get sockopt SO_RCVBUF" << std::endl;
+	LOGGER_ERROR("Response Packet Client", "multicast-socket: could not get sockopt SO_RCVBUF");
 	return false;
 }
 
@@ -256,24 +257,24 @@ bool UdpComm::bind(const char* addr_str, int port)
 	int r = inet_pton(AF_INET, addr_str, &(addr.sin_addr));
 	if (r <= 0)
 	{
-		std::cerr << "UdpComm::bind() failed: invalid m_address " << addr_str << std::endl;
+		LOGGER_ERROR("Response Packet Client", std::string("UdpComm::bind() failed: invalid m_address ") + addr_str);
 		return false;
 	}
 #endif
 
 #ifdef SO_REUSEADDR
 	if (-1 == setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes)))
-		std::cerr << "UdpComm: could not set SO_REUSEADDR" << std::endl;
+		LOGGER_ERROR("Response Packet Client", "UdpComm: could not set SO_REUSEADDR");
 #endif
 #ifdef SO_REUSEPORT
 	if (-1 == setsockopt(m_sock, SOL_SOCKET, SO_REUSEPORT, (const char*)&yes, sizeof(yes)))
-		std::cerr << "UdpComm: could not set SO_REUSEPORT" << std::endl;
+		LOGGER_ERROR("Response Packet Client", "UdpComm: could not set SO_REUSEPORT");
 #endif
 	if (-1 == ::bind(m_sock, (struct sockaddr*)&addr, sizeof(struct sockaddr_in)))
 	{
 		char errmsg[256];
 		strerror_s(errmsg, 255, errno);
-		std::cout << "UdpComm::bind() failed: " << errmsg << std::endl;
+		LOGGER_ERROR("Response Packet Client", std::string("UdpComm::bind() failed: ") + errmsg);
 		return false;
 	}
 

@@ -1,5 +1,6 @@
 #include "ResponsePacketClient.h"
-#include "serialization/json.h"
+#include "../serialization/json.h"
+#include "../logger/Logger.h"
 
 #include <iostream>
 
@@ -7,32 +8,32 @@ using json = nlohmann::json;
 
 ResponsePacketClientPlant::ResponsePacketClientPlant()
 {
-	std::cout << "Create client" << std::endl;
+	LOGGER_LOG("Response Packet Client", "Create client");
 }
 
 ResponsePacketClientPlant::~ResponsePacketClientPlant()
 {
-	std::cout << "Delete obj client" << std::endl;
+	LOGGER_LOG("Response Packet Client", "Delete obj client");
 }
 
 std::unique_ptr<PacketComm> ResponsePacketClientPlant::process_packet(PacketComm packet, SocketClientTcp& tcpComm)
 {
 	std::unique_ptr<PacketComm> responsePacket = nullptr;
 	
-	std::cout << tcpComm.getInfo() << ":" << std::endl;
+	LOGGER_LOG("Response Packet Client", tcpComm.getInfo() + ":");
 	switch (packet.m_header.m_command)
 	{
 	case Command::CLOSE_CONNECTION:
-		std::cout << "Close Connection" << std::endl;
+		LOGGER_LOG("Response Packet Client", "Close Connection");
 		tcpComm.closeSocket();
 		break;
 	case Command::RESPONSE_COMMAND:
-		std::cout << "RESPONSE" << std::endl;
+		LOGGER_LOG("Response Packet Client", "RESPONSE");
 		m_queueResponsePacket.add(packet);
 		break;
 	case Command::NONE:
 	default:
-		std::cout << "None command" << std::endl;
+		LOGGER_LOG("Response Packet Client", "None command");
 	}
 
 	return responsePacket;

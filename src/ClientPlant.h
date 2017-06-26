@@ -1,10 +1,10 @@
 #pragma once
 
-#include "utils/PacketComm.h"
-#include "utils/Loader.h"
+#include "utils/communication/PacketComm.h"
+#include "utils/communication/ResponsePacketClient.h"
+#include "utils/db/Loader.h"
 #include "utils/network/TcpComm.h"
 #include "utils/network/ClientTCP.h"
-#include "utils/ResponsePacketClient.h"
 
 /// <summary>
 /// Class allows sending requests and responding packets to the server.  

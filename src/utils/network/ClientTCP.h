@@ -1,10 +1,10 @@
 #pragma once
 
 #include "TcpComm.h"
-#include "../PacketComm.h"
 #include "../Queue.h"
-#include "../Runnable.h"
-#include "../ResponsePacket.h"
+#include "../communication/PacketComm.h"
+#include "../communication/ResponsePacket.h"
+#include "../concurrency/Runnable.h"
 
 /// <summary>
 /// Client TCP handles tcp communication with a thread.

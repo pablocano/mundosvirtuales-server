@@ -1,4 +1,5 @@
 #include "SystemCall.h"
+#include "../logger/Logger.h"
 
 #include <thread>
 
@@ -66,9 +67,9 @@ unsigned long long SystemCall::getCurrentThreadTime()
   struct timespec ts;
 
   if(pthread_getcpuclockid(pthread_self(), &cid) == 0)
-	  std::cerr << "Problem pthread get CPU" << std::endl;
+	  LOGGER_ERROR("Response Packet Client", "Problem pthread get CPU");
   if(clock_gettime(cid, &ts) == 0)
-	  std::cerr << "Problem get time" << std::endl;
+	  LOGGER_ERROR("Response Packet Client", "Problem get time");
 
   unsigned long long time = ts.tv_sec * 1000000ll + ts.tv_nsec / 1000;
 
@@ -86,7 +87,7 @@ const char* SystemCall::getHostName()
   {
     static char buf[100] = {0};
     if(!gethostname(buf, sizeof(buf)))
-		std::cerr << "Problem get buffer" << std::endl;
+		LOGGER_ERROR("Response Packet Client", "Problem get buffer");
     hostname = buf;
   }
   return hostname;

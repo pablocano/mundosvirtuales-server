@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ResponsePacket.h"
-#include "Loader.h"
+#include "../db/Loader.h"
 
 /// <summary>
 /// Process incoming packets, if it is necessary, this class makes a query to database for response some packets.   

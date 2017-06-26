@@ -1,5 +1,6 @@
 #include "ClientPlant.h"
-#include "utils/SystemCall.h"
+#include "utils/platform/SystemCall.h"
+#include "utils/logger/Logger.h"
 
 #include <exception>
 
@@ -32,7 +33,7 @@ Machines ClientPlant::requestMachines()
 			}
 			catch (std::exception e)
 			{
-				std::cerr << e.what() << std::endl;
+				LOGGER_ERROR("Response Packet Client", e.what());
 			}
 		}
 			
