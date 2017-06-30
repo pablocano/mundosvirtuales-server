@@ -43,9 +43,9 @@ std::string Loader::get_text_from_path(std::string path_file)
 	return path_file; // TODO: this function must return the content of file.
 }
 
-Machines Loader::load_machines()
+Assemblies Loader::load_machines()
 {
-	Machines machines;
+	Assemblies machines;
 
 	try
 	{
@@ -53,10 +53,10 @@ Machines Loader::load_machines()
 		soci::session sql(db_engine, connectString);
 
 		soci::rowset<soci::row> rows_machines(
-			sql.prepare << "SELECT machines.machines_id AS machine_id, machinetranslation.name AS name, machines.part_number AS part_number, models.path_model AS path_model, models.color AS color, models.animated AS animated, models.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.models_id = machines.Models_models_id) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
+			sql.prepare << "SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, models.path_model AS path_model, models.color AS color, models.animated AS animated, models.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.models_id = machines.Models_models_id) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
 
-		std::map<int, Machine> map_machines;
-		std::map<int, MachineParts> map_parts;
+		std::map<int, Assembly> map_machines;
+		std::map<int, Parts> map_parts;
 
 		std::stringstream strSQL;
 
@@ -69,7 +69,9 @@ Machines Loader::load_machines()
 			std::string info		= it->get<std::string>("info");
 			std::string shortInfo	= it->get<std::string>("shortinfo");
 			std::string pn			= it->get<std::string>("part_number");
-			bool animated			= it->get<int>("animated") != 0;  // TODO: check boolean values
+			bool animated			= it->get<int>("animated") != 0;		// TODO: check boolean values
+			bool canShowInfo		= it->get<int>("canshowinfo") != 0;		// TODO: check boolean values
+			bool canBeSelected		= it->get<int>("canbeselected") != 0;	// TODO: check boolean values
 
 			strSQL.str("");
 			strSQL << "SELECT count(*) FROM partsofmachine WHERE Machines_machines_id = " << part_id;
@@ -83,12 +85,12 @@ Machines Loader::load_machines()
 				strSQL << "SELECT count(*) FROM partsofmachine WHERE Machines_related_machines_id = " << part_id;
 				int n_machines = 0;
 				sql << strSQL.str(), soci::into(n_machines);
-				MachinePart part(part_id, path_model, material, info, shortInfo, pn);
+				Part part(part_id, path_model, material, info, shortInfo, pn);
 				if (n_machines <= 0)
 				{
 					// Create Machine with only one part
-					Machine machine(part_id, path_model, info, shortInfo, pn);
-					machine.machineParts.push_back(part);
+					Assembly machine(part_id, path_model, info, shortInfo, pn, canBeSelected, canShowInfo);
+					machine.parts.push_back(part);
 					map_machines[part_id] = machine;
 				}
 				else
@@ -107,14 +109,14 @@ Machines Loader::load_machines()
 			else
 			{
 				// It's a machine
-				Machine machine(part_id, path_model, info, shortInfo, pn);
+				Assembly machine(part_id, path_model, info, shortInfo, pn, canBeSelected, canShowInfo);
 				map_machines[part_id] = machine;
 			}
 		}
 
 		// Append parts in Machine
 		for (auto machine_id = map_parts.begin(); machine_id != map_parts.end(); ++machine_id)
-			map_machines[machine_id->first].machineParts = machine_id->second;
+			map_machines[machine_id->first].parts = machine_id->second;
 
 		// Added Machines
 		for (auto it = map_machines.begin(); it != map_machines.end(); ++it)

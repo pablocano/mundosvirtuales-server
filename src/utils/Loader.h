@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../plant/Machine.h"
+#include "../plant/Assembly.h"
 
 class Loader
 {
@@ -35,7 +35,7 @@ public:
 
 	void set_language(std::string lang);
 	
-	Machines load_machines();
+	Assemblies load_machines();
 
 protected:
 	std::string get_text_from_path(std::string path_file);

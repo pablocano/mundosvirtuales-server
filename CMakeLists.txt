@@ -25,8 +25,8 @@ set( UTILS_SRC
 	src/utils/network/ClientTCP.cpp
 	src/utils/SystemCall.cpp
 	src/utils/security/Cryptography.cpp
-	src/plant/Machine.cpp
-	src/plant/MachinePart.cpp
+	src/plant/Assembly.cpp
+	src/plant/Part.cpp
 )
 
 set ( UTILS_INCLUDE
@@ -43,8 +43,8 @@ set ( UTILS_INCLUDE
 	src/utils/security/Cryptography.h
 	src/utils/serialization/json.h
 	src/utils/PacketComm.h
-	src/plant/Machine.h
-	src/plant/MachinePart.h
+	src/plant/Assembly.h
+	src/plant/Part.h
 )
 
 if (WIN32)
