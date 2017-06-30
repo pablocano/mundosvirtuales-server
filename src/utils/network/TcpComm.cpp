@@ -1,4 +1,5 @@
 #include "TcpComm.h"
+#include "../logger/Logger.h"
 
 #include <iostream>
 #ifndef WINCE
@@ -48,7 +49,7 @@ public:
 
 #endif
 
-SocketServerTCP::SocketServerTCP(int port)
+SocketServerTCP::SocketServerTCP(int port) : SocketTCP()
 {
 	m_address.sin_family = AF_INET;
 	m_address.sin_port = htons(port);
@@ -59,11 +60,11 @@ SocketServerTCP::SocketServerTCP(int port)
 		setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, (char*)&val, sizeof(val));
 		m_address.sin_addr.s_addr = INADDR_ANY;
 		if (bindSocket())
-			std::cerr << "Problem Binding" << std::endl;
+			LOGGER_ERROR("Response Packet Client", "Problem Binding");
 		if (listenSocket())
-			std::cerr << "Problem Listening" << std::endl;
-
-		NON_BLOCK(m_socket); // switch socket to nonblocking
+			LOGGER_ERROR("Response Packet Client", "Problem Listening");
+		if (m_isNonBlock)
+			NON_BLOCK(m_socket); // switch socket to nonblocking
 	}
 }
 
@@ -94,11 +95,12 @@ bool SocketServerTCP::listenSocket()
 }
 
 SocketClientTcp::SocketClientTcp(const char* ip, int port) :
-	m_bWasConnected(false)
+	m_bWasConnected(false), SocketTCP()
 {
+	m_isNonBlock = true;
 	m_address.sin_family = AF_INET;
 	m_address.sin_port = htons(port);
-	if (ip) // connect as client?
+	if (ip)
 	{
 		struct hostent* he;
 		if ((he = gethostbyname(ip)) == NULL)
@@ -123,8 +125,9 @@ SocketClientTcp::SocketClientTcp(int socketClient) :
 		int addrlen = sizeof(sockaddr_in);
 #endif
 		getpeername(m_socket, (sockaddr*)&m_address, &addrlen);
-
-		NON_BLOCK(m_socket); // switch socket to nonblocking
+		
+		if (m_isNonBlock)
+			NON_BLOCK(m_socket); // switch socket to nonblocking
 	}
 
 	checkConnection();
@@ -150,7 +153,9 @@ bool SocketClientTcp::checkConnection()
 		if (connected())
 		{
 			m_bWasConnected = true;
-			NON_BLOCK(m_socket); // switch socket to nonblocking
+			
+			if (m_isNonBlock)
+				NON_BLOCK(m_socket); // switch socket to nonblocking
 #ifdef MACOSX
 			int yes = 1;
 			if (!setsockopt(m_socket, SOL_SOCKET, SO_NOSIGPIPE, &yes, sizeof(yes)))

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #ifdef WIN32
 
 #ifdef NOMINMAX
@@ -20,23 +22,25 @@
 	#define CLOSE(socket) close(socket)
 #endif
 
-class SocketClientTcp;
-
+/// <summary>
+/// Base class for socket TCP.
+/// </summary>
 class SocketTCP
 {
 protected:
-	sockaddr_in m_address; /**< The socket m_address. */
-	int m_socket; /**< The handle of the basic socket. */
+	sockaddr_in m_address; /* The address connection. */
+	int m_socket; /* The handle of the basic socket. */
+	bool m_isNonBlock; /* If it is true the socket is non-blocking. */
 
 public:
-	/**
-	* Constructor
-	*/
-	SocketTCP() : m_socket(0) {}
+	/// <summary>
+	/// Constructor.
+	/// </summary>
+	SocketTCP() : m_socket(0), m_isNonBlock(false) {}
 
-	/**
-	* The function closes the transfer socket.
-	*/
+	/// <summary>
+	/// Closes the transfer socket.
+	/// </summary>
 	void closeSocket()
 	{
 		if (m_socket > 0)
@@ -44,126 +48,129 @@ public:
 		m_socket = 0;
 	}
 
-	char* getInfo()
+	/// <summary>
+	/// Gets information about address connection.
+	/// </summary>
+	/// <returns>Returns string with information.</returns>
+	std::string getInfo()
 	{
-		return inet_ntoa(m_address.sin_addr);
+		return std::string(inet_ntoa(m_address.sin_addr));
 	}
 
+	/// <summary>
+	/// Gets handle socket.
+	/// </summary>
+	/// <returns>Returns handle socket.</returns>
 	int getSocket() { return m_socket; }
+	
+	/// <summary>
+	/// The function return whether the connection was successful.
+	/// </summary>
+	/// <returns>Returns true if the connection was established, false otherwise.</returns>
+	bool connected() const { return m_socket > 0; }
+
 };
 
+/// <summary>
+/// Class that allows to handle sockets for server deployments.
+/// </summary>
 class SocketServerTCP : public SocketTCP
 {
 public:
-	/**
-	* Constructor.
-	* Opens a TCP connection to a remote host.
-	* @param port The port over which will be communicated.
-	*/
+	/// <summary>
+	/// Constructor.
+	/// Opens a TCP connection to a remote host.
+	/// </summary>
+	/// <param name="port">Port The port over which will be communicated.</param>
 	SocketServerTCP(int port);
 
-	/**
-	* Destructor.
-	*/
+	/// <summary>
+	/// Destructor.
+	/// </summary>
 	~SocketServerTCP();
 
-	/**
-	* Accept Clients
-	* @return Socket client
-	*/
+	/// <summary>
+	/// Accept Clients.
+	/// </summary>
+	/// <returns>Returns socket client.</returns>
 	int acceptClient();
 
-	/**
-	* The function return whether the connection was successful.
-	* @return Was the connection established?
-	*/
-	bool connected() const { return m_socket > 0; }
-
 protected:
-	/**
-	* Binds the socket to an m_address and port number a server call
-	* @return binding on m_address was successful?
-	*/
+
+	/// <summary>
+	/// Binds the socket to an m_address and port number a server call.
+	/// </summary>
+	/// <returns>Returns true if binding on m_address was successful, false otherwise.</returns>
 	bool bindSocket();
 
-	/**
-	* Listens to connecting clients, a server call
-	* @return listening client was successful?
-	*/
+	/// <summary>
+	/// Listens to connecting clients, a server call.
+	/// </summary>
+	/// <returns>Returns true if listening client was successful, false otherwise.</returns>
 	bool listenSocket();
 };
 
 
-/**
- * @class SocketClientTcp
- * The class implements a tcp connection.
- */
+/// <summary>
+/// The class implements a tcp connection with socket.
+/// </summary>
 class SocketClientTcp : public SocketTCP
 {
 private:
-	bool m_bWasConnected; /**< Whether a tranfer connection was established or not */
+	bool m_bWasConnected; /* Whether a tranfer connection was established or not */
 
-	/**
-	* The method checks whether the connection is available.
-	* If not, it tries to reestablish it.
-	* @return Can the connection be used now?
-	*/
+	/// <summary>
+	/// The method checks whether the connection is available.
+	/// If not, it tries to reestablish it.
+	/// </summary>
+	/// <returns>Returns true if the connection can be used now, false otherwise.</returns>
 	bool checkConnection();
 
 public:
-	/**
-	 * Constructor.
-	 * Opens a TCP connection to a remote host.
-	 * @param ip The ip m_address of the communication partner. If 0, the port
-	 *           will be opened as server.
-	 * @param port The port over which will be communicated.
-	 */
+
+	/// <summary>
+	/// Constructor.
+	/// Opens a TCP connection to a remote host.
+	/// </summary>
+	/// <param name="ip">The ip m_address of the communication partner. If 0, the port will be opened as server.</param>
+	/// <param name="port">The port over which will be communicated.</param>
 	SocketClientTcp(const char* ip, int port);
 
-	/**
-	* Constructor.
-	* Opens a TCP connection to a remote host.
-	* @param socket.
-	*/
+	/// <summary>
+	/// Constructor.
+	/// </summary>
+	/// <param name="socketClient">Socket</param>
 	SocketClientTcp(int socketClient);
 
-	/**
-	 * Destructor.
-	 */
+	/// <summary>
+	/// Destructor.
+	/// </summary>
 	~SocketClientTcp();
 
-	/**
-	* The function sends a block of bytes.
-	* It will return immediately unless the send buffer is full.
-	* @param buffer The bytes to send.
-	* @param size The number of bytes to send.
-	* @return Was the data successfully sent?
-	*/
+	/// <summary>
+	/// The function sends a block of bytes.
+	/// It will return immediately unless the send buffer is full.
+	/// </summary>
+	/// <param name="buffer">The bytes to send.</param>
+	/// <param name="size">The number of bytes to send.</param>
+	/// <returns>Returns true if the data was successfully sent, false otherwise.</returns>
 	bool send(const char* buffer, int size);
 
-	/**
-	* The function receives a block of bytes.
-	* @param buffer This buffer will be filled with the bytes to receive.
-	*               It must provide at least "size" bytes.
-	* @param size The number of bytes to receive.
-	* @param wait The method will wait until all bytes have been received.
-	*             However, it can still fail if the connection is broken.
-	* Was the data successfully received?
-	*/
+	/// <summary>
+	/// The function receives a block of bytes.
+	/// </summary>
+	/// <param name="buffer">This buffer will be filled with the bytes to receive. It must provide at least "size" bytes.</param>
+	/// <param name="size">The number of bytes to receive.</param>
+	/// <param name="wait">The method will wait until all bytes have been received. However, it can still fail if the connection is broken.</param>
+	/// <returns>Returns true if the data was successfully received, false otherwise.</returns>
 	bool receive(char* buffer, int size, bool wait = true);
 
-	/**
-	* The function receives a block of bytes using the system call recv().
-	* @param buffer This buffer will be filled with the bytes to receive.
-	* @param size of buffer.
-	* @param flags See RECV(2) manpage.
-	* @return number of bytes received, or -1 on error.
-	*/
+	/// <summary>
+	/// The function receives a block of bytes using the system call recv().
+	/// </summary>
+	/// <param name="buffer">This buffer will be filled with the bytes to receive.</param>
+	/// <param name="size">Size of buffer</param>
+	/// <param name="flags">See RECV(2) manpage.</param>
+	/// <returns>Number of bytes received, or -1 on error.</returns>
 	int receiveSys(void* buffer, unsigned int size, int flags);
-
-	/**
-	* The function return whether the connection was successful.
-	* @return Was the connection established?
-	*/
-	bool connected() const { return m_socket > 0; }
 };

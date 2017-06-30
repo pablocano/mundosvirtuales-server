@@ -1,9 +1,13 @@
 #include "SystemCall.h"
-#include "util.h"
+#include "../logger/Logger.h"
+
+#include <thread>
 
 #include <iostream>
 #ifndef WIN32
 #include <unistd.h>
+#include <pthread.h>
+#include <signal.h>
 #else
 
 #ifdef NOMINMAX
@@ -63,9 +67,9 @@ unsigned long long SystemCall::getCurrentThreadTime()
   struct timespec ts;
 
   if(pthread_getcpuclockid(pthread_self(), &cid) == 0)
-	  std::cerr << "Problem pthread get CPU" << std::endl;
+	  LOGGER_ERROR("Response Packet Client", "Problem pthread get CPU");
   if(clock_gettime(cid, &ts) == 0)
-	  std::cerr << "Problem get time" << std::endl;
+	  LOGGER_ERROR("Response Packet Client", "Problem get time");
 
   unsigned long long time = ts.tv_sec * 1000000ll + ts.tv_nsec / 1000;
 
@@ -83,7 +87,7 @@ const char* SystemCall::getHostName()
   {
     static char buf[100] = {0};
     if(!gethostname(buf, sizeof(buf)))
-		std::cerr << "Problem get buffer" << std::endl;
+		LOGGER_ERROR("Response Packet Client", "Problem get buffer");
     hostname = buf;
   }
   return hostname;
@@ -96,10 +100,16 @@ const char* SystemCall::getHostAddr()
   {
     static char buf[100];
     hostent* hostAddr = (hostent*) gethostbyname(getHostName());
-    if(hostAddr && *hostAddr->h_addr_list)
-      strcpy(buf, inet_ntoa(*(in_addr*) *hostAddr->h_addr_list)); // TODO: change for strcpy_s
-    else
-      strcpy(buf, "127.0.0.1"); // TODO: change for strcpy_s
+	if (hostAddr && *hostAddr->h_addr_list)
+	{
+		char* ipHost = inet_ntoa(*(in_addr*)*hostAddr->h_addr_list);
+		strcpy_s(buf, strlen(ipHost) + 1, ipHost);
+	}
+	else
+	{
+		const char* ipLocalhost = "127.0.0.1";
+		strcpy_s(buf, sizeof(ipLocalhost), ipLocalhost);
+	}
     hostaddr = buf;
   }
   return hostaddr;
@@ -153,5 +163,45 @@ void SystemCall::getLoad(float& mem, float load[3])
     load[2] = float(info.loads[2]) / 65536.f;
     mem = float(info.totalram - info.freeram) / float(info.totalram);
   }
+#endif
+}
+
+
+void SystemCall::killThread(void* lpThread, int exitCode)
+{
+#ifdef WIN32
+	::TerminateThread(lpThread, exitCode);
+	::CloseHandle(lpThread);
+#else
+	pthread_cancel(lpThread);
+#endif
+}
+
+#ifdef WIN32
+unsigned long __stdcall SystemCall::wrapperFunThreadWin(void* fun)
+{
+	((FN_CALLBACK)fun)();
+	return 0;
+}
+#endif
+
+bool SystemCall::createThread(void* lpThread, FN_CALLBACK fun_callback)
+{
+#ifdef WIN32
+	unsigned long threadID;
+	lpThread = ::CreateThread(nullptr, 0, &SystemCall::wrapperFunThreadWin, fun_callback, 0, &threadID);
+	return lpThread != nullptr;
+#else
+	int err = pthread_create(lpThread, nullptr, fun_callback, nullptr);
+	return err == 0;
+#endif
+}
+
+void SystemCall::joinThread(void* lpThread)
+{
+#ifdef WIN32
+	WaitForSingleObject(lpThread, false);
+#else
+	pthread_join(lpThread, nullptr);
 #endif
 }

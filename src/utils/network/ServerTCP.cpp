@@ -1,9 +1,10 @@
 #include "ServerTCP.h"
+#include "../logger/Logger.h"
 
 ServerTCP::ServerTCP(std::string _db_name, std::string _db_user, std::string _db_host, int _db_port, std::string _db_password, std::string _db_engine) :
 	m_lpServerPlant( new ResponsePacketServerPlant(_db_name, _db_user, _db_host, _db_port, _db_password, _db_engine))
 {
-	std::cout << "Create Server" << std::endl;
+	LOGGER_LOG("Server TCP", "Create Server");
 }
 
 ServerTCP::~ServerTCP()
@@ -16,13 +17,13 @@ ServerTCP::~ServerTCP()
 	try { stop(); }
 	catch (...) { /*??*/ }
 
-	std::cout << "Delete Thread Server" << std::endl;
+	LOGGER_LOG("Server TCP", "Delete Thread Server");
 }
 
 void ServerTCP::run()
 {
 	m_lpTcpServer = new SocketServerTCP(PORT_SERVERPLANT);
-	std::cout << "Run Server" << std::endl;
+	LOGGER_LOG("Server TCP", "Run Server");
 	while (!m_stop || exist_client())
 	{
 		int socketClient = 0;
@@ -36,7 +37,7 @@ void ServerTCP::run()
 			lpClient->start();
 		}
 	}
-	std::cout << "Stop Server" << std::endl;
+	LOGGER_LOG("Server TCP", "Stop Server");
 }
 
 bool ServerTCP::exist_client()

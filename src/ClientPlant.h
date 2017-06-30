@@ -1,10 +1,10 @@
 #pragma once
 
-#include "utils/PacketComm.h"
-#include "utils/Loader.h"
+#include "utils/communication/PacketComm.h"
+#include "utils/communication/ResponsePacketClient.h"
+#include "utils/db/Loader.h"
 #include "utils/network/TcpComm.h"
 #include "utils/network/ClientTCP.h"
-#include "utils/ResponsePacketClient.h"
 
 /// <summary>
 /// Class allows sending requests and responding packets to the server.  
@@ -23,7 +23,7 @@ public:
 	/// <summary>
 	/// Gets machines, this function makes request to server.
 	/// </summary>
-	/// <returns>Returns assemblies.</returns>
+	/// <returns>Returns machines.</returns>
 	Assemblies requestMachines();
 
 	static uint32_t m_indexPacketRequest; /* Count request packet. */
