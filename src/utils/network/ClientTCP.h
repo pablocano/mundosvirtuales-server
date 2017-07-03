@@ -2,7 +2,6 @@
 
 #include "TcpComm.h"
 #include "../Queue.h"
-#include "../communication/PacketComm.h"
 #include "../communication/ResponsePacket.h"
 #include "../concurrency/Runnable.h"
 

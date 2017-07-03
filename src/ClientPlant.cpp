@@ -16,7 +16,7 @@ Assemblies ClientPlant::requestMachines()
 	{
 		HeaderPacketComm header;
 		PacketComm packetRequest;
-		packetRequest.m_header.m_command = Command::GET_MACHINES;
+		packetRequest.m_header.m_command = Command::GET_ASSEMBLIES;
 		packetRequest.m_header.m_idResponse = ++ClientPlant::m_indexPacketRequest;
 
 		std::unique_ptr<char[]> packetTCP = packetRequest.packing();

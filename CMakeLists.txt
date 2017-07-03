@@ -31,6 +31,8 @@ set( UTILS_SRC
 	src/plant/Assembly.cpp
 	src/plant/Part.cpp
 	src/plant/ModelControl.cpp
+	src/utils/AssemblyUtils.cpp
+	src/utils/Position.cpp
 	src/utils/Logger/Logger.cpp
 	src/utils/administration/Group.cpp
 	src/utils/administration/Permission.cpp
@@ -52,6 +54,7 @@ set ( UTILS_INCLUDE
 	src/plant/ModelControl.h
 	src/plant/sensors/Sensor.h
 	src/plant/sensors/SensorException.h
+	src/utils/AssemblyUtils.h
 	src/utils/Exception.h
 	src/utils/Logger/Logger.h
 	src/utils/Logger/LoggerException.h

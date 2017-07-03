@@ -9,18 +9,18 @@
 
 using namespace db;
 
-void Row::addRegister(const RegisterValue& registerValue)
+void Row::addRegister(RegisterValue& registerValue)
 {
 	m_registers.push_back(registerValue);
 }
 
 int Row::find_field(std::string fieldName) const
 {
-	auto it = std::find(m_fields.begin(), m_fields.end(), fieldName);
-	if (it == m_fields.end())
+	auto it = std::find(m_lpFields->begin(), m_lpFields->end(), fieldName);
+	if (it == m_lpFields->end())
 		return -1;
 	else
-		return (int) std::distance(m_fields.begin(), it);
+		return (int) std::distance(m_lpFields->begin(), it);
 }
 
 DB::DB(std::string _db_name, std::string _db_user, std::string _db_host, int _db_port, std::string _db_password, std::string _db_engine) :
@@ -97,14 +97,14 @@ Rows DB::query(std::string query) const
 
 	for (auto it = soci_rows.begin(); it != soci_rows.end(); ++it)
 	{
-		Row row(rows.getFields());
+		Row row;
 		for (std::size_t i = 0; i != it->size(); ++i)
 		{
 			const soci::column_properties & props = it->get_properties(i);
 			IndicatorField indicator = (it->get_indicator(i) == soci::i_null) ? IndicatorField::IS_NULL : (it->get_indicator(i) == soci::i_truncated) ? IndicatorField::IS_TRUNCATED : IndicatorField::IS_OK;
 			RegisterValue registerValue;
 
-			switch (rows.getFields()[i].getType())
+			switch ((*rows.getFields())[i].getType())
 			{
 			case TypeData::STRING:
 				registerValue.set<std::string>(it->get<std::string>(i));
@@ -127,7 +127,7 @@ Rows DB::query(std::string query) const
 			}
 
 			registerValue.setIndicator(indicator);
-			registerValue.setFieldData(&rows.getFields()[i]);
+			registerValue.setFieldData(&(*rows.getFields())[i]);
 			row.addRegister(registerValue);
 		}
 

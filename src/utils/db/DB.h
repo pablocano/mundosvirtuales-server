@@ -46,6 +46,11 @@ namespace db
 		{
 			return (m_name == field.m_name) && (m_type == field.m_type);
 		}
+
+		bool operator==(const std::string name)
+		{
+			return m_name == name;
+		}
 	};
 
 	class RegisterValue
@@ -60,13 +65,10 @@ namespace db
 
 		RegisterValue() : m_value(nullptr), m_size(0), m_indicator(IndicatorField::IS_OK), m_fieldData(nullptr) {}
 
-		RegisterValue(RegisterValue& w)
+		RegisterValue(const RegisterValue& w)
 		{
 			m_size = w.m_size;
-			if (m_value)
-				m_value = realloc(m_value, m_size);
-			else
-				m_value = malloc(m_size);
+			m_value = malloc(m_size);
 			m_indicator = w.m_indicator;
 			m_fieldData = w.m_fieldData;
 			memcpy(m_value, w.m_value, m_size);
@@ -74,7 +76,6 @@ namespace db
 
 		RegisterValue(RegisterValue&& w)
 		{
-			if (m_value) free(m_value);
 			m_size = std::move(w.m_size);
 			m_value = std::move(w.m_value);
 			m_indicator = std::move(w.m_indicator);
@@ -86,10 +87,7 @@ namespace db
 		RegisterValue& operator=(const RegisterValue& w)
 		{
 			m_size = w.m_size;
-			if (m_value)
-				m_value = realloc(m_value, m_size);
-			else
-				m_value = malloc(m_size);
+			m_value = malloc(m_size);
 			m_indicator = w.m_indicator;
 			m_fieldData = w.m_fieldData;
 			memcpy(m_value, w.m_value, m_size);
@@ -113,12 +111,37 @@ namespace db
 			memcpy(m_value, static_cast<const void *>(&p), m_size);
 		}
 
-		template<typename T>
-		T& get() const
+		template<>
+		void set<std::string>(const std::string& p)
 		{
-			T& d = *static_cast<T*>(m_value);
+			m_size = (int) p.length() + 1;
+			if (m_value)
+			{
+				m_value = realloc(m_value, m_size);
+			}
+			else
+			{
+				m_value = malloc(m_size);
+			}
+			memcpy(m_value, static_cast<const void *>(p.data()), p.length());
+			*((char *)m_value + p.length()) = '\0';
+		}
+
+		template<typename T>
+		T get() const
+		{
+			T d = *static_cast<T*>(m_value);
 			return d;
 		}
+
+		template<>
+		std::string get<std::string>() const
+		{
+			char* lpS = static_cast<char *>(m_value);
+			std::string s = std::string(lpS);
+			return s;
+		}
+
 
 		IndicatorField getIndicator() const { return m_indicator; }
 
@@ -132,13 +155,32 @@ namespace db
 	class Row
 	{
 	protected:
-		std::vector<FieldData>& m_fields;
+		std::vector<FieldData>* m_lpFields;
 		std::vector<RegisterValue> m_registers;
 
 	public:
-		Row(std::vector<FieldData>& fields) : m_fields(fields), m_registers() {}
+		
+		Row() : m_lpFields(nullptr), m_registers() {}
 
-		void addRegister(const RegisterValue& registerValue);
+		Row(const Row& row)
+		{
+			m_lpFields = row.m_lpFields;
+			m_registers = row.m_registers;
+		}
+
+		Row& operator=(const Row& row)
+		{
+			m_lpFields = row.m_lpFields;
+			m_registers = row.m_registers;
+			return *this;
+		}
+
+		void addRegister(RegisterValue& registerValue);
+
+		void setFieldData(std::vector<FieldData>* fields)
+		{
+			m_lpFields = fields;
+		}
 
 		template<typename T>
 		T get(std::string field, T default = T()) const
@@ -155,15 +197,46 @@ namespace db
 
 	class Rows : public std::vector<Row>
 	{
+	protected:
+		std::vector<FieldData> m_fields;
+		std::vector<Row> m_rows;
+
+		void setFields()
+		{
+			for (auto it = m_rows.begin(); it != m_rows.end(); ++it)
+			{
+				it->setFieldData(&m_fields);
+			}
+		}
+
 	public:
-		Rows() : m_fields() {}
+		Rows() : m_fields(), m_rows() {}
+
+		Rows(const Rows& rows)
+		{
+			m_fields = rows.m_fields;
+			m_rows = rows.m_rows;
+			setFields();
+		}
+
+		Rows& operator=(const Rows& rows)
+		{
+			m_fields = rows.m_fields;
+			m_rows = rows.m_rows;
+			setFields();
+
+			return *this;
+		}
+
+		void push_back(Row& row) { m_rows.push_back(row); m_rows.back().setFieldData(&m_fields); }
+
+		std::vector<Row>::iterator begin() { return m_rows.begin(); }
+
+		std::vector<Row>::iterator end() { return m_rows.end(); }
 
 		void addField(FieldData field);
 
-		std::vector<FieldData>& getFields() { return m_fields; }
-
-	private:
-		std::vector<FieldData> m_fields;
+		std::vector<FieldData>* getFields() { return &m_fields; }
 	};
 
 	class DB

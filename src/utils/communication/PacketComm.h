@@ -1,8 +1,9 @@
 #pragma once
 
+#include "../Position.h"
 #include "../security/Cryptography.h"
 #include "../serialization/json.h"
-#include "../Position.h"
+
 #include <string>
 #include <cstring>
 #include <cstdlib>
@@ -34,15 +35,17 @@ typedef enum _Command
 {
 	NONE,
 	RESPONSE_COMMAND,
+	CLOSE_CONNECTION,
 	GET_INFO_PLANT,
-	GET_MACHINES,
-	GET_LIST_MACHINES,
-	GET_MODEL_MACHINES,
-	GET_INFO_MACHINE,
-	GET_MAINTENANCE_MACHINE,
+	GET_ASSEMBLIES,
+	GET_LIST_ASSEMBLIES,
+	GET_MODEL_ASSEMBLIES,
+	GET_INFO_ASSEMBLIES,
+	GET_MAINTENANCE_ASSEMBLY,
 	GET_LIST_SENSORS,
 	GET_SENSORS,
-	CLOSE_CONNECTION
+	GET_VERSION_ID,
+	UPDATE_ASSEMBLY
 } Command;
 
 /// <summary>
@@ -184,51 +187,6 @@ typedef STRUCT_PACKET _PacketComm
 			(m_header == packet.m_header && (sizeContent() == _sizeContent && strncmp(m_lpContent, packet.m_lpContent, _sizeContent - 1)));
 	}
 } PacketComm;
-
-using json = nlohmann::json;
-
-struct AssemblyRelation
-{
-	int m_id_assembly_parent;
-	int m_id_assembly_son;
-	Position m_position;
-	int m_version;
-
-	AssemblyRelation(int id_assembly_parent, int id_assembly_son) : m_id_assembly_parent(id_assembly_parent), m_id_assembly_son(id_assembly_son), m_position(), m_version() {}
-};
-
-void to_json(json& j, const AssemblyRelation& m)
-{
-	j = json{ { "id_assembly_parent", m.m_id_assembly_parent },{ "id_assembly_son", m.m_id_assembly_son }, { "position", m.m_position }, { "version", m.m_version } };
-}
-
-void from_json(const json& j, AssemblyRelation& m)
-{
-	m.m_id_assembly_parent = j.at("id_assembly_parent").get<int>();
-	m.m_id_assembly_son = j.at("id_assembly_son").get<int>();
-	m.m_position = j.at("position");
-	m.m_version = j.at("version").get<int>();
-}
-
-struct AssemblyComm
-{
-	std::string m_part_number;
-	int m_id_assembly;
-	int m_version;
-	std::vector<AssemblyRelation> m_listAssemblyRelations;
-
-	AssemblyComm() : m_part_number(), m_listAssemblyRelations(), m_id_assembly(), m_version() {}
-};
-
-void to_json(json& j, const AssemblyComm& m)
-{
-
-}
-
-void from_json(const json& j, AssemblyComm& m)
-{
-
-}
 
 #ifdef WIN32
 	#pragma pack(pop)

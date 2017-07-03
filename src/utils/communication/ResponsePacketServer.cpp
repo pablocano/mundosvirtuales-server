@@ -1,5 +1,6 @@
 #include "ResponsePacketServer.h"
 #include "../logger/Logger.h"
+#include "../AssemblyUtils.h"
 
 using json = nlohmann::json;
 
@@ -22,7 +23,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 	case Command::GET_INFO_PLANT:
 		LOGGER_LOG("ResponsePacketServerPlant", "Get info plant");
 		break;
-	case Command::GET_MACHINES:
+	case Command::GET_ASSEMBLIES:
 		LOGGER_LOG("ResponsePacketServerPlant", "Get machines");
 		{
 			HeaderPacketComm header;
@@ -44,16 +45,16 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 			tcpComm.send(packetTCP.get(), responsePacket.size());
 		}
 		break;
-	case Command::GET_LIST_MACHINES:
+	case Command::GET_LIST_ASSEMBLIES:
 		LOGGER_LOG("ResponsePacketServerPlant", "Get list machines");
 		break;
-	case Command::GET_MODEL_MACHINES:
+	case Command::GET_MODEL_ASSEMBLIES:
 		LOGGER_LOG("ResponsePacketServerPlant", "Get model machines");
 		break;
-	case Command::GET_INFO_MACHINE:
+	case Command::GET_INFO_ASSEMBLIES:
 		LOGGER_LOG("ResponsePacketServerPlant", "Get info machine");
 		break;
-	case Command::GET_MAINTENANCE_MACHINE:
+	case Command::GET_MAINTENANCE_ASSEMBLY:
 		LOGGER_LOG("ResponsePacketServerPlant", "Get maintenance");
 		break;
 	case Command::GET_LIST_SENSORS:

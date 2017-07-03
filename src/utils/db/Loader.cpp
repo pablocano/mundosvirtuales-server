@@ -78,7 +78,6 @@ Assemblies Loader::load_machines()
 		std::stringstream strErr;
 		strErr << "Error: " << e.what() << std::endl;
 		std::cerr << strErr.str();
-		// strError = strErr.str();
 	}
 
 	return machines;
