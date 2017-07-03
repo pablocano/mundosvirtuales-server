@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../security/Cryptography.h"
+#include "../serialization/json.h"
+#include "../Position.h"
 #include <cstring>
 #include <cstdlib>
 #include <memory>
@@ -181,6 +183,51 @@ typedef STRUCT_PACKET _PacketComm
 			(m_header == packet.m_header && (sizeContent() == _sizeContent && strncmp(m_lpContent, packet.m_lpContent, _sizeContent - 1)));
 	}
 } PacketComm;
+
+using json = nlohmann::json;
+
+struct AssemblyRelation
+{
+	std::string m_partnumber;
+	int m_id_assembly_parent;
+	int m_id_assembly_son;
+	Position m_position;
+	int m_version;
+
+	AssemblyRelation(int id_assembly_parent, int id_assembly_son) : m_id_assembly_parent(id_assembly_parent), m_id_assembly_son(id_assembly_son), m_position(), m_version() {}
+};
+
+void to_json(json& j, const AssemblyRelation& m)
+{
+	j = json{ { "id_assembly_parent", m.m_id_assembly_parent },{ "id_assembly_son", m.m_id_assembly_son }, { "position", m.m_position }, { "version", m.m_version } };
+}
+
+void from_json(const json& j, AssemblyRelation& m)
+{
+	m.m_id_assembly_parent = j.at("id_assembly_parent").get<int>();
+	m.m_id_assembly_son = j.at("id_assembly_son").get<int>();
+	m.m_position = j.at("position");
+	m.m_version = j.at("version").get<int>();
+}
+
+struct AssemblyComm
+{
+	std::vector<AssemblyRelation> m_listAssemblyRelations;
+	int m_id_assembly;
+	int m_version;
+
+	AssemblyComm() : m_listAssemblyRelations(), m_id_assembly(), m_version() {}
+};
+
+void to_json(json& j, const AssemblyComm& m)
+{
+
+}
+
+void from_json(const json& j, AssemblyComm& m)
+{
+
+}
 
 #ifdef WIN32
 	#pragma pack(pop)

@@ -176,17 +176,35 @@ std::ostream& operator<<(std::ostream& os, const Quaternion<T>& q)
 typedef Quaternion<float>  Quatf;
 typedef Quaternion<double> QuatD;
 
-class Position
+struct Position
 {
-protected:
 	Vectorf3D m_pos;
-	Quatf m_rot;
-
-public:
+	Vectorf3D m_rot;
 
 	Position() : m_pos(), m_rot() {}
-
-	Vectorf3D getPos() { return m_pos; }
-
-	Quatf getRot() { return m_rot; }
 };
+
+using json = nlohmann::json;
+
+void to_json(json& j, const Vectorf3D& m)
+{
+	j = json{ { "x", m.x }, { "y", m.y }, { "z", m.z } };
+}
+
+void from_json(const json& j, Vectorf3D& m)
+{
+	m.x = j.at("x").get<float>();
+	m.y = j.at("y").get<float>();
+	m.z = j.at("z").get<float>();
+}
+
+void to_json(json& j, const Position& m)
+{
+	j = json{ { "position", m.m_pos }, { "rotation", m.m_rot } };
+}
+
+void from_json(const json& j, Position& m)
+{
+	m.m_pos = j.at("position");
+	m.m_rot = j.at("rotation");
+}

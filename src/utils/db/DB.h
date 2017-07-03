@@ -60,10 +60,13 @@ namespace db
 
 		RegisterValue() : m_value(nullptr), m_size(0), m_indicator(IndicatorField::IS_OK), m_fieldData(nullptr) {}
 
-		RegisterValue(const RegisterValue& w)
+		RegisterValue(RegisterValue& w)
 		{
 			m_size = w.m_size;
-			m_value = malloc(m_size);
+			if (m_value)
+				m_value = realloc(m_value, m_size);
+			else
+				m_value = malloc(m_size);
 			m_indicator = w.m_indicator;
 			m_fieldData = w.m_fieldData;
 			memcpy(m_value, w.m_value, m_size);
@@ -76,16 +79,19 @@ namespace db
 			m_value = std::move(w.m_value);
 			m_indicator = std::move(w.m_indicator);
 			m_fieldData = std::move(w.m_fieldData);
-			w.m_size = 0;
 			w.m_value = nullptr;
+			w.m_size = 0;
 		}
 
 		RegisterValue& operator=(const RegisterValue& w)
 		{
 			m_size = w.m_size;
-			m_value = malloc(m_size);
-			m_indicator = std::move(w.m_indicator);
-			m_fieldData = std::move(w.m_fieldData);
+			if (m_value)
+				m_value = realloc(m_value, m_size);
+			else
+				m_value = malloc(m_size);
+			m_indicator = w.m_indicator;
+			m_fieldData = w.m_fieldData;
 			memcpy(m_value, w.m_value, m_size);
 			return *this;
 		}
@@ -132,7 +138,7 @@ namespace db
 	public:
 		Row(std::vector<FieldData>& fields) : m_fields(fields), m_registers() {}
 
-		void addRegister(RegisterValue registerValue);
+		void addRegister(const RegisterValue& registerValue);
 
 		template<typename T>
 		T get(std::string field, T default = T()) const

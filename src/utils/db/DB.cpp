@@ -9,7 +9,7 @@
 
 using namespace db;
 
-void Row::addRegister(RegisterValue registerValue)
+void Row::addRegister(const RegisterValue& registerValue)
 {
 	m_registers.push_back(registerValue);
 }
