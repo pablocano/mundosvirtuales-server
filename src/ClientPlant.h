@@ -24,7 +24,7 @@ public:
 	/// Gets machines, this function makes request to server.
 	/// </summary>
 	/// <returns>Returns machines.</returns>
-	Machines requestMachines();
+	Assemblies requestMachines();
 
 	static uint32_t m_indexPacketRequest; /* Count request packet. */
 };

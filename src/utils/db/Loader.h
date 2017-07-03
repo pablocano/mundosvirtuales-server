@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../../plant/Assembly.h"
 #include "DB.h"
-#include "../../plant/Machine.h"
 
 using namespace db;
 
@@ -13,6 +13,6 @@ protected:
 public:
 	Loader(std::string _db_name, std::string _db_user,  std::string _db_host = "", int _db_port = 5432, std::string _db_password = "", std::string _db_engine = "postgresql");
 	
-	Machines load_machines();
+	Assemblies load_machines();
 
 };

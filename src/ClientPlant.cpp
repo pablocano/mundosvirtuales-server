@@ -8,9 +8,9 @@ using json = nlohmann::json;
 
 uint32_t ClientPlant::m_indexPacketRequest = 0;
 
-Machines ClientPlant::requestMachines()
+Assemblies ClientPlant::requestMachines()
 {
-	Machines machines;
+	Assemblies machines;
 
 	if (m_tcpComm.connected())
 	{

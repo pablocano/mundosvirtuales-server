@@ -8,16 +8,16 @@ Loader::Loader(std::string _db_name, std::string _db_user, std::string _db_host,
 
 }
 
-Machines Loader::load_machines()
+Assemblies Loader::load_machines()
 {
-	Machines machines;
+	Assemblies machines;
 
 	try
 	{
 		Rows rows_machines = m_dataBase.query("SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.id_model = machines.Models_id_model) INNER JOIN modelsversion ON ((models.id_model = modelsversion.Models_id_model) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
 
-		std::map<int, Machine> map_machines;
-		std::map<int, MachineParts> map_parts;
+		std::map<int, Assembly> map_machines;
+		std::map<int, Parts> map_parts;
 
 		for (auto it = rows_machines.begin(); it != rows_machines.end(); ++it)
 		{
@@ -32,19 +32,19 @@ Machines Loader::load_machines()
 			bool canShowInfo		= it->get<bool>("canshowinfo");
 			bool canBeSelected		= it->get<bool>("canbeselected");
 
-			int n_parts = m_dataBase.countQuery("partsofmachine", "Machines_machines_id = " +std::to_string(part_id));
+			int n_parts = m_dataBase.countQuery("partsofmachine", "Machines_machines_id = " + std::to_string(part_id));
 
 			if (n_parts <= 0)
 			{
 				// It's only part
 				int n_machines = m_dataBase.countQuery("partsofmachine", "Machines_related_machines_id = " + std::to_string(part_id));
 
-				MachinePart part(part_id, path_model, material, info, shortInfo, pn);
+				Part part(part_id, path_model, material, info, shortInfo, pn);
 				if (n_machines <= 0)
 				{
 					// Create Machine with only one part
-					Machine machine(part_id, path_model, info, shortInfo, pn, canBeSelected, canShowInfo);
-					machine.machineParts.push_back(part);
+					Assembly machine(part_id, path_model, info, shortInfo, pn, canBeSelected, canShowInfo);
+					machine.parts.push_back(part);
 					map_machines[part_id] = machine;
 				}
 				else
@@ -60,14 +60,14 @@ Machines Loader::load_machines()
 			else
 			{
 				// It's a machine
-				Machine machine(part_id, path_model, info, shortInfo, pn, canBeSelected, canShowInfo);
+				Assembly machine(part_id, path_model, info, shortInfo, pn, canBeSelected, canShowInfo);
 				map_machines[part_id] = machine;
 			}
 		}
 
 		// Append parts in Machine
 		for (auto machine_id = map_parts.begin(); machine_id != map_parts.end(); ++machine_id)
-			map_machines[machine_id->first].machineParts = machine_id->second;
+			map_machines[machine_id->first].parts = machine_id->second;
 
 		// Added Machines
 		for (auto it = map_machines.begin(); it != map_machines.end(); ++it)

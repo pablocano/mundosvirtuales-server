@@ -1,5 +1,4 @@
 #include "ResponsePacketServer.h"
-#include "../logger/Logger.h"
 
 using json = nlohmann::json;
 
@@ -16,14 +15,14 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 {
 	std::unique_ptr<PacketComm> responsePacket = nullptr;
 
-	LOGGER_LOG("ResponsePacketServerPlant", tcpComm.getInfo() + ":");
+	std::cout << tcpComm.getInfo() << ":" << std::endl;
 	switch (packet.m_header.m_command)
 	{
 	case Command::GET_INFO_PLANT:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get info plant");
+		std::cout << "Get info plant" << std::endl;
 		break;
 	case Command::GET_MACHINES:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get machines");
+		std::cout << "Get machines" << std::endl;
 		{
 			HeaderPacketComm header;
 			PacketComm responsePacket;
@@ -38,44 +37,44 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 			responsePacket.m_lpContent = (char*) data.c_str();
 			m_mutexLoader.unlock();
 
-			//LOG("ResponsePacketServerPlant", responsePacket.m_lpContent);
+			//std::cout << responsePacket.m_lpContent << std::endl;
 
 			std::unique_ptr<char[]> packetTCP = responsePacket.packing();
 			tcpComm.send(packetTCP.get(), responsePacket.size());
 		}
 		break;
 	case Command::GET_LIST_MACHINES:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get list machines");
+		std::cout << "Get list machines" << std::endl;
 		break;
 	case Command::GET_MODEL_MACHINES:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get model machines");
+		std::cout << "Get model machines" << std::endl;
 		break;
 	case Command::GET_INFO_MACHINE:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get info machine");
+		std::cout << "Get info machine" << std::endl;
 		break;
 	case Command::GET_MAINTENANCE_MACHINE:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get maintenance");
+		std::cout << "Get maintenance" << std::endl;
 		break;
 	case Command::GET_LIST_SENSORS:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get list sensors");
+		std::cout << "Get list sensors" << std::endl;
 		break;
 	case Command::GET_SENSORS:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get sensors");
+		std::cout << "Get sensors" << std::endl;
 		break;
 	case Command::CLOSE_CONNECTION:
-		LOGGER_LOG("ResponsePacketServerPlant", "Close Connection");
+		std::cout << "Close Connection" << std::endl;
 		break;
 	case Command::RESPONSE_COMMAND:
-		LOGGER_LOG("ResponsePacketServerPlant", "RESPONSE");
+		std::cout << "RESPONSE" << std::endl;
 		m_queueResponsePacket.add(packet);
 		break;
 	case Command::NONE:
 	default:
-		LOGGER_LOG("ResponsePacketServerPlant", "None command");
+		std::cout << "None command" << std::endl;
 	}
 
 	if (packet.sizeContent() > 0)
-		LOGGER_LOG("ResponsePacketServerPlant", packet.m_lpContent);
+		std::cout << packet.m_lpContent << std::endl;
 
 	return responsePacket;
 }

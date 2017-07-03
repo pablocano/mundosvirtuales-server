@@ -28,8 +28,8 @@ set( CLIENT_INCLUDE
 )
 
 set( UTILS_SRC
-	src/plant/Machine.cpp
-	src/plant/MachinePart.cpp
+	src/plant/Assembly.cpp
+	src/plant/Part.cpp
 	src/plant/ModelControl.cpp
 	src/utils/Logger/Logger.cpp
 	src/utils/administration/Group.cpp
@@ -47,8 +47,8 @@ set( UTILS_SRC
 
 set ( UTILS_INCLUDE
 	src/plant/PlantException.h
-	src/plant/Machine.h
-	src/plant/MachinePart.h
+	src/plant/Assembly.h
+	src/plant/Part.h
 	src/plant/ModelControl.h
 	src/plant/sensors/Sensor.h
 	src/plant/sensors/SensorException.h

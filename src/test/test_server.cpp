@@ -17,10 +17,10 @@ void test_server()
 
 	client.start();
 
-	static Machines machines;
+	static Assemblies machines;
 	
 	static Concurrency con([]() -> bool { machines = client.requestMachines(); return machines.size() > 0; },
-		[]() { LOGGER_LOG("Response Packet Client", "Machines:"); for (Machine machine : machines) LOGGER_LOG("Test Server", machine.name); }, 100);
+		[]() { LOGGER_LOG("Response Packet Client", "Machines:"); for (Assembly machine : machines) LOGGER_LOG("Test Server", machine.name); }, 100);
 
 	LOGGER_LOG("Test Server", "Post concurrency");
 	
