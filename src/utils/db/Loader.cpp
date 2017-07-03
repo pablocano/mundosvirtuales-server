@@ -1,46 +1,11 @@
 #include "Loader.h"
 
 #include <iostream>
-#include <sstream>
-
-#include "soci/soci.h"
-#include "soci/soci-config.h"
-#include "soci/postgresql/soci-postgresql.h"
 
 Loader::Loader(std::string _db_name, std::string _db_user, std::string _db_host, int _db_port, std::string _db_password, std::string _db_engine) :
-	db_name(_db_name), db_user(_db_user), db_host(_db_host), db_port(_db_port), db_password(_db_password), db_engine(_db_engine), 
-	current_language_id(1), // Default language
-	strError("")
+	m_dataBase(_db_name, _db_user, _db_host, _db_port, _db_password, _db_engine)
 {
 
-}
-
-std::string Loader::get_str_connection()
-{
-	std::stringstream ss;
-	
-	ss.str("");
-	if (!db_host.empty())
-	{
-		ss << "host=" << db_host << " ";
-		ss << "port=" << db_port << " ";
-	}
-	ss << "dbname=" << db_name << " ";
-	ss << "user=" << db_user;
-	if (!db_password.empty())
-		ss << " password=" << db_password;
-
-	return ss.str();
-}
-
-void Loader::set_language(std::string lang)
-{
-	current_language_id = 1; // TODO: select language from lang argument
-}
-
-std::string Loader::get_text_from_path(std::string path_file)
-{
-	return path_file; // TODO: this function must return the content of file.
 }
 
 Machines Loader::load_machines()
@@ -49,16 +14,10 @@ Machines Loader::load_machines()
 
 	try
 	{
-		std::string connectString = get_str_connection();
-		soci::session sql(db_engine, connectString);
-
-		soci::rowset<soci::row> rows_machines(
-			sql.prepare << "SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.id_model = machines.Models_id_model) INNER JOIN modelsversion ON ((models.id_model = modelsversion.Models_id_model) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
+		Rows rows_machines = m_dataBase.query("SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.id_model = machines.Models_id_model) INNER JOIN modelsversion ON ((models.id_model = modelsversion.Models_id_model) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
 
 		std::map<int, Machine> map_machines;
 		std::map<int, MachineParts> map_parts;
-
-		std::stringstream strSQL;
 
 		for (auto it = rows_machines.begin(); it != rows_machines.end(); ++it)
 		{
@@ -69,22 +28,17 @@ Machines Loader::load_machines()
 			std::string info		= it->get<std::string>("info");
 			std::string shortInfo	= it->get<std::string>("shortinfo");
 			std::string pn			= it->get<std::string>("part_number");
-			bool animated			= it->get<int>("animated") != 0;		// TODO: check boolean values
-			bool canShowInfo		= it->get<int>("canshowinfo") != 0;		// TODO: check boolean values
-			bool canBeSelected		= it->get<int>("canbeselected") != 0;	// TODO: check boolean values
+			bool animated			= it->get<bool>("animated");
+			bool canShowInfo		= it->get<bool>("canshowinfo");
+			bool canBeSelected		= it->get<bool>("canbeselected");
 
-			strSQL.str("");
-			strSQL << "SELECT count(*) FROM partsofmachine WHERE Machines_machines_id = " << part_id;
-			int n_parts = 0;
-			sql << strSQL.str(), soci::into(n_parts);
+			int n_parts = m_dataBase.countQuery("partsofmachine", "Machines_machines_id = " +std::to_string(part_id));
 
 			if (n_parts <= 0)
 			{
 				// It's only part
-				strSQL.str("");
-				strSQL << "SELECT count(*) FROM partsofmachine WHERE Machines_related_machines_id = " << part_id;
-				int n_machines = 0;
-				sql << strSQL.str(), soci::into(n_machines);
+				int n_machines = m_dataBase.countQuery("partsofmachine", "Machines_related_machines_id = " + std::to_string(part_id));
+
 				MachinePart part(part_id, path_model, material, info, shortInfo, pn);
 				if (n_machines <= 0)
 				{
@@ -96,13 +50,10 @@ Machines Loader::load_machines()
 				else
 				{
 					// Save part
-					strSQL.str("");
-					strSQL << "SELECT machines_machines_id FROM partsofmachine WHERE Machines_related_machines_id = " << part_id;
-					std::vector<int> parent_machines(n_machines);
-					sql << strSQL.str(), soci::into(parent_machines);
+					Rows parent_machines = m_dataBase.query("SELECT machines_machines_id FROM partsofmachine WHERE Machines_related_machines_id = " + std::to_string(part_id));
 					for (auto it_machines = parent_machines.begin(); it_machines != parent_machines.end(); ++it_machines)
 					{
-						map_parts[*it_machines].push_back(part);
+						map_parts[it_machines->get<int>("machines_machines_id")].push_back(part);
 					}
 				}
 			}
@@ -127,7 +78,7 @@ Machines Loader::load_machines()
 		std::stringstream strErr;
 		strErr << "Error: " << e.what() << std::endl;
 		std::cerr << strErr.str();
-		strError = strErr.str();
+		// strError = strErr.str();
 	}
 
 	return machines;

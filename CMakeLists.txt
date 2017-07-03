@@ -6,12 +6,14 @@ set( SERVER_SRC
 	src/main.cpp
 	src/ServerPlant.cpp
 	src/utils/communication/ResponsePacketServer.cpp
+	src/utils/db/DB.cpp
 	src/utils/db/Loader.cpp
 )
 
 set( SERVER_INCLUDE
 	src/ServerPlant.h
 	src/utils/communication/ResponsePacketServer.h
+	src/utils/db/DB.h
 	src/utils/db/Loader.h
 )
 
