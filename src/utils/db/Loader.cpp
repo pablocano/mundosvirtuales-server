@@ -1,4 +1,5 @@
 #include "Loader.h"
+#include "../logger/Logger.h"
 
 #include <iostream>
 
@@ -10,16 +11,16 @@ Loader::Loader(std::string _db_name, std::string _db_user, std::string _db_host,
 
 Assemblies Loader::load_machines()
 {
-	Assemblies machines;
+	Assemblies assemblies;
 
 	try
 	{
-		Rows rows_machines = m_dataBase.query("SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.id_model = machines.Models_id_model) INNER JOIN modelsversion ON ((models.id_model = modelsversion.Models_id_model) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
+		Rows rows_assemblies = m_dataBase.query("SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.id_model = machines.Models_id_model) INNER JOIN modelsversion ON ((models.id_model = modelsversion.Models_id_model) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
 
 		std::map<int, Assembly> map_machines;
 		std::map<int, Parts> map_parts;
 
-		for (auto it = rows_machines.begin(); it != rows_machines.end(); ++it)
+		for (auto it = rows_assemblies.begin(); it != rows_assemblies.end(); ++it)
 		{
 			std::vector<int> machine_ids;
 			int part_id				= it->get<int>("machine_id");
@@ -71,14 +72,12 @@ Assemblies Loader::load_machines()
 
 		// Added Machines
 		for (auto it = map_machines.begin(); it != map_machines.end(); ++it)
-			machines.push_back(it->second);
+			assemblies.push_back(it->second);
 	}
 	catch (const std::exception &e)
 	{
-		std::stringstream strErr;
-		strErr << "Error: " << e.what() << std::endl;
-		std::cerr << strErr.str();
+		LOGGER_ERROR("DB", e.what());
 	}
 
-	return machines;
+	return assemblies;
 }

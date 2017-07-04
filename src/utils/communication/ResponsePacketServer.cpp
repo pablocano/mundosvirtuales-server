@@ -39,8 +39,6 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 			responsePacket.m_lpContent = (char*) data.c_str();
 			m_mutexLoader.unlock();
 
-			//LOG("ResponsePacketServerPlant", responsePacket.m_lpContent);
-
 			std::unique_ptr<char[]> packetTCP = responsePacket.packing();
 			tcpComm.send(packetTCP.get(), responsePacket.size());
 		}

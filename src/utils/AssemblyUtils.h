@@ -16,7 +16,7 @@ void to_json(json& j, const AssemblyRelation& m);
 
 void from_json(const json& j, AssemblyRelation& m);
 
-typedef struct _AssemblyComm
+struct AssemblyComm
 {
 	std::string m_part_number;
 	std::string m_name;
@@ -24,8 +24,8 @@ typedef struct _AssemblyComm
 	int m_version;
 	std::vector<AssemblyRelation> m_listAssemblyRelations;
 
-	_AssemblyComm() : m_part_number(), m_listAssemblyRelations(), m_id_assembly(), m_version() {}
-} AssemblyComm;
+	AssemblyComm() : m_part_number(), m_listAssemblyRelations(), m_id_assembly(), m_version() {}
+};
 
 void to_json(json& j, const AssemblyComm& m);
 

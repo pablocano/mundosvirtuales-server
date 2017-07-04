@@ -19,7 +19,7 @@ std::string Logger::getStringDate(std::chrono::system_clock::time_point date)
 	std::time_t t = s.count();
 	std::size_t fractional_seconds = ms.count() % 1000;
 
-	std::strftime(buf, sizeof(buf), "%d-%m-%Y %T", std::localtime(&t));
+	std::strftime(buf, sizeof(buf), "%d-%m-%Y %T", std::localtime(&t)); // TODO: Unsafe variable localtime.
 	return std::string(buf) + ":" + std::to_string(fractional_seconds);
 }
 

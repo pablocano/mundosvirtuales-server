@@ -142,7 +142,6 @@ namespace db
 			return s;
 		}
 
-
 		IndicatorField getIndicator() const { return m_indicator; }
 
 		void setIndicator(IndicatorField indicator) { m_indicator = indicator; }
@@ -150,6 +149,8 @@ namespace db
 		FieldData getFieldData() { return *m_fieldData; }
 
 		void setFieldData(FieldData* field) { m_fieldData = field; }
+
+		std::string getValue() const;
 	};
 
 	class Row
@@ -175,6 +176,14 @@ namespace db
 			return *this;
 		}
 
+		template<typename T>
+		void addRegisterPerValue(const T& value)
+		{
+			RegisterValue registerValue;
+			registerValue.set<T>(value);
+			addRegister(registerValue);
+		}
+
 		void addRegister(RegisterValue& registerValue);
 
 		void setFieldData(std::vector<FieldData>* fields)
@@ -193,9 +202,13 @@ namespace db
 		}
 
 		int find_field(std::string fieldName) const;
+
+		std::string getSQLFieldNames() const;
+
+		std::string getSQLRegisterValues() const;
 	};
 
-	class Rows : public std::vector<Row>
+	class Rows
 	{
 	protected:
 		std::vector<FieldData> m_fields;
@@ -230,9 +243,15 @@ namespace db
 
 		void push_back(Row& row) { m_rows.push_back(row); m_rows.back().setFieldData(&m_fields); }
 
+		Row& back() { return m_rows.back(); }
+
 		std::vector<Row>::iterator begin() { return m_rows.begin(); }
 
 		std::vector<Row>::iterator end() { return m_rows.end(); }
+
+		std::vector<Row>::const_iterator cbegin() const { return m_rows.cbegin(); }
+
+		std::vector<Row>::const_iterator cend() const { return m_rows.cend(); }
 
 		void addField(FieldData field);
 
@@ -259,6 +278,10 @@ namespace db
 		Rows query(std::string query) const;
 
 		int countQuery(std::string table, std::string where) const;
+
+		bool insert(const std::string& table, const Rows& rows);
+
+		bool insert(const std::string& table, const Row& row);
 
 	private:
 		std::string get_text_from_path(std::string path_file) const;

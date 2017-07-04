@@ -2,15 +2,19 @@
 
 #include <iostream>
 #include <sstream>
+#include <ctime>
 
 #include "soci/soci.h"
 #include "soci/soci-config.h"
 #include "soci/postgresql/soci-postgresql.h"
 
+#include "../logger/Logger.h"
+
 using namespace db;
 
 void Row::addRegister(RegisterValue& registerValue)
 {
+	registerValue.setFieldData(&m_lpFields->at(m_registers.size()));
 	m_registers.push_back(registerValue);
 }
 
@@ -21,6 +25,40 @@ int Row::find_field(std::string fieldName) const
 		return -1;
 	else
 		return (int) std::distance(m_lpFields->begin(), it);
+}
+
+std::string Row::getSQLFieldNames() const
+{
+	std::stringstream ss;
+	ss.str("");
+	ss << "(";
+	int pos = 0;
+	for (; pos < m_lpFields->size() - 1; ++pos)
+		ss << m_lpFields->at(pos).getName() << ", ";
+
+	if (pos == m_lpFields->size() - 1)
+		ss << m_lpFields->at(pos).getName();
+
+	ss << ")";
+
+	return ss.str();
+}
+
+std::string Row::getSQLRegisterValues() const
+{
+	std::stringstream ss;
+	ss.str("");
+	ss << "(";
+	int pos = 0;
+	for (; pos < m_registers.size() - 1; ++pos)
+		ss << m_registers.at(pos).getValue() << ", ";
+
+	if (pos == m_registers.size() - 1)
+		ss << m_registers.at(pos).getValue();
+
+	ss << ")";
+
+	return ss.str();
 }
 
 DB::DB(std::string _db_name, std::string _db_user, std::string _db_host, int _db_port, std::string _db_password, std::string _db_engine) :
@@ -97,7 +135,9 @@ Rows DB::query(std::string query) const
 
 	for (auto it = soci_rows.begin(); it != soci_rows.end(); ++it)
 	{
-		Row row;
+		rows.push_back(Row()); // New row
+		Row& row = rows.back(); // Get last added row 
+
 		for (std::size_t i = 0; i != it->size(); ++i)
 		{
 			const soci::column_properties & props = it->get_properties(i);
@@ -130,8 +170,6 @@ Rows DB::query(std::string query) const
 			registerValue.setFieldData(&(*rows.getFields())[i]);
 			row.addRegister(registerValue);
 		}
-
-		rows.push_back(row);
 	}
 
 	return rows;
@@ -152,6 +190,51 @@ int DB::countQuery(std::string table, std::string where) const
 	return counts;
 }
 
+bool DB::insert(const std::string& table, const Rows & rows)
+{
+	try
+	{
+		std::string connectString = get_str_connection();
+		soci::session sql(db_engine, connectString);
+
+		soci::transaction tr(sql);
+
+		for (auto row = rows.cbegin(); row != rows.cend(); ++row)
+		{
+			std::stringstream ss;
+			ss << "insert into " << table << row->getSQLFieldNames() << " values" << row->getSQLRegisterValues() << ";";
+			sql << ss.str();
+		}
+
+		tr.commit();
+		return true;
+	}
+	catch (...)
+	{
+		return false;
+	}
+}
+
+bool DB::insert(const std::string& table, const Row & row)
+{
+	try
+	{
+		std::string connectString = get_str_connection();
+		soci::session sql(db_engine, connectString);
+
+		std::stringstream ss;
+		ss << "insert into " << table << row.getSQLFieldNames() << " values" << row.getSQLRegisterValues() << ";";
+		std::string query = ss.str();
+		sql << query;
+		return true;
+	}
+	catch(const std::exception &e)
+	{
+		LOGGER_ERROR("DB", e.what());
+		return false;
+	}
+}
+
 std::string DB::get_text_from_path(std::string path_file) const
 {
 	return path_file; // TODO: this function must return the content of file.
@@ -160,4 +243,34 @@ std::string DB::get_text_from_path(std::string path_file) const
 void Rows::addField(FieldData field)
 {
 	m_fields.push_back(field);
+}
+
+std::string RegisterValue::getValue() const
+{
+	std::string value;
+	switch (m_fieldData->getType())
+	{
+	case TypeData::STRING:
+		value = "'" + get<std::string>() + "'";
+		break;
+	case TypeData::DOUBLE:
+		value = std::to_string(get<double>());
+		break;
+	case TypeData::INTEGER:
+		value = std::to_string(get<int>());
+		break;
+	case TypeData::UNSIGNED_LONG:
+		value = std::to_string(get<unsigned long>());
+		break;
+	case TypeData::LONG_LONG:
+		value = std::to_string(get<long long>());
+		break;
+	case TypeData::DATE:
+		value = "'" + std::string(std::asctime(&get<std::tm>())) + "'";
+		break;
+	default:
+		return std::string("NULL");
+	}
+
+	return value;
 }
