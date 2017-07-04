@@ -18,8 +18,9 @@ std::string Logger::getStringDate(std::chrono::system_clock::time_point date)
 	std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(ms);
 	std::time_t t = s.count();
 	std::size_t fractional_seconds = ms.count() % 1000;
-
-	std::strftime(buf, sizeof(buf), "%d-%m-%Y %T", std::localtime(&t)); // TODO: Unsafe variable localtime.
+	std::tm tm_time;
+	localtime_s(&tm_time, &t);
+	std::strftime(buf, sizeof(buf), "%d-%m-%Y %T", &tm_time);
 	return std::string(buf) + ":" + std::to_string(fractional_seconds);
 }
 
@@ -33,8 +34,9 @@ void Logger::updateLogger(std::string type, std::chrono::system_clock::time_poin
 
 void Logger::consoleLogger(std::string type, std::chrono::system_clock::time_point date, std::string source, std::string message)
 {
+	static std::string sep = "\t"; // Separator
 	m_mutex.lock();
-	std::cout << "<" << type << "> " << getStringDate(date) << " " << source << " " << m_prompt << " " << message << std::endl;
+	std::cout << "<" << type << ">" << sep << getStringDate(date) << sep << source << sep << m_prompt << sep << message << std::endl;
 	m_mutex.unlock();
 }
 

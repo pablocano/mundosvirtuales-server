@@ -7,14 +7,22 @@ set( SERVER_SRC
 	src/ServerPlant.cpp
 	src/utils/communication/ResponsePacketServer.cpp
 	src/utils/db/DB.cpp
+	src/utils/db/FieldData.cpp
 	src/utils/db/Loader.cpp
+	src/utils/db/RegisterValue.cpp
+	src/utils/db/Row.cpp
+	src/utils/db/Rows.cpp
 )
 
 set( SERVER_INCLUDE
 	src/ServerPlant.h
 	src/utils/communication/ResponsePacketServer.h
 	src/utils/db/DB.h
+	src/utils/db/FieldData.h
 	src/utils/db/Loader.h
+	src/utils/db/RegisterValue.h
+	src/utils/db/Row.h
+	src/utils/db/Rows.h
 )
 
 set( CLIENT_SRC

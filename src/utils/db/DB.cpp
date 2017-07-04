@@ -1,6 +1,7 @@
 #include "DB.h"
 
 #include <iostream>
+#include <cstring>
 #include <sstream>
 #include <ctime>
 
@@ -11,55 +12,6 @@
 #include "../logger/Logger.h"
 
 using namespace db;
-
-void Row::addRegister(RegisterValue& registerValue)
-{
-	registerValue.setFieldData(&m_lpFields->at(m_registers.size()));
-	m_registers.push_back(registerValue);
-}
-
-int Row::find_field(std::string fieldName) const
-{
-	auto it = std::find(m_lpFields->begin(), m_lpFields->end(), fieldName);
-	if (it == m_lpFields->end())
-		return -1;
-	else
-		return (int) std::distance(m_lpFields->begin(), it);
-}
-
-std::string Row::getSQLFieldNames() const
-{
-	std::stringstream ss;
-	ss.str("");
-	ss << "(";
-	int pos = 0;
-	for (; pos < m_lpFields->size() - 1; ++pos)
-		ss << m_lpFields->at(pos).getName() << ", ";
-
-	if (pos == m_lpFields->size() - 1)
-		ss << m_lpFields->at(pos).getName();
-
-	ss << ")";
-
-	return ss.str();
-}
-
-std::string Row::getSQLRegisterValues() const
-{
-	std::stringstream ss;
-	ss.str("");
-	ss << "(";
-	int pos = 0;
-	for (; pos < m_registers.size() - 1; ++pos)
-		ss << m_registers.at(pos).getValue() << ", ";
-
-	if (pos == m_registers.size() - 1)
-		ss << m_registers.at(pos).getValue();
-
-	ss << ")";
-
-	return ss.str();
-}
 
 DB::DB(std::string _db_name, std::string _db_user, std::string _db_host, int _db_port, std::string _db_password, std::string _db_engine) :
 	db_name(_db_name), db_user(_db_user), db_host(_db_host), db_port(_db_port), db_password(_db_password), db_engine(_db_engine),
@@ -238,39 +190,4 @@ bool DB::insert(const std::string& table, const Row & row)
 std::string DB::get_text_from_path(std::string path_file) const
 {
 	return path_file; // TODO: this function must return the content of file.
-}
-
-void Rows::addField(FieldData field)
-{
-	m_fields.push_back(field);
-}
-
-std::string RegisterValue::getValue() const
-{
-	std::string value;
-	switch (m_fieldData->getType())
-	{
-	case TypeData::STRING:
-		value = "'" + get<std::string>() + "'";
-		break;
-	case TypeData::DOUBLE:
-		value = std::to_string(get<double>());
-		break;
-	case TypeData::INTEGER:
-		value = std::to_string(get<int>());
-		break;
-	case TypeData::UNSIGNED_LONG:
-		value = std::to_string(get<unsigned long>());
-		break;
-	case TypeData::LONG_LONG:
-		value = std::to_string(get<long long>());
-		break;
-	case TypeData::DATE:
-		value = "'" + std::string(std::asctime(&get<std::tm>())) + "'";
-		break;
-	default:
-		return std::string("NULL");
-	}
-
-	return value;
 }
