@@ -1,3 +1,4 @@
+#include "utils/db/DBAdapterSOCI.h"
 #include "utils/platform/SystemCall.h"
 #include "utils/logger/Logger.h"
 #include "utils/util.h"
@@ -10,7 +11,7 @@ void observerLogDataBase(std::string type, std::chrono::system_clock::time_point
 {
 	using namespace db;
 
-	static DB dataBase("proter", "postgres", "127.0.0.1", 5432, "test123");
+	static DBAdapterSOCI dataBase("proter", "postgres", "127.0.0.1", 5432, "test123");
 
 	Row row;
 	std::vector<FieldData> fieldData;
@@ -34,7 +35,8 @@ void observerLogDataBase(std::string type, std::chrono::system_clock::time_point
 
 int main()
 {
-	ServerPlant server("proter", "postgres", "127.0.0.1", 5432, "test123");
+	DBAdapterSOCI dataBase("proter", "postgres", "127.0.0.1", 5432, "test123");
+	ServerPlant server(&dataBase);
 
 	LOGGER_ADD_OBSERVER(observerLogDataBase);
 	

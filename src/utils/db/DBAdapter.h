@@ -9,9 +9,9 @@
 namespace db
 {
 	/// <summary>
-	/// This class allows send and receive queries to remote database.
+	/// Abstract class allows send and receive queries to remote database.
 	/// </summary>
-	class DB
+	class DBAdapter
 	{
 	protected:
 		std::string db_user; /* User database. */
@@ -24,19 +24,19 @@ namespace db
 		int current_language_id; /* Current language. */
 
 	public:
-		DB(std::string _db_name, std::string _db_user, std::string _db_host = "", int _db_port = 5432, std::string _db_password = "", std::string _db_engine = "postgresql");
+		DBAdapter(std::string _db_name, std::string _db_user, std::string _db_host = "", int _db_port = 5432, std::string _db_password = "", std::string _db_engine = "postgresql");
 
 		void set_language(std::string lang);
 
-		Rows query(std::string query) const;
+		virtual Rows query(std::string query) const = 0;
 
-		int countQuery(std::string table, std::string where) const;
+		virtual int countQuery(std::string table, std::string where) const = 0;
 
-		bool insert(const std::string& table, const Rows& rows);
+		virtual bool insert(const std::string& table, const Rows& rows) = 0;
 
-		bool insert(const std::string& table, const Row& row);
+		virtual bool insert(const std::string& table, const Row& row) = 0;
 
-	private:
+	protected:
 		std::string get_text_from_path(std::string path_file) const;
 
 		std::string get_str_connection() const; /* returns string connection for library SOCI */

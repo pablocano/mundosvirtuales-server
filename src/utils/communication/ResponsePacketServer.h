@@ -23,7 +23,7 @@ public:
 	/// <param name="_db_port">Port remote host.</param>
 	/// <param name="_db_password">Password user database.</param>
 	/// <param name="_db_engine">Engine database (default: PostgreSQL).</param>
-	ResponsePacketServerPlant(std::string _db_name, std::string _db_user, std::string _db_host = "", int _db_port = 5432, std::string _db_password = "", std::string _db_engine = "postgresql");
+	ResponsePacketServerPlant(DBAdapter* lpDBAdapter);
 	
 	/// <summary>
 	/// Destructor.

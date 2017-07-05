@@ -1,8 +1,8 @@
 #include "ServerTCP.h"
 #include "../logger/Logger.h"
 
-ServerTCP::ServerTCP(std::string _db_name, std::string _db_user, std::string _db_host, int _db_port, std::string _db_password, std::string _db_engine) :
-	m_lpServerPlant( new ResponsePacketServerPlant(_db_name, _db_user, _db_host, _db_port, _db_password, _db_engine))
+ServerTCP::ServerTCP(DBAdapter* lpDBAdapter) :
+	m_lpServerPlant( new ResponsePacketServerPlant(lpDBAdapter))
 {
 	LOGGER_LOG("Server TCP", "Create Server");
 }

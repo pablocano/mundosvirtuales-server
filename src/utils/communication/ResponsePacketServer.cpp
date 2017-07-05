@@ -4,8 +4,7 @@
 
 using json = nlohmann::json;
 
-ResponsePacketServerPlant::ResponsePacketServerPlant(std::string _db_name, std::string _db_user, std::string _db_host, int _db_port, std::string _db_password, std::string _db_engine) :
-	m_loader(_db_name, _db_user, _db_host, _db_port, _db_password, _db_engine)
+ResponsePacketServerPlant::ResponsePacketServerPlant(DBAdapter* lpDBAdapter) : m_loader(lpDBAdapter)
 {
 }
 

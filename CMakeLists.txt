@@ -6,20 +6,28 @@ set( SERVER_SRC
 	src/main.cpp
 	src/ServerPlant.cpp
 	src/utils/communication/ResponsePacketServer.cpp
-	src/utils/db/DB.cpp
-	src/utils/db/FieldData.cpp
+	src/utils/db/DBAdapterSOCI.cpp
 	src/utils/db/Loader.cpp
-	src/utils/db/RegisterValue.cpp
-	src/utils/db/Row.cpp
-	src/utils/db/Rows.cpp
 )
 
 set( SERVER_INCLUDE
 	src/ServerPlant.h
 	src/utils/communication/ResponsePacketServer.h
-	src/utils/db/DB.h
-	src/utils/db/FieldData.h
+	src/utils/db/DBAdapterSOCI.h
 	src/utils/db/Loader.h
+)
+
+set( DB_SRC
+	src/utils/db/DBAdapter.cpp
+	src/utils/db/FieldData.cpp
+	src/utils/db/RegisterValue.cpp
+	src/utils/db/Row.cpp
+	src/utils/db/Rows.cpp
+)
+
+set( DB_INCLUDE
+	src/utils/db/DBAdapter.h
+	src/utils/db/FieldData.h
 	src/utils/db/RegisterValue.h
 	src/utils/db/Row.h
 	src/utils/db/Rows.h
@@ -117,7 +125,7 @@ SET(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
 find_package (Threads REQUIRED)
 
-add_library( utilsCore ${UTILS_SRC} ${UTILS_INCLUDE})
+add_library( utilsCore ${UTILS_SRC} ${DB_SRC} ${UTILS_INCLUDE} ${DB_INCLUDE} )
 if(WIN32)
 	# Include winmm for timeGetTime function, wsock32 and ws2_32 for socket windows.
 	target_link_libraries( utilsCore "${LIBSOCI_LIB}/$(Configuration)/soci_core_4_0.lib" "${LIBSOCI_LIB}/$(Configuration)/soci_postgresql_4_0.lib" wsock32 ws2_32 winmm)

@@ -5,6 +5,7 @@
 #include "../Queue.h"
 #include "../communication/ResponsePacketServer.h"
 #include "../concurrency/Runnable.h"
+#include "../db/DBAdapter.h"
 
 /// <summary>
 /// Server TCP handles tcp communication for each remote client.
@@ -34,7 +35,7 @@ public:
 	/// <param name="_db_port">Port remote host.</param>
 	/// <param name="_db_password">Password user database.</param>
 	/// <param name="_db_engine">Engine database (default: PostgreSQL).</param>
-	ServerTCP(std::string _db_name, std::string _db_user, std::string _db_host = "", int _db_port = 5432, std::string _db_password = "", std::string _db_engine = "postgresql");
+	ServerTCP(DBAdapter* lpDBAdapter);
 	
 	/// <summary>
 	/// Destructor.

@@ -3,10 +3,8 @@
 
 #include <iostream>
 
-Loader::Loader(std::string _db_name, std::string _db_user, std::string _db_host, int _db_port, std::string _db_password, std::string _db_engine) :
-	m_dataBase(_db_name, _db_user, _db_host, _db_port, _db_password, _db_engine)
+Loader::Loader(DBAdapter* lpDataBase) : m_lpDataBase(lpDataBase)
 {
-
 }
 
 Assemblies Loader::load_machines()
@@ -15,7 +13,7 @@ Assemblies Loader::load_machines()
 
 	try
 	{
-		Rows rows_assemblies = m_dataBase.query("SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.id_model = machines.Models_id_model) INNER JOIN modelsversion ON ((models.id_model = modelsversion.Models_id_model) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
+		Rows rows_assemblies = m_lpDataBase->query("SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.id_model = machines.Models_id_model) INNER JOIN modelsversion ON ((models.id_model = modelsversion.Models_id_model) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
 
 		std::map<int, Assembly> map_machines;
 		std::map<int, Parts> map_parts;
@@ -33,12 +31,12 @@ Assemblies Loader::load_machines()
 			bool canShowInfo		= it->get<bool>("canshowinfo");
 			bool canBeSelected		= it->get<bool>("canbeselected");
 
-			int n_parts = m_dataBase.countQuery("partsofmachine", "Machines_machines_id = " + std::to_string(part_id));
+			int n_parts = m_lpDataBase->countQuery("partsofmachine", "Machines_machines_id = " + std::to_string(part_id));
 
 			if (n_parts <= 0)
 			{
 				// It's only part
-				int n_machines = m_dataBase.countQuery("partsofmachine", "Machines_related_machines_id = " + std::to_string(part_id));
+				int n_machines = m_lpDataBase->countQuery("partsofmachine", "Machines_related_machines_id = " + std::to_string(part_id));
 
 				Part part(part_id, path_model, material, info, shortInfo, pn);
 				if (n_machines <= 0)
@@ -51,7 +49,7 @@ Assemblies Loader::load_machines()
 				else
 				{
 					// Save part
-					Rows parent_machines = m_dataBase.query("SELECT machines_machines_id FROM partsofmachine WHERE Machines_related_machines_id = " + std::to_string(part_id));
+					Rows parent_machines = m_lpDataBase->query("SELECT machines_machines_id FROM partsofmachine WHERE Machines_related_machines_id = " + std::to_string(part_id));
 					for (auto it_machines = parent_machines.begin(); it_machines != parent_machines.end(); ++it_machines)
 					{
 						map_parts[it_machines->get<int>("machines_machines_id")].push_back(part);
@@ -76,7 +74,7 @@ Assemblies Loader::load_machines()
 	}
 	catch (const std::exception &e)
 	{
-		LOGGER_ERROR("DB", e.what());
+		LOGGER_ERROR("DBAdapter", e.what());
 	}
 
 	return assemblies;
