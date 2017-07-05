@@ -4,7 +4,7 @@
 
 using json = nlohmann::json;
 
-ResponsePacketServerPlant::ResponsePacketServerPlant(DBAdapter* lpDBAdapter) : m_loader(lpDBAdapter)
+ResponsePacketServerPlant::ResponsePacketServerPlant(DBAdapter* lpDBAdapter) : m_lpDBAdapter(lpDBAdapter)
 {
 }
 
@@ -25,21 +25,12 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 	case Command::GET_ASSEMBLIES:
 		LOGGER_LOG("ResponsePacketServerPlant", "Get machines");
 		{
-			HeaderPacketComm header;
-			PacketComm responsePacket;
-			responsePacket.m_header.m_command = Command::RESPONSE_COMMAND;
-			responsePacket.m_header.m_idResponse = packet.m_header.m_idResponse;
-			responsePacket.m_header.m_statusComm = StatusServer::NORMAL;
-
-			m_mutexLoader.lock();
-			Assemblies machines = m_loader.load_machines();
+			Assemblies machines = Assembly::loadFromDB(m_lpDBAdapter);
+			
 			json j = json{ {"machines", machines} };
 			std::string data = j.dump();
-			responsePacket.m_lpContent = (char*) data.c_str();
-			m_mutexLoader.unlock();
 
-			std::unique_ptr<char[]> packetTCP = responsePacket.packing();
-			tcpComm.send(packetTCP.get(), responsePacket.size());
+			sendResponse(tcpComm, packet, (char*)data.c_str());
 		}
 		break;
 	case Command::GET_LIST_ASSEMBLIES:
@@ -62,6 +53,18 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 		break;
 	case Command::CLOSE_CONNECTION:
 		LOGGER_LOG("ResponsePacketServerPlant", "Close Connection");
+		break;
+	case Command::GET_VERSION_ID:
+		LOGGER_LOG("ResponsePacketServerPlant", "Get Version ID");
+		{
+			sendResponse(tcpComm, packet, nullptr, StatusServer::OK_RESPONSE);
+		}
+		break;
+	case Command::UPDATE_ASSEMBLY:
+		LOGGER_LOG("ResponsePacketServerPlant", "Get Version ID");
+		{
+			sendResponse(tcpComm, packet, nullptr, StatusServer::OK_RESPONSE);
+		}
 		break;
 	case Command::RESPONSE_COMMAND:
 		LOGGER_LOG("ResponsePacketServerPlant", "RESPONSE");

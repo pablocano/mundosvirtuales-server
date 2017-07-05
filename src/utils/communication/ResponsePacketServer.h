@@ -1,7 +1,10 @@
 #pragma once
 
 #include "ResponsePacket.h"
-#include "../db/Loader.h"
+#include "../db/DBAdapter.h"
+#include "../../plant/Assembly.h"
+
+using namespace db;
 
 /// <summary>
 /// Process incoming packets, if it is necessary, this class makes a query to database for response some packets.   
@@ -9,9 +12,7 @@
 class ResponsePacketServerPlant : public ResponsePacket
 {
 protected:
-	Loader m_loader; /* This object allows to make queries to database. */
-	std::mutex m_mutexLoader; /* Mutex for uses object loader. */
-	std::condition_variable m_condvLoader; /* Condition for uses object loader. */
+	DBAdapter* m_lpDBAdapter; /* This object allows to make queries to database. */
 
 public:
 	/// <summary>

@@ -1,11 +1,20 @@
 #pragma once
 
 #include "../utils/serialization/json.h"
+#include "../utils/db/DBAdapter.h"
 #include "Part.h"
 #include <vector>
 #include <string>
 
 using json = nlohmann::json;
+using namespace db;
+
+class Assembly;
+
+/// <summary>
+/// Definition of a vector of assemblies.
+/// </summary>
+typedef std::vector<Assembly> Assemblies;
 
 /// <summary>
 /// Class that contains all the information about an assembly. An assembly is made of sub-assemblies and parts
@@ -34,6 +43,8 @@ public:
 	/// Destructor
 	/// </summary>
 	~Assembly();
+
+	static Assemblies loadFromDB(DBAdapter* m_lpDataBase);
 
 	/// <summary>
 	/// All the sub-assemblies of this assembly
@@ -80,11 +91,6 @@ public:
 	/// </summary>
 	int assembly_id;
 };
-
-/// <summary>
-/// Definition of a vector of assemblies.
-/// </summary>
-typedef std::vector<Assembly> Assemblies;
 
 /// <summary>
 /// Return a json representation of the assembly class.

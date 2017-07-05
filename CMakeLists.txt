@@ -7,14 +7,12 @@ set( SERVER_SRC
 	src/ServerPlant.cpp
 	src/utils/communication/ResponsePacketServer.cpp
 	src/utils/db/DBAdapterSOCI.cpp
-	src/utils/db/Loader.cpp
 )
 
 set( SERVER_INCLUDE
 	src/ServerPlant.h
 	src/utils/communication/ResponsePacketServer.h
 	src/utils/db/DBAdapterSOCI.h
-	src/utils/db/Loader.h
 )
 
 set( DB_SRC

@@ -36,4 +36,14 @@ public:
 	/// <param name="request">Request packet.</param>
 	/// <returns>Returns response packet if this exist in queue, otherwise a new packet.</returns>
 	PacketComm get_response(PacketComm &request);
+
+	/// <summary>
+	/// Sends response packet.
+	/// </summary>
+	/// <param name="tcpComm">Socket TCP.</param>
+	/// <param name="packet">Packet that is necessary to answer.</param>
+	/// <param name="lpContent">Packet Content to send as response.</param>
+	/// <param name="statusServer">Status of server.</param>
+	/// <returns></returns>
+	bool sendResponse(SocketClientTcp& tcpComm, PacketComm& packet, char* lpContent = nullptr, StatusServer statusServer = StatusServer::NORMAL);
 };
