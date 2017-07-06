@@ -124,9 +124,16 @@ typedef STRUCT_PACKET _PacketComm
 	{
 		int _sizeContent = 0;
 		if (m_lpContent)
-			_sizeContent = ((int)strlen(m_lpContent)) + 1;
+		{
+			int n = (int)strlen(m_lpContent);
+			if (n > 1) // discard empty string.
+			{
+				_sizeContent = n + 1; // Added '\0' character.
+				_sizeContent += _sizeContent % 4; // Adds padding for encryptation.
+			}
+		}
 
-		return _sizeContent > 1 ? _sizeContent : 0;
+		return _sizeContent;
 	}
 
 	/// <summary>
@@ -135,7 +142,7 @@ typedef STRUCT_PACKET _PacketComm
 	/// <returns>Returns smart pointer with data Packet (header + payload).</returns>
 	std::unique_ptr<char[]> packing()
 	{
-		std::unique_ptr<char[]> p(new char[size()]);
+		std::unique_ptr<char[]> p((char *)std::calloc(size(), sizeof(char)));
 		uint32_t key[4] = KEY_CRYPT;
 		m_header.m_size = sizeContent();
 		std::memcpy(p.get(), &m_header, SIZE_HEADER_PACKET);
@@ -144,11 +151,11 @@ typedef STRUCT_PACKET _PacketComm
 		if (m_header.m_size > 0)
 		{
 			char* lpContent = p.get() + SIZE_HEADER_PACKET;
-			std::memcpy(lpContent, m_lpContent, m_header.m_size);
-			Cryptography::encrypt((uint32_t*)lpContent, (m_header.m_size - 1) / 4, key);
+			std::memcpy(lpContent, m_lpContent, (int)strlen(m_lpContent));
+			Cryptography::encrypt((uint32_t*)lpContent, m_header.m_size / 4, key);
 		}
 #else
-		std::memcpy(p.get() + SIZE_HEADER_PACKET, m_lpContent, m_header.m_size);
+		std::memcpy(p.get() + SIZE_HEADER_PACKET, m_lpContent, (int)strlen(m_lpContent) + 1);
 #endif
 
 		return p;
@@ -170,7 +177,7 @@ typedef STRUCT_PACKET _PacketComm
 #ifdef COMM_ENCRYPTED
 		if (packet.m_header.m_size > 0)
 		{
-			Cryptography::decrypt((uint32_t*)packet.m_lpContent, (packet.m_header.m_size - 1) / 4, key);
+			Cryptography::decrypt((uint32_t*)packet.m_lpContent, packet.m_header.m_size / 4, key);
 		}
 #endif
 

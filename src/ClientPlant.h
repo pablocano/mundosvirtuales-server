@@ -2,9 +2,9 @@
 
 #include "utils/communication/PacketComm.h"
 #include "utils/communication/ResponsePacketClient.h"
-#include "utils/db/Loader.h"
 #include "utils/network/TcpComm.h"
 #include "utils/network/ClientTCP.h"
+#include "plant/Assembly.h"
 
 /// <summary>
 /// Class allows sending requests and responding packets to the server.  

@@ -25,7 +25,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 	case Command::GET_ASSEMBLIES:
 		LOGGER_LOG("ResponsePacketServerPlant", "Get machines");
 		{
-			Assemblies machines = Assembly::loadFromDB(m_lpDBAdapter);
+			Assemblies machines = Assembly::loadAssembliesFromDB(m_lpDBAdapter);
 			
 			json j = json{ {"machines", machines} };
 			std::string data = j.dump();
@@ -57,13 +57,43 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 	case Command::GET_VERSION_ID:
 		LOGGER_LOG("ResponsePacketServerPlant", "Get Version ID");
 		{
-			sendResponse(tcpComm, packet, nullptr, StatusServer::OK_RESPONSE);
+			try
+			{
+				json parseJSON = json::parse(packet.m_lpContent);
+				int version = parseJSON.at("version").get<int>();
+				int assembly_id = parseJSON.at("id").get<int>();
+				
+				json j = json{ { "version", version + 1 }, { "id", assembly_id } };
+				std::string data = j.dump();
+				
+				sendResponse(tcpComm, packet, (char *) data.c_str(), StatusServer::OK_RESPONSE);
+			}
+			catch (const std::exception &e)
+			{
+				LOGGER_ERROR("ResponsePacketServerPlant", e.what());
+				sendResponse(tcpComm, packet, nullptr, StatusServer::ERROR_RESPONSE);
+			}
 		}
 		break;
 	case Command::UPDATE_ASSEMBLY:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get Version ID");
+		LOGGER_LOG("ResponsePacketServerPlant", "Update Assembly");
 		{
-			sendResponse(tcpComm, packet, nullptr, StatusServer::OK_RESPONSE);
+			try
+			{
+				/*json parseJSON = json::parse(packet.m_lpContent);
+				int version = parseJSON.at("version").get<int>();
+				int assembly_id = parseJSON.at("id").get<int>();
+
+				json j = json{ { "version", version + 1 },{ "id", assembly_id } };
+				std::string data = j.dump();*/
+
+				sendResponse(tcpComm, packet, nullptr, StatusServer::OK_RESPONSE);
+			}
+			catch (const std::exception &e)
+			{
+				LOGGER_ERROR("ResponsePacketServerPlant", e.what());
+				sendResponse(tcpComm, packet, nullptr, StatusServer::ERROR_RESPONSE);
+			}
 		}
 		break;
 	case Command::RESPONSE_COMMAND:

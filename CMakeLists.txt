@@ -62,9 +62,10 @@ set( UTILS_SRC
 )
 
 set ( UTILS_INCLUDE
-	src/plant/PlantException.h
 	src/plant/Assembly.h
+	src/plant/ObjectPlant.h
 	src/plant/Part.h
+	src/plant/PlantException.h
 	src/plant/ModelControl.h
 	src/plant/sensors/Sensor.h
 	src/plant/sensors/SensorException.h

@@ -1,7 +1,7 @@
 INSERT INTO Language (language_id, iso_country_code, iso_language_code, codepage)
 VALUES (1, 'es_CL', 'CL', 'ISO-8859-1');
 
-INSERT INTO models (id_model, current_version)
+INSERT INTO models (model_id, current_version)
 VALUES (1, 1),
 (2, 1),
 (3, 1),
@@ -255,7 +255,7 @@ VALUES (1, 0, 0, 0, 0, 0, 0),
 (167, 0, 0, 0, 0, 0, 0),
 (168, 0, 0, 0, 0, 0, 0);
 
-INSERT INTO modelsversion (Models_id_model, PositionEntity_position_entity_id, version, animated, created_at, path_model, color, material)
+INSERT INTO modelsversion (Models_model_id, PositionEntity_position_entity_id, version, animated, created_at, path_model, color, material)
 VALUES (1, 1, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__Accesorios_B4_TRed.Planta-05102017_Bombas_y_tuberias__Accesorios_B4_TRed', 'DarkGray', 'Metal'),
 (2, 2, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__Accesorios_B5_codo.Planta-05102017_Bombas_y_tuberias__Accesorios_B5_codo', 'DarkGray', 'Metal'),
 (3, 3, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__Accesorios_B6.Planta-05102017_Bombas_y_tuberias__Accesorios_B6', 'Gray', 'Metal'),
@@ -340,7 +340,7 @@ VALUES (1, 1, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__
 (82, 82, 1, false, now(), '/Game/Proter/Planta-05102017_Planta__PISO.Planta-05102017_Planta__PISO', 'Yellow', 'Metal');
 
 
-INSERT INTO machines (part_number, Models_id_model, canShowInfo, canBeSelected)
+INSERT INTO machines (part_number, Models_model_id, canShowInfo, canBeSelected)
 VALUES ('NA', 1, 'False', 'False'),
 ('NA', 2, 'False', 'False'),
 ('NA', 3, 'False', 'False'),
@@ -592,30 +592,30 @@ VALUES (1, 1, 'Accesorios B4 TRed', 'Accesorios B4 TRed', 'Accesorios B4 TRed'),
 (1, 81, 'Estructura Planta', 'Estructura Planta', 'Estructura Planta'),
 (1, 82, 'PISO', 'PISO', 'PISO');
 
-INSERT INTO models (id_model, current_version)
+INSERT INTO models (model_id, current_version)
 VALUES (83, 1),
 (84, 1),
 (85, 1),
 (86, 1);
 
-INSERT INTO  modelsversion (Models_id_model, PositionEntity_position_entity_id, version, animated, created_at, path_model, color, material)
+INSERT INTO  modelsversion (Models_model_id, PositionEntity_position_entity_id, version, animated, created_at, path_model, color, material)
 VALUES (83, 165, 1, false, now(), '.', 'None', 'None'),
 (84, 166, 1, false, now(), '.', 'None', 'None'),
 (85, 167, 1, false, now(), '.', 'None', 'None'),
 (86, 168, 1, false, now(), '.', 'None', 'None');
 
-INSERT INTO machines (machines_id, part_number, Models_id_model, canShowInfo, canBeSelected)
+INSERT INTO machines (machines_id, part_number, Models_model_id, canShowInfo, canBeSelected)
 VALUES (83, 'NA', 83, 'True', 'False'),
 (84, 'PR0501-3', 84, 'True', 'True'),
 (85, 'NA', 85, 'True', 'False'),
 (86, 'NA', 86, 'True', 'False');
 
-INSERT INTO sensor (id_sensor, name, path_sensor)
+INSERT INTO sensor (sensor_id, name, path_sensor)
 VALUES (1, 'Temperature-PR0501-3', '/temperature-1'),
 (2, 'Pressure-PR0501-3', '/pressure-1'),
 (3, 'Flux-PR0501-3', '/flux-1');
 
-INSERT INTO sensor_machine (Machines_machines_id, Sensor_id_sensor)
+INSERT INTO sensor_machine (Machines_machines_id, Sensor_sensor_id)
 VALUES (84, 1),
 (84, 2),
 (84, 3);
@@ -626,7 +626,7 @@ VALUES (1, 83, 'Caseta', 'Caseta', 'Caseta'),
 (1, 85, 'Soplador', 'Soplador', 'Soplador'),
 (1, 86, 'Planta', 'Planta', 'Planta');
 
-INSERT INTO users (id_user, username, password_user, first_name, last_name, active, created_at)
+INSERT INTO users (user_id, username, password_user, first_name, last_name, active, created_at)
 VALUES (1, 'root', 'test123', '_', '_', true, now()),
 (2, 'pdoren', 'test123', 'Pablo', 'Saavedra', true, now()),
 (3, 'pcano', 'test123', 'Pablo', 'Cano', true, now());

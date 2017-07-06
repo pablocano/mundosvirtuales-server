@@ -15,7 +15,7 @@ Assembly::~Assembly()
 {
 }
 
-Assemblies Assembly::loadFromDB(DBAdapter* lpDataBase)
+Assemblies Assembly::loadAssembliesFromDB(DBAdapter* lpDataBase)
 {
 	using namespace db;
 
@@ -23,7 +23,7 @@ Assemblies Assembly::loadFromDB(DBAdapter* lpDataBase)
 
 	try
 	{
-		Rows rows_assemblies = lpDataBase->query("SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.id_model = machines.Models_id_model) INNER JOIN modelsversion ON ((models.id_model = modelsversion.Models_id_model) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
+		Rows rows_assemblies = lpDataBase->query("SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.model_id = machines.Models_model_id) INNER JOIN modelsversion ON ((models.model_id = modelsversion.Models_model_id) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
 
 		std::map<int, Assembly> map_machines;
 		std::map<int, Parts> map_parts;
@@ -88,6 +88,11 @@ Assemblies Assembly::loadFromDB(DBAdapter* lpDataBase)
 	}
 
 	return assemblies;
+}
+
+void Assembly::loadFromDB(DBAdapter* lpDBAdapter)
+{
+
 }
 
 void to_json(json& j, const Assembly& m) {

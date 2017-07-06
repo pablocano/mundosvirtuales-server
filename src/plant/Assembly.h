@@ -3,6 +3,7 @@
 #include "../utils/serialization/json.h"
 #include "../utils/db/DBAdapter.h"
 #include "Part.h"
+#include "ObjectPlant.h"
 #include <vector>
 #include <string>
 
@@ -19,7 +20,7 @@ typedef std::vector<Assembly> Assemblies;
 /// <summary>
 /// Class that contains all the information about an assembly. An assembly is made of sub-assemblies and parts
 /// </summary>
-class Assembly
+class Assembly : public ObjectPlant
 {
 public:
 	/// <summary>
@@ -44,7 +45,18 @@ public:
 	/// </summary>
 	~Assembly();
 
-	static Assemblies loadFromDB(DBAdapter* m_lpDataBase);
+	/// <summary>
+	/// Load Assemblies from database.
+	/// </summary>
+	/// <param name="m_lpDataBase">Pointer to the database handle.</param>
+	/// <returns>Returns a vector with all assemblies stored in the database.</returns>
+	static Assemblies loadAssembliesFromDB(DBAdapter* m_lpDataBase);
+
+	/// <summary>
+	/// Load properties this object from database.
+	/// </summary>
+	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
+	void loadFromDB(DBAdapter* lpDBAdapter);
 
 	/// <summary>
 	/// All the sub-assemblies of this assembly
