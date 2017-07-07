@@ -30,29 +30,29 @@ Rows DBAdapterSOCI::query(std::string query) const
 
 	for (std::size_t i = 0; i != r.size(); ++i)
 	{
-		TypeData type = TypeData::NONE;
+		TypeData type = TypeData::DB_NONE;
 
 		const soci::column_properties & props = r.get_properties(i);
 
 		switch (props.get_data_type())
 		{
 		case soci::dt_string:
-			type = TypeData::STRING;
+			type = TypeData::DB_STRING;
 			break;
 		case soci::dt_double:
-			type = TypeData::DOUBLE;
+			type = TypeData::DB_DOUBLE;
 			break;
 		case soci::dt_integer:
-			type = TypeData::INTEGER;
+			type = TypeData::DB_INTEGER;
 			break;
 		case soci::dt_unsigned_long_long:
-			type = TypeData::UNSIGNED_LONG;
+			type = TypeData::DB_UNSIGNED_LONG;
 			break;
 		case soci::dt_long_long:
-			type = TypeData::LONG_LONG;
+			type = TypeData::DB_LONG_LONG;
 			break;
 		case soci::dt_date:
-			type = TypeData::STRING;
+			type = TypeData::DB_STRING;
 			break;
 		}
 
@@ -74,22 +74,22 @@ Rows DBAdapterSOCI::query(std::string query) const
 
 			switch ((*rows.getFields())[i].getType())
 			{
-			case TypeData::STRING:
+			case TypeData::DB_STRING:
 				registerValue.set<std::string>(it->get<std::string>(i));
 				break;
-			case TypeData::DOUBLE:
+			case TypeData::DB_DOUBLE:
 				registerValue.set<double>(it->get<double>(i));
 				break;
-			case TypeData::INTEGER:
+			case TypeData::DB_INTEGER:
 				registerValue.set<int>(it->get<int>(i));
 				break;
-			case TypeData::UNSIGNED_LONG:
+			case TypeData::DB_UNSIGNED_LONG:
 				registerValue.set<unsigned long>(it->get<unsigned long>(i));
 				break;
-			case TypeData::LONG_LONG:
+			case TypeData::DB_LONG_LONG:
 				registerValue.set<long long>(it->get<long long>(i));
 				break;
-			case TypeData::DATE:
+			case TypeData::DB_DATE:
 				registerValue.set<std::tm>(it->get<std::tm>(i));
 				break;
 			}

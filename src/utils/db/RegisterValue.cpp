@@ -73,22 +73,22 @@ std::string RegisterValue::getValue() const
 	std::string value;
 	switch (m_fieldData->getType())
 	{
-	case TypeData::STRING:
+	case TypeData::DB_STRING:
 		value = "'" + get<std::string>() + "'";
 		break;
-	case TypeData::DOUBLE:
+	case TypeData::DB_DOUBLE:
 		value = std::to_string(get<double>());
 		break;
-	case TypeData::INTEGER:
+	case TypeData::DB_INTEGER:
 		value = std::to_string(get<int>());
 		break;
-	case TypeData::UNSIGNED_LONG:
+	case TypeData::DB_UNSIGNED_LONG:
 		value = std::to_string(get<unsigned long>());
 		break;
-	case TypeData::LONG_LONG:
+	case TypeData::DB_LONG_LONG:
 		value = std::to_string(get<long long>());
 		break;
-	case TypeData::DATE:
+	case TypeData::DB_DATE:
 		char str[100];
 		asctime_s(str, sizeof(str), &get<std::tm>());
 		value = "'" + std::string(str) + "'";

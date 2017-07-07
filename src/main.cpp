@@ -16,11 +16,11 @@ void observerLogDataBase(std::string type, std::chrono::system_clock::time_point
 	Row row;
 	std::vector<FieldData> fieldData;
 
-	fieldData.push_back(FieldData("Users_user_id", TypeData::INTEGER));
-	fieldData.push_back(FieldData("type_log", TypeData::STRING));
-	fieldData.push_back(FieldData("source", TypeData::STRING));
-	fieldData.push_back(FieldData("message", TypeData::STRING));
-	fieldData.push_back(FieldData("created_at", TypeData::DATE));
+	fieldData.push_back(FieldData("Users_user_id", TypeData::DB_INTEGER));
+	fieldData.push_back(FieldData("type_log", TypeData::DB_STRING));
+	fieldData.push_back(FieldData("source", TypeData::DB_STRING));
+	fieldData.push_back(FieldData("message", TypeData::DB_STRING));
+	fieldData.push_back(FieldData("created_at", TypeData::DB_DATE));
 
 	row.setFieldData(&fieldData);
 
