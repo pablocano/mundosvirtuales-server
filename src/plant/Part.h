@@ -1,15 +1,17 @@
 #pragma once
 
-#include "../utils/serialization/json.h"
+#include "../plant/ObjectPlant.h"
+#include "../utils/serialization/json.h" 
 #include <vector>
 #include <string>
 
 using json = nlohmann::json;
+using namespace db;
 
 /// <summary>
 /// Contains all the information of a part.
 /// </summary>
-class Part
+class Part : public ObjectPlant
 {
 public:
 	/// <summary>
@@ -27,6 +29,39 @@ public:
 	/// <param name="shortInfo">A little description about the part.</param>
 	/// <param name="pn">The part number of this part.</param>
 	Part(int id, std::string name, std::string material, std::string info, std::string shortInfo, std::string pn);
+	
+	/// /// <summary>
+	/// Constructor object from row.
+	/// </summary>
+	/// <param name="row">Row</param>
+	Part(const Row& row) : Part() { *this = row; }
+
+	/// <summary>
+	/// Load properties this object from database.
+	/// </summary>
+	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
+	/// <param name="id">Identifier of Assembly in the database.</param>
+	/// <returns>Returns true if the load was successful, false otherwise.</returns>
+	bool loadFromDB(DBAdapter* lpDBAdapter, int id);
+
+	/// <summary>
+	/// Save part to database.
+	/// </summary>
+	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
+	/// <returns>Returns true if this object was saved successfully, false otherwise.</returns>
+	bool saveToDB(DBAdapter* lpDBAdapter);
+
+	/// <summary>
+	/// Operator equals with Row.
+	/// </summary>
+	/// <param name="row">Row reference.</param>
+	void operator=(const Row& row);
+
+	/// <summary>
+	/// Gets a row.
+	/// </summary>
+	/// <returns>Rerturns a row contructed from this object data.</returns>
+	Row getRow();
 	
 	/// <summary>
 	/// Destructor

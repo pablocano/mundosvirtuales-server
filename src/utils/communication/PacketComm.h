@@ -45,6 +45,7 @@ typedef enum _Command
 	GET_LIST_SENSORS,
 	GET_SENSORS,
 	GET_VERSION_ID,
+	NEW_ASSEMBLY,
 	UPDATE_ASSEMBLY
 } Command;
 

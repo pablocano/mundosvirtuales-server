@@ -32,14 +32,6 @@ Assemblies Assembly::loadAssembliesFromDB(DBAdapter* lpDataBase)
 		{
 			std::vector<int> machine_ids;
 			int part_id = it->get<int>("machine_id");
-			std::string path_model = it->get<std::string>("path_model");
-			std::string material = "/Game/Materials/ProterMaterials/" + it->get<std::string>("color", "") + it->get<std::string>("material") + "." + it->get<std::string>("color", "") + it->get<std::string>("material");
-			std::string info = it->get<std::string>("info");
-			std::string shortInfo = it->get<std::string>("shortinfo");
-			std::string pn = it->get<std::string>("part_number");
-			bool animated = it->get<bool>("animated");
-			bool canShowInfo = it->get<bool>("canshowinfo");
-			bool canBeSelected = it->get<bool>("canbeselected");
 
 			int n_parts = lpDataBase->countQuery("partsofmachine", "Machines_machines_id = " + std::to_string(part_id));
 
@@ -48,11 +40,11 @@ Assemblies Assembly::loadAssembliesFromDB(DBAdapter* lpDataBase)
 				// It's only part
 				int n_machines = lpDataBase->countQuery("partsofmachine", "Machines_related_machines_id = " + std::to_string(part_id));
 
-				Part part(part_id, path_model, material, info, shortInfo, pn);
+				Part part(*it);
 				if (n_machines <= 0)
 				{
 					// Create Machine with only one part
-					Assembly machine(part_id, path_model, info, shortInfo, pn, canBeSelected, canShowInfo);
+					Assembly machine(*it);
 					machine.parts.push_back(part);
 					map_machines[part_id] = machine;
 				}
@@ -69,7 +61,7 @@ Assemblies Assembly::loadAssembliesFromDB(DBAdapter* lpDataBase)
 			else
 			{
 				// It's a machine
-				Assembly machine(part_id, path_model, info, shortInfo, pn, canBeSelected, canShowInfo);
+				Assembly machine(*it);
 				map_machines[part_id] = machine;
 			}
 		}
@@ -90,9 +82,49 @@ Assemblies Assembly::loadAssembliesFromDB(DBAdapter* lpDataBase)
 	return assemblies;
 }
 
-void Assembly::loadFromDB(DBAdapter* lpDBAdapter)
+bool Assembly::loadFromDB(DBAdapter* lpDBAdapter, int id)
 {
+	try
+	{
+		Rows rows_assemblies = lpDBAdapter->query("SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.model_id = machines.Models_model_id) INNER JOIN modelsversion ON ((models.model_id = modelsversion.Models_model_id) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
 
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		LOGGER_ERROR("Assembly", e.what());
+		return false;
+	}
+}
+
+bool Assembly::saveToDB(DBAdapter* lpDBAdapter)
+{
+	try
+	{
+
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		LOGGER_ERROR("Assembly", e.what());
+		return false;
+	}
+}
+
+void Assembly::operator=(const Row& row)
+{
+	assembly_id = row.get<int>("machine_id");
+	name = row.get<std::string>("path_model");
+	info = row.get<std::string>("info");
+	shortInfo = row.get<std::string>("shortinfo");
+	pn = row.get<std::string>("part_number");
+	canBeSelected = row.get<bool>("canbeselected");
+	canShowInfo = row.get<bool>("canshowinfo");
+}
+
+Row Assembly::getRow()
+{
+	return Row();
 }
 
 void to_json(json& j, const Assembly& m) {

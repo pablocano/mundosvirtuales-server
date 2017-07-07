@@ -13,7 +13,10 @@ RegisterValue::RegisterValue(const RegisterValue & w)
 	m_value = malloc(m_size);
 	m_indicator = w.m_indicator;
 	m_fieldData = w.m_fieldData;
-	memcpy(m_value, w.m_value, m_size);
+	if (m_value && w.m_value)
+		memcpy(m_value, w.m_value, m_size);
+	else
+		m_value = nullptr;
 }
 
 RegisterValue::RegisterValue(RegisterValue && w)
@@ -32,7 +35,10 @@ RegisterValue& RegisterValue::operator=(const RegisterValue& w)
 	m_value = malloc(m_size);
 	m_indicator = w.m_indicator;
 	m_fieldData = w.m_fieldData;
-	memcpy(m_value, w.m_value, m_size);
+	if (m_value && w.m_value)
+		memcpy(m_value, w.m_value, m_size);
+	else
+		m_value = nullptr;
 	return *this;
 }
 

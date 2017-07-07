@@ -11,9 +11,48 @@ Part::Part(int id, std::string name, std::string material, std::string info, std
 {
 }
 
-
 Part::~Part()
 {
+}
+bool Part::loadFromDB(DBAdapter* lpDBAdapter, int id)
+{
+	try
+	{
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		LOGGER_ERROR("Part", e.what());
+		return false;
+	}
+}
+
+bool Part::saveToDB(DBAdapter* lpDBAdapter)
+{
+	try
+	{
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		LOGGER_ERROR("Part", e.what());
+		return false;
+	}
+}
+
+void Part::operator=(const Row& row)
+{
+	part_id = row.get<int>("machine_id");
+	this->name = row.get<std::string>("path_model");
+	material = "/Game/Materials/ProterMaterials/" + row.get<std::string>("color", "") + row.get<std::string>("material") + "." + row.get<std::string>("color", "") + row.get<std::string>("material");
+	info = row.get<std::string>("info");
+	shortInfo = row.get<std::string>("shortinfo");
+	pn = row.get<std::string>("part_number");	
+}
+
+Row Part::getRow()
+{
+	return Row();
 }
 
 void to_json(json & j, const Part& m)

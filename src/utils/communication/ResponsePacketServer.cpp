@@ -65,8 +65,30 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 				
 				json j = json{ { "version", version + 1 }, { "id", assembly_id } };
 				std::string data = j.dump();
-				
+					
 				sendResponse(tcpComm, packet, (char *) data.c_str(), StatusServer::OK_RESPONSE);
+			}
+			catch (const std::exception &e)
+			{
+				LOGGER_ERROR("ResponsePacketServerPlant", e.what());
+				sendResponse(tcpComm, packet, nullptr, StatusServer::ERROR_RESPONSE);
+			}
+		}
+		break;
+	case Command::NEW_ASSEMBLY:
+		LOGGER_LOG("ResponsePacketServerPlant", "New Assembly");
+		{
+			try
+			{
+				json parseJSON = json::parse(packet.m_lpContent);
+				AssemblyComm assembly = parseJSON;
+				
+				// TODO: Save assembly.
+				
+				json j = json{ { "id", 3 } };
+				std::string data = j.dump();
+
+				sendResponse(tcpComm, packet, (char *)data.c_str(), StatusServer::OK_RESPONSE);
 			}
 			catch (const std::exception &e)
 			{

@@ -41,6 +41,12 @@ public:
 	Assembly(int id, std::string name, std::string info, std::string shortInfo, std::string pn, bool canBeSelected = false, bool canShowInfo = false);
 	
 	/// <summary>
+	/// Constructor object from row.
+	/// </summary>
+	/// <param name="row">Row</param>
+	Assembly(const Row& row) : Assembly() { *this = row; }
+
+	/// <summary>
 	/// Destructor
 	/// </summary>
 	~Assembly();
@@ -56,7 +62,28 @@ public:
 	/// Load properties this object from database.
 	/// </summary>
 	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
-	void loadFromDB(DBAdapter* lpDBAdapter);
+	/// <param name="id">Identifier of Assembly in the database.</param>
+	/// <returns>Returns true if the load was successful, false otherwise.</returns>
+	bool loadFromDB(DBAdapter* lpDBAdapter, int id);
+
+	/// <summary>
+	/// Save Assembly to database.
+	/// </summary>
+	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
+	/// <returns>Returns true if this object was saved successfully, false otherwise.</returns>
+	bool saveToDB(DBAdapter* lpDBAdapter);
+
+	/// <summary>
+	/// Operator equals with Row.
+	/// </summary>
+	/// <param name="row">Row reference.</param>
+	void operator=(const Row& row);
+
+	/// <summary>
+	/// Gets a row.
+	/// </summary>
+	/// <returns>Rerturns a row contructed from this object data.</returns>
+	Row getRow();
 
 	/// <summary>
 	/// All the sub-assemblies of this assembly

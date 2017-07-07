@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../utils/db/DBAdapter.h"
+#include "../utils/db/Row.h"
 
 #include <string>
 
@@ -18,6 +19,12 @@ public:
 
 	void setID(int id) { m_id = id; }
 
-	virtual void loadFromDB(DBAdapter* lpDBAdapter) = 0;
+	virtual bool loadFromDB(DBAdapter* lpDBAdapter, int id) = 0;
+
+	virtual bool saveToDB(DBAdapter* lpDBAdapter) = 0;
+
+	virtual void operator=(const Row& row) = 0;
+
+	Row getRow() { return Row(); }
 };
 

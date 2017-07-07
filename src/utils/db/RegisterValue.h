@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FieldData.h"
+#include "../logger/Logger.h"
 
 #include <memory>
 
@@ -118,14 +119,14 @@ namespace db
 	{
 		m_size = sizeof(T);
 		if (m_value)
-		{
 			m_value = realloc(m_value, m_size);
-		}
 		else
-		{
 			m_value = malloc(m_size);
-		}
-		memcpy(m_value, static_cast<const void *>(&p), m_size);
+
+		if (m_value)
+			memcpy(m_value, static_cast<const void *>(&p), m_size);
+		else
+			LOGGER_DEBUG("RegisterValue", "It doesn't work allocation memory for register.");
 	}
 
 	template<>
@@ -133,15 +134,17 @@ namespace db
 	{
 		m_size = (int)p.length() + 1;
 		if (m_value)
-		{
 			m_value = realloc(m_value, m_size);
+		else
+			m_value = malloc(m_size);
+
+		if (m_value)
+		{
+			memcpy(m_value, static_cast<const void *>(p.data()), p.length());
+			*((char *)m_value + p.length()) = '\0';
 		}
 		else
-		{
-			m_value = malloc(m_size);
-		}
-		memcpy(m_value, static_cast<const void *>(p.data()), p.length());
-		*((char *)m_value + p.length()) = '\0';
+			LOGGER_DEBUG("RegisterValue", "It doesn't work allocation memory for register.");
 	}
 
 	template<typename T>

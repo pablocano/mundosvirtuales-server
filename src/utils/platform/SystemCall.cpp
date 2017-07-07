@@ -145,9 +145,9 @@ void SystemCall::getLoad(float& mem, float load[3])
 {
 #ifdef WIN32
   load[0] = load[1] = load[2] = -1.f; //Not implemented yet
-  MEMORYSTATUS memStat;
-  memStat.dwLength = sizeof(MEMORYSTATUS);
-  GlobalMemoryStatus(&memStat);
+  MEMORYSTATUSEX memStat;
+  memStat.dwLength = sizeof(MEMORYSTATUSEX);
+  GlobalMemoryStatusEx(&memStat);
   mem = float(memStat.dwMemoryLoad) / 100.f;
 #elif defined(MACOSX) // FIXME
   mem = -1.f;
