@@ -47,7 +47,8 @@ void Part::operator=(const Row& row)
 	material = "/Game/Materials/ProterMaterials/" + row.get<std::string>("color", "") + row.get<std::string>("material") + "." + row.get<std::string>("color", "") + row.get<std::string>("material");
 	info = row.get<std::string>("info");
 	shortInfo = row.get<std::string>("shortinfo");
-	pn = row.get<std::string>("part_number");	
+	pn = row.get<std::string>("part_number");
+	animated = row.get<bool>("animated", false);
 }
 
 Row Part::getRow()

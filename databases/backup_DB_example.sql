@@ -307,7 +307,7 @@ VALUES (1, 1, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__
 (49, 49, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__Soplador_proteccion.Planta-05102017_Bombas_y_tuberias__Soplador_proteccion', 'Orange', 'Metal'),
 (50, 50, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__Soplador_tuerca.Planta-05102017_Bombas_y_tuberias__Soplador_tuerca', 'Gray', 'Metal'),
 (51, 51, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__Soporte.Planta-05102017_Bombas_y_tuberias__Soporte', 'Gray', 'Metal'),
-(52, 52, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__Terreno.Planta-05102017_Bombas_y_tuberias__Terreno', '', 'M_Concrete_Panel'),
+(52, 52, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__Terreno.Planta-05102017_Bombas_y_tuberias__Terreno', '', 'M_Concrete_Panels'),
 (53, 53, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__Tuberia_A1.Planta-05102017_Bombas_y_tuberias__Tuberia_A1', 'DarkGray', 'Metal'),
 (54, 54, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__Tuberia_A2.Planta-05102017_Bombas_y_tuberias__Tuberia_A2', 'DarkGray', 'Metal'),
 (55, 55, 1, false, now(), '/Game/Proter/Planta-05102017_Bombas_y_tuberias__Tuberia_A3.Planta-05102017_Bombas_y_tuberias__Tuberia_A3', 'DarkGray', 'Metal'),

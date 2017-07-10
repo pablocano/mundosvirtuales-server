@@ -143,7 +143,7 @@ typedef STRUCT_PACKET _PacketComm
 	/// <returns>Returns smart pointer with data Packet (header + payload).</returns>
 	std::unique_ptr<char[]> packing()
 	{
-		std::unique_ptr<char[]> p((char *)std::calloc(size(), sizeof(char)));
+		std::unique_ptr<char[]> p(new char[size()]());
 		uint32_t key[4] = KEY_CRYPT;
 		m_header.m_size = sizeContent();
 		std::memcpy(p.get(), &m_header, SIZE_HEADER_PACKET);
