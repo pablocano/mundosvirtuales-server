@@ -10,7 +10,7 @@ namespace db
 	class Rows
 	{
 	protected:
-		std::vector<FieldData> m_fields;
+		Fields m_fields;
 		std::vector<Row> m_rows;
 
 		void setFields();
@@ -24,6 +24,8 @@ namespace db
 
 		void push_back(Row& row);
 
+		Row& front();
+
 		Row& back();
 
 		std::vector<Row>::iterator begin();
@@ -32,10 +34,12 @@ namespace db
 
 		std::vector<Row>::const_iterator cbegin() const;
 
-		std::vector<Row>::const_iterator cend() const { return m_rows.cend(); }
+		std::vector<Row>::const_iterator cend() const;
+
+		int size() const;
 
 		void addField(FieldData field);
 
-		std::vector<FieldData>* getFields();
+		Fields* getFields();
 	};
 }

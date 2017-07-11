@@ -13,7 +13,7 @@ namespace db
 	class Row
 	{
 	protected:
-		std::vector<FieldData>* m_lpFields; /* Pointer reference table fields. */
+		Fields* m_lpFields; /* Pointer reference table fields. */
 		std::vector<RegisterValue> m_registers; /* Registers of table. */
 
 	public:
@@ -70,7 +70,7 @@ namespace db
 		/// Sets information about fields.
 		/// </summary>
 		/// <param name="fields">Fields reference.</param>
-		void setFieldData(std::vector<FieldData>* fields);
+		void setFieldData(Fields* fields);
 
 		/// <summary>
 		/// Finds register from field's name.
@@ -84,11 +84,17 @@ namespace db
 		/// </summary>
 		/// <returns>Returns a string with all field names.</returns>
 		std::string getSQLFieldNames() const;
-
+		
 		/// <summary>
 		/// Gets all register of row.
 		/// </summary>
 		/// <returns>Returns a string with all register values.</returns>
 		std::string getSQLRegisterValues() const;
+
+		/// <summary>
+		/// Gets a string for using it in SQL update query.
+		/// </summary>
+		/// <returns>Returns a string for making an update query with this object.</returns>
+		std::string getSQLUpdateRegisterValues() const;
 	};
 }

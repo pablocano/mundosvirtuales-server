@@ -1,6 +1,7 @@
 #include "Part.h"
 
 
+using namespace db;
 
 Part::Part()
 {
@@ -14,11 +15,21 @@ Part::Part(int id, std::string name, std::string material, std::string info, std
 Part::~Part()
 {
 }
+
 bool Part::loadFromDB(DBAdapter* lpDBAdapter, int id)
 {
 	try
 	{
-		return true;
+		Rows rows = lpDBAdapter->query("SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.model_id = machines.Models_model_id) INNER JOIN modelsversion ON ((models.model_id = modelsversion.Models_model_id) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1) AND (machines.machines_id = " + std::to_string(id) + "))");
+
+		if (rows.size())
+		{
+			Row row = rows.front();
+			*this = row;
+			return true;
+		}
+		else
+			return false;
 	}
 	catch (const std::exception& e)
 	{
@@ -28,6 +39,19 @@ bool Part::loadFromDB(DBAdapter* lpDBAdapter, int id)
 }
 
 bool Part::saveToDB(DBAdapter* lpDBAdapter)
+{
+	try
+	{
+		return lpDBAdapter->insert("machines", this->getRow());
+	}
+	catch (const std::exception& e)
+	{
+		LOGGER_ERROR("Part", e.what());
+		return false;
+	}
+}
+
+bool Part::updateToDB(DBAdapter * lpDBAdapter)
 {
 	try
 	{
@@ -53,7 +77,22 @@ void Part::operator=(const Row& row)
 
 Row Part::getRow()
 {
-	return Row();
+	Row row;
+	Fields fieldData;
+
+	fieldData.push_back(FieldData("machines_id", TypeData::DB_INTEGER));
+	fieldData.push_back(FieldData("part_number", TypeData::DB_STRING));
+	fieldData.push_back(FieldData("canShowInfo", TypeData::DB_INTEGER));
+	fieldData.push_back(FieldData("canBeSelected", TypeData::DB_INTEGER));
+
+	row.setFieldData(&fieldData);
+
+	row.addRegisterPerValue<int>(part_id);
+	row.addRegisterPerValue<std::string>(pn);
+	row.addRegisterPerValue<bool>(true);
+	row.addRegisterPerValue<bool>(true);
+
+	return row;
 }
 
 void to_json(json & j, const Part& m)

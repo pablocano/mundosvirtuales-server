@@ -111,6 +111,19 @@ bool Assembly::saveToDB(DBAdapter* lpDBAdapter)
 	}
 }
 
+bool Assembly::updateToDB(DBAdapter * lpDBAdapter)
+{
+	try
+	{
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		LOGGER_ERROR("Part", e.what());
+		return false;
+	}
+}
+
 void Assembly::operator=(const Row& row)
 {
 	assembly_id = row.get<int>("machine_id");

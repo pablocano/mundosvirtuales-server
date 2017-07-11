@@ -14,7 +14,7 @@ void observerLogDataBase(std::string type, std::chrono::system_clock::time_point
 	static DBAdapterSOCI dataBase("proter", "postgres", "127.0.0.1", 5432, "test123");
 
 	Row row;
-	std::vector<FieldData> fieldData;
+	Fields fieldData;
 
 	fieldData.push_back(FieldData("Users_user_id", TypeData::DB_INTEGER));
 	fieldData.push_back(FieldData("type_log", TypeData::DB_STRING));

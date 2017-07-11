@@ -5,11 +5,10 @@ using json = nlohmann::json;
 
 struct AssemblyRelation
 {
-	int m_id_assembly_parent;
-	int m_id_assembly_child;
+	int m_id_assembly;
 	Position m_position;
 
-	AssemblyRelation() : m_id_assembly_parent(), m_id_assembly_child(), m_position() {}
+	AssemblyRelation() : m_id_assembly(), m_position() {}
 };
 
 void to_json(json& j, const AssemblyRelation& m);

@@ -24,5 +24,10 @@ namespace db
 		bool insert(const std::string& table, const Rows& rows);
 
 		bool insert(const std::string& table, const Row& row);
+
+		bool update(const std::string& table, const Rows& rows, const std::string name_id);
+
+		bool update(const std::string& table, const Row& row, const std::string where);
+
 	};
 }

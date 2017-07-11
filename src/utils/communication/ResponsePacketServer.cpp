@@ -81,6 +81,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 			try
 			{
 				json parseJSON = json::parse(packet.m_lpContent);
+				std::string s(packet.m_lpContent);
 				AssemblyComm assembly = parseJSON;
 				
 				// TODO: Save assembly.

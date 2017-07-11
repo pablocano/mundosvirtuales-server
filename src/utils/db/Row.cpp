@@ -1,4 +1,5 @@
 #include "Row.h"
+#include "Row.h"
 
 #include <sstream>
 
@@ -25,7 +26,7 @@ void Row::addRegister(RegisterValue& registerValue)
 	m_registers.push_back(registerValue);
 }
 
-void Row::setFieldData(std::vector<FieldData>* fields)
+void Row::setFieldData(Fields* fields)
 {
 	m_lpFields = fields;
 }
@@ -63,12 +64,26 @@ std::string Row::getSQLRegisterValues() const
 	ss << "(";
 	int pos = 0;
 	for (; pos < m_registers.size() - 1; ++pos)
-		ss << m_registers.at(pos).getValue() << ", ";
+		ss << m_registers.at(pos).getSQLValue() << ", ";
 
 	if (pos == m_registers.size() - 1)
-		ss << m_registers.at(pos).getValue();
+		ss << m_registers.at(pos).getSQLValue();
 
 	ss << ")";
+
+	return ss.str();
+}
+
+std::string Row::getSQLUpdateRegisterValues() const
+{
+	std::stringstream ss;
+	ss.str("");
+	int pos = 0;
+	for (; pos < m_registers.size() - 1; ++pos)
+		ss << m_lpFields->at(pos).getName() << " = " << m_registers.at(pos).getSQLValue() << ", ";
+
+	if (pos == m_registers.size() - 1)
+		ss << m_lpFields->at(pos).getName() << " = " << m_registers.at(pos).getSQLValue();
 
 	return ss.str();
 }

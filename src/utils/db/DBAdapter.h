@@ -36,6 +36,10 @@ namespace db
 
 		virtual bool insert(const std::string& table, const Row& row) = 0;
 
+		virtual bool update(const std::string& table, const Rows& rows, const std::string name_id) = 0;
+
+		virtual bool update(const std::string& table, const Row& row, const std::string where) = 0;
+
 	protected:
 		std::string get_text_from_path(std::string path_file) const;
 

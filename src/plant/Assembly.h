@@ -74,6 +74,13 @@ public:
 	bool saveToDB(DBAdapter* lpDBAdapter);
 
 	/// <summary>
+	/// Update Assembly to database.
+	/// </summary>
+	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
+	/// <returns>Returns true if this object was updated successfully, false otherwise.</returns>
+	bool updateToDB(DBAdapter* lpDBAdapter);
+
+	/// <summary>
 	/// Operator equals with Row.
 	/// </summary>
 	/// <param name="row">Row reference.</param>

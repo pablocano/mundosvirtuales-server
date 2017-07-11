@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace db
 {
@@ -12,6 +13,7 @@ namespace db
 		DB_NONE,
 		DB_STRING,
 		DB_INTEGER,
+		DB_BOOL,
 		DB_DOUBLE,
 		DB_UNSIGNED_LONG,
 		DB_LONG_LONG,
@@ -39,4 +41,6 @@ namespace db
 
 		bool operator==(const std::string name);
 	};
+
+	typedef std::vector<FieldData> Fields;
 }

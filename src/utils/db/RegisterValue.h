@@ -111,7 +111,7 @@ namespace db
 		/// Gets a string with stored value.
 		/// </summary>
 		/// <returns>Returns string with stored value.</returns>
-		std::string getValue() const;
+		std::string getSQLValue() const;
 	};
 
 	template<typename T>

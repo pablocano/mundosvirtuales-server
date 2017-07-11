@@ -4,13 +4,12 @@ using json = nlohmann::json;
 
 void to_json(json& j, const AssemblyRelation& m)
 {
-	j = json{ { "m_id_assembly_parent", m.m_id_assembly_parent },{ "m_id_assembly_child", m.m_id_assembly_child },{ "m_position", m.m_position } };
+	j = json{ { "m_id_assembly", m.m_id_assembly },{ "m_position", m.m_position } };
 }
 
 void from_json(const json& j, AssemblyRelation& m)
 {
-	m.m_id_assembly_parent = j.at("m_id_assembly_parent").get<int>();
-	m.m_id_assembly_child = j.at("m_id_assembly_child").get<int>();
+	m.m_id_assembly = j.at("m_id_assembly").get<int>();
 	m.m_position = j.at("m_position").get<Position>();
 }
 

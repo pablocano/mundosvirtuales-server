@@ -23,6 +23,8 @@ public:
 
 	virtual bool saveToDB(DBAdapter* lpDBAdapter) = 0;
 
+	virtual bool updateToDB(DBAdapter* lpDBAdapter) = 0;
+
 	virtual void operator=(const Row& row) = 0;
 
 	Row getRow() { return Row(); }

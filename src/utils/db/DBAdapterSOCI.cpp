@@ -83,6 +83,9 @@ Rows DBAdapterSOCI::query(std::string query) const
 			case TypeData::DB_INTEGER:
 				registerValue.set<int>(it->get<int>(i));
 				break;
+			case TypeData::DB_BOOL:
+				registerValue.set<int>(it->get<int>(i) != 0);
+				break;
 			case TypeData::DB_UNSIGNED_LONG:
 				registerValue.set<unsigned long>(it->get<unsigned long>(i));
 				break;
@@ -137,8 +140,9 @@ bool DBAdapterSOCI::insert(const std::string& table, const Rows & rows)
 		tr.commit();
 		return true;
 	}
-	catch (...)
+	catch (const std::exception &e)
 	{
+		LOGGER_ERROR("DBAdapterSOCI", e.what());
 		return false;
 	}
 }
@@ -158,7 +162,55 @@ bool DBAdapterSOCI::insert(const std::string& table, const Row & row)
 	}
 	catch(const std::exception &e)
 	{
-		LOGGER_ERROR("DBAdapter", e.what());
+		LOGGER_ERROR("DBAdapterSOCI", e.what());
+		return false;
+	}
+}
+
+bool db::DBAdapterSOCI::update(const std::string & table, const Rows & rows, const std::string name_id)
+{
+	try
+	{
+		std::string connectString = get_str_connection();
+		soci::session sql(db_engine, connectString);
+
+		soci::transaction tr(sql);
+
+		for (auto row = rows.cbegin(); row != rows.cend(); ++row)
+		{
+			std::stringstream ss;
+			ss.str("");
+			ss << "update " << table << "set " << row->getSQLUpdateRegisterValues() << " where " << name_id << " = " << row->get<int>(name_id) << ";";
+		}
+
+		tr.commit();
+		return true;
+	}
+	catch (const std::exception &e)
+	{
+		LOGGER_ERROR("DBAdapterSOCI", e.what());
+		return false;
+	}
+}
+
+bool db::DBAdapterSOCI::update(const std::string & table, const Row & row, const std::string where)
+{
+	try
+	{
+		std::string connectString = get_str_connection();
+		soci::session sql(db_engine, connectString);
+
+		std::stringstream ss;
+		ss.str("");
+		ss << "update " << table << "set " << row.getSQLUpdateRegisterValues() << " where " << where << ";";
+
+		std::string query = ss.str();
+		sql << query;
+		return true;
+	}
+	catch (const std::exception &e)
+	{
+		LOGGER_ERROR("DBAdapterSOCI", e.what());
 		return false;
 	}
 }

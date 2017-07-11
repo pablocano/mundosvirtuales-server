@@ -22,6 +22,6 @@ void to_json(json& j, const Position& m)
 
 void from_json(const json& j, Position& m)
 {
-	m.m_pos = j.at("position");
-	m.m_rot = j.at("rotation");
+	m.m_pos = j.at("m_pos");
+	m.m_rot = j.at("m_rot");
 }

@@ -130,7 +130,8 @@ typedef STRUCT_PACKET _PacketComm
 			if (n > 1) // discard empty string.
 			{
 				_sizeContent = n + 1; // Added '\0' character.
-				_sizeContent += _sizeContent % 4; // Adds padding for encryptation.
+				int m = _sizeContent % 4;
+				_sizeContent += (m == 0 ? 0 : (4 - m)); // Adds padding for encryptation.
 			}
 		}
 

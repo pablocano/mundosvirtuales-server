@@ -34,7 +34,12 @@ void Rows::push_back(Row & row)
 	m_rows.back().setFieldData(&m_fields);
 }
 
-Row & Rows::back() 
+Row& Rows::front()
+{
+	return m_rows.front();
+}
+
+Row& Rows::back() 
 { 
 	return m_rows.back();
 }
@@ -54,12 +59,22 @@ std::vector<Row>::const_iterator Rows::cbegin() const
 	return m_rows.cbegin();
 }
 
+std::vector<Row>::const_iterator Rows::cend() const
+{
+	return m_rows.cend();
+}
+
+int Rows::size() const
+{
+	return m_rows.size();
+}
+
 void Rows::addField(FieldData field)
 {
 	m_fields.push_back(field);
 }
 
-std::vector<FieldData>* Rows::getFields()
+Fields* Rows::getFields()
 { 
 	return &m_fields;
 }

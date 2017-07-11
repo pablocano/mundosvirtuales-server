@@ -68,7 +68,7 @@ void RegisterValue::setFieldData(FieldData * field)
 	m_fieldData = field;
 }
 
-std::string RegisterValue::getValue() const
+std::string RegisterValue::getSQLValue() const
 {
 	std::string value;
 	switch (m_fieldData->getType())
