@@ -11,7 +11,7 @@ using namespace db;
 /// <summary>
 /// Contains all the information of a part.
 /// </summary>
-class Part : public ObjectPlant
+class Part : public ObjectDB
 {
 public:
 	/// <summary>

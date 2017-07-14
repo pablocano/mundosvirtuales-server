@@ -2,8 +2,11 @@
 
 #include "../utils/serialization/json.h"
 #include "../utils/db/DBAdapter.h"
+#include "../utils/db/ObjectDB.h"
+#include "../utils/Position.h"
+#include "ModelAssembly.h"
+#include "InfoAssembly.h"
 #include "Part.h"
-#include "ObjectPlant.h"
 #include <vector>
 #include <string>
 
@@ -13,15 +16,88 @@ using namespace db;
 class Assembly;
 
 /// <summary>
-/// Definition of a vector of assemblies.
+/// 
 /// </summary>
-typedef std::vector<Assembly> Assemblies;
+class SubAssembly : public ObjectDB
+{
+protected:
+	
+	Position m_position;
+	std::shared_ptr<Assembly> m_lpAssembly;
+
+public:
+
+	SubAssembly();
+
+	Position getPosition() const;
+
+	Assembly getAssembly() const;
+
+	/// <summary>
+	/// Operator equals with Row.
+	/// </summary>
+	/// <param name="row">Row reference.</param>
+	void operator=(const Row& row);
+
+	/// <summary>
+	/// Gets a row.
+	/// </summary>
+	/// <returns>Returns a row constructed from this object's data.</returns>
+	Row getRow() const;
+};
+
+/// <summary>
+/// Definition of a vector of subassemblies.
+/// </summary>
+class SubAssemblies
+{
+protected:
+	typedef std::vector<SubAssembly> m_subAssemblies;
+
+public:
+	SubAssemblies();
+
+	void push_back(SubAssembly& subAssembly);
+
+	SubAssembly& front();
+
+	SubAssembly& back();
+
+	std::vector<SubAssembly>::iterator begin();
+
+	std::vector<SubAssembly>::iterator end();
+
+	std::vector<SubAssembly>::const_iterator cbegin() const;
+
+	std::vector<SubAssembly>::const_iterator cend() const;
+
+	int size() const;
+};
+
 
 /// <summary>
 /// Class that contains all the information about an assembly. An assembly is made of sub-assemblies and parts
 /// </summary>
-class Assembly : public ObjectPlant
+class Assembly : public ObjectDB
 {
+protected:
+	/// <summary>
+	/// All the sub-assemblies of this assembly
+	/// </summary>
+	SubAssemblies m_subAssemblies;
+
+	/// <summary>
+	/// All the parts that this assembly is made of.
+	/// </summary>
+	Parts m_parts;
+
+	/// <summary>
+	/// Information container.  
+	/// </summary>
+	InfoAssembly m_infoAssembly;
+
+	ModelAssembly m_modelAssembly;
+
 public:
 	/// <summary>
 	/// Default constructor
@@ -59,28 +135,6 @@ public:
 	static Assemblies loadAssembliesFromDB(DBAdapter* m_lpDataBase);
 
 	/// <summary>
-	/// Load properties this object from database.
-	/// </summary>
-	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
-	/// <param name="id">Identifier of Assembly in the database.</param>
-	/// <returns>Returns true if the load was successful, false otherwise.</returns>
-	bool loadFromDB(DBAdapter* lpDBAdapter, int id);
-
-	/// <summary>
-	/// Save Assembly to database.
-	/// </summary>
-	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
-	/// <returns>Returns true if this object was saved successfully, false otherwise.</returns>
-	bool saveToDB(DBAdapter* lpDBAdapter);
-
-	/// <summary>
-	/// Update Assembly to database.
-	/// </summary>
-	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
-	/// <returns>Returns true if this object was updated successfully, false otherwise.</returns>
-	bool updateToDB(DBAdapter* lpDBAdapter);
-
-	/// <summary>
 	/// Operator equals with Row.
 	/// </summary>
 	/// <param name="row">Row reference.</param>
@@ -90,52 +144,17 @@ public:
 	/// Gets a row.
 	/// </summary>
 	/// <returns>Rerturns a row contructed from this object data.</returns>
-	Row getRow();
+	Row getRow() const;
 
-	/// <summary>
-	/// All the sub-assemblies of this assembly
-	/// </summary>
-	std::vector<Assembly> subAssemblies;
+	Assemblies getSubAssemblies() const { return subAssemblies; }
 
-	/// <summary>
-	/// All the parts that this assembly is made of.
-	/// </summary>
-	std::vector<Part> parts;
+	std::vector<Part> getParts() const { return parts; }
 
-	/// <summary>
-	/// The name of the machine
-	/// </summary>
-	std::string name;
+	InfoAssembly getInfoAssembly() const { return infoAssembly; }
 
-	/// <summary>
-	/// If this assembly has inforation to shown.
-	/// </summary>
-	bool canShowInfo;
+	friend void to_json(json& j, const Assembly& m);
 
-	/// <summary>
-	/// The descriptions of this assembly.
-	/// </summary>
-	std::string info;
-
-	/// <summary>
-	/// A short description of this assembly.
-	/// </summary>
-	std::string shortInfo;
-
-	/// <summary>
-	/// The part number of this assembly.
-	/// </summary>
-	std::string pn;
-
-	/// <summary>
-	/// If this assembly can be selected in the virtual environment.
-	/// </summary>
-	bool canBeSelected;
-
-	/// <summary>
-	/// The unique identifier of this assembly.
-	/// </summary>
-	int assembly_id;
+	friend void from_json(const json& j, Assembly& m);
 };
 
 /// <summary>

@@ -1,72 +1,52 @@
-DROP TABLE IF EXISTS OutputModel CASCADE;
+DROP TABLE IF EXISTS output_model CASCADE;
 
-DROP TABLE IF EXISTS InputModel CASCADE;
+DROP TABLE IF EXISTS input_model CASCADE;
 
-DROP TABLE IF EXISTS ModelControl CASCADE;
+DROP TABLE IF EXISTS stock_translation CASCADE;
 
-DROP TABLE IF EXISTS PartsOfModel CASCADE;
+DROP TABLE IF EXISTS model_control CASCADE;
 
-DROP TABLE IF EXISTS PartsOfMachine CASCADE;
+DROP TABLE IF EXISTS subassembly CASCADE;
 
-DROP TABLE IF EXISTS Permission_user CASCADE;
+DROP TABLE IF EXISTS permission_user CASCADE;
 
-DROP TABLE IF EXISTS Permission_group CASCADE;
+DROP TABLE IF EXISTS permission_group CASCADE;
 
-DROP TABLE IF EXISTS Group_user CASCADE;
+DROP TABLE IF EXISTS model_version CASCADE;
 
-DROP TABLE IF EXISTS ModelsVersion CASCADE;
+DROP TABLE IF EXISTS assembly_translation CASCADE;
 
-DROP TABLE IF EXISTS MachineTranslation CASCADE;
+DROP TABLE IF EXISTS group_user CASCADE;
 
-DROP TABLE IF EXISTS Sensor_machine CASCADE;
+DROP TABLE IF EXISTS role_group CASCADE;
+
+DROP TABLE IF EXISTS sensor_stock CASCADE;
+
+DROP TABLE IF EXISTS stock CASCADE;
 
 DROP TABLE IF EXISTS role_user CASCADE;
 
-DROP TABLE IF EXISTS StockTranslation CASCADE;
+DROP TABLE IF EXISTS assembly CASCADE;
 
-DROP TABLE IF EXISTS Stock CASCADE;
+DROP TABLE IF EXISTS translate CASCADE;
 
-DROP TABLE IF EXISTS Role_group CASCADE;
+DROP TABLE IF EXISTS logger CASCADE;
 
-DROP TABLE IF EXISTS Logger CASCADE;
+DROP TABLE IF EXISTS groups CASCADE;
 
-DROP TABLE IF EXISTS Machines CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
-DROP TABLE IF EXISTS Translate CASCADE;
+DROP TABLE IF EXISTS language CASCADE;
 
-DROP TABLE IF EXISTS Groups CASCADE;
-
-DROP TABLE IF EXISTS Users CASCADE;
-
-DROP TABLE IF EXISTS Language CASCADE;
+DROP TABLE IF EXISTS position_entity CASCADE;
 
 DROP TABLE IF EXISTS roles CASCADE;
 
-DROP TABLE IF EXISTS PositionEntity CASCADE;
-
-DROP TABLE IF EXISTS Permissions CASCADE;
-
-DROP TABLE IF EXISTS Models CASCADE;
-
 DROP TABLE IF EXISTS Sensor CASCADE;
 
+DROP TABLE IF EXISTS model CASCADE;
 
-CREATE TABLE Sensor (
-  sensor_id SERIAL  NOT NULL ,
-  name VARCHAR(50)   NOT NULL ,
-  path_sensor VARCHAR(256)   NOT NULL   ,
-PRIMARY KEY(sensor_id));
-
-
-
-
-CREATE TABLE Models (
-  model_id SERIAL  NOT NULL ,
-  current_version INTEGER  DEFAULT 1    ,
-PRIMARY KEY(model_id));
-
-
-
+DROP TABLE IF EXISTS Permissions CASCADE;
 
 CREATE TABLE Permissions (
   permission_id SERIAL  NOT NULL ,
@@ -79,7 +59,35 @@ PRIMARY KEY(permission_id));
 
 
 
-CREATE TABLE PositionEntity (
+CREATE TABLE model (
+  model_id SERIAL  NOT NULL ,
+  current_version INTEGER  DEFAULT 1    ,
+PRIMARY KEY(model_id));
+
+
+
+
+CREATE TABLE Sensor (
+  sensor_id SERIAL  NOT NULL ,
+  name VARCHAR(50)   NOT NULL ,
+  path_sensor VARCHAR(256)   NOT NULL   ,
+PRIMARY KEY(sensor_id));
+
+
+
+
+CREATE TABLE roles (
+  roles_id SERIAL  NOT NULL ,
+  role VARCHAR(25)   NOT NULL ,
+  created_at TIMESTAMP    ,
+  deleted_at TIMESTAMP    ,
+  updated_at TIMESTAMP      ,
+PRIMARY KEY(roles_id));
+
+
+
+
+CREATE TABLE position_entity (
   position_entity_id SERIAL  NOT NULL ,
   pos_x FLOAT  DEFAULT 0.0  ,
   pos_y FLOAT  DEFAULT 0.0  ,
@@ -92,18 +100,7 @@ PRIMARY KEY(position_entity_id));
 
 
 
-CREATE TABLE roles (
-  role_id SERIAL  NOT NULL ,
-  role VARCHAR(25)   NOT NULL ,
-  created_at TIMESTAMP    ,
-  deleted_at TIMESTAMP    ,
-  updated_at TIMESTAMP      ,
-PRIMARY KEY(role_id));
-
-
-
-
-CREATE TABLE Language (
+CREATE TABLE language (
   language_id SERIAL  NOT NULL ,
   iso_country_code VARCHAR(25)   NOT NULL ,
   iso_language_code VARCHAR(25)   NOT NULL ,
@@ -113,8 +110,8 @@ PRIMARY KEY(language_id));
 
 
 
-CREATE TABLE Users (
-  user_id SERIAL  NOT NULL ,
+CREATE TABLE users (
+  users_id SERIAL  NOT NULL ,
   username VARCHAR(15)   NOT NULL ,
   password_user VARCHAR(20)   NOT NULL ,
   first_name VARCHAR(25)   NOT NULL ,
@@ -123,431 +120,413 @@ CREATE TABLE Users (
   created_at TIMESTAMP  DEFAULT now() NOT NULL ,
   deleted_at TIMESTAMP    ,
   updated_at TIMESTAMP      ,
-PRIMARY KEY(user_id));
+PRIMARY KEY(users_id));
 
 
 
 
-CREATE TABLE Groups (
-  group_id SERIAL  NOT NULL ,
+CREATE TABLE groups (
+  groups_id SERIAL  NOT NULL ,
   name VARCHAR(25)   NOT NULL ,
   created_at TIMESTAMP  DEFAULT now() NOT NULL ,
   deleted_at TIMESTAMP    ,
   updated_at TIMESTAMP      ,
-PRIMARY KEY(group_id));
+PRIMARY KEY(groups_id));
 
 
 
 
-CREATE TABLE Translate (
-  translate_id SERIAL  NOT NULL ,
-  Language_language_id INTEGER   NOT NULL ,
-  name VARCHAR(20)   NOT NULL ,
-  value VARCHAR(256)   NOT NULL   ,
-PRIMARY KEY(translate_id, Language_language_id)  ,
-  FOREIGN KEY(Language_language_id)
-    REFERENCES Language(language_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE);
-
-
-CREATE INDEX Translate_FKIndex1 ON Translate (Language_language_id);
-
-
-CREATE INDEX IFK_Rel_Translate ON Translate (Language_language_id);
-
-
-CREATE TABLE Machines (
-  machines_id SERIAL  NOT NULL ,
-  Models_model_id INTEGER   NOT NULL ,
-  part_number VARCHAR(20)  DEFAULT 'NA' NOT NULL ,
-  canShowInfo BOOL  DEFAULT False NOT NULL ,
-  canBeSelected BOOL  DEFAULT False NOT NULL   ,
-PRIMARY KEY(machines_id)  ,
-  FOREIGN KEY(Models_model_id)
-    REFERENCES Models(model_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE);
-
-
-CREATE INDEX Machines_FKIndex1 ON Machines (Models_model_id);
-
-
-CREATE INDEX IFK_Rel_Machine_Model ON Machines (Models_model_id);
-
-
-CREATE TABLE Logger (
-  log_id SERIAL  NOT NULL ,
-  Users_user_id INTEGER   NOT NULL ,
+CREATE TABLE logger (
+  logger_id SERIAL  NOT NULL ,
+  users_id INTEGER   NOT NULL ,
   source VARCHAR(30)    ,
   type_log VARCHAR(20)    ,
   message TEXT    ,
   created_at TIMESTAMP  DEFAULT now()    ,
-PRIMARY KEY(log_id)  ,
-  FOREIGN KEY(Users_user_id)
-    REFERENCES Users(user_id)
+PRIMARY KEY(logger_id)  ,
+  FOREIGN KEY(users_id)
+    REFERENCES users(users_id)
       ON UPDATE CASCADE);
 
 
-CREATE INDEX Logger_FKIndex1 ON Logger (Users_user_id);
+CREATE INDEX logger_FKIndex1 ON logger (users_id);
 
 
-CREATE INDEX IFK_Rel_Log ON Logger (Users_user_id);
+CREATE INDEX IFK_Rel_Log ON logger (users_id);
 
 
-CREATE TABLE Role_group (
-  role_group_id SERIAL  NOT NULL ,
-  roles_role_id INTEGER   NOT NULL ,
-  Groups_group_id INTEGER   NOT NULL ,
-  created_at TIMESTAMP      ,
-PRIMARY KEY(role_group_id)    ,
-  FOREIGN KEY(Groups_group_id)
-    REFERENCES Groups(group_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE,
-  FOREIGN KEY(roles_role_id)
-    REFERENCES roles(role_id)
+CREATE TABLE translate (
+  translate_id SERIAL  NOT NULL ,
+  language_id INTEGER   NOT NULL ,
+  name VARCHAR(20)   NOT NULL ,
+  value VARCHAR(256)   NOT NULL   ,
+PRIMARY KEY(translate_id, language_id)  ,
+  FOREIGN KEY(language_id)
+    REFERENCES language(language_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX Role_group_FKIndex1 ON Role_group (Groups_group_id);
-CREATE INDEX Role_group_FKIndex2 ON Role_group (roles_role_id);
+CREATE INDEX translate_FKIndex1 ON translate (language_id);
 
 
-CREATE INDEX IFK_Rel_Role_Group_Groups ON Role_group (Groups_group_id);
-CREATE INDEX IFK_Rel_Role_Group_Roles ON Role_group (roles_role_id);
+CREATE INDEX IFK_Rel_translate ON translate (language_id);
 
 
-CREATE TABLE Stock (
-  stock_id SERIAL  NOT NULL ,
-  PositionEntity_position_entity_id INTEGER   NOT NULL ,
-  serial_number VARCHAR(20)   NOT NULL ,
-  Machines_machines_id INTEGER   NOT NULL ,
-  created_at TIMESTAMP  DEFAULT now() NOT NULL ,
-  deleted_at TIMESTAMP    ,
-  updated_at TIMESTAMP      ,
-PRIMARY KEY(stock_id)    ,
-  FOREIGN KEY(Machines_machines_id)
-    REFERENCES Machines(machines_id),
-  FOREIGN KEY(PositionEntity_position_entity_id)
-    REFERENCES PositionEntity(position_entity_id)
+CREATE TABLE assembly (
+  assembly_id SERIAL  NOT NULL ,
+  model_id INTEGER   NOT NULL ,
+  part_number VARCHAR(20)  DEFAULT 'NA' NOT NULL   ,
+PRIMARY KEY(assembly_id)  ,
+  FOREIGN KEY(model_id)
+    REFERENCES model(model_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX Stock_FKIndex1 ON Stock (Machines_machines_id);
-CREATE INDEX Stock_FKIndex2 ON Stock (PositionEntity_position_entity_id);
+CREATE INDEX assembly_FKIndex1 ON assembly (model_id);
 
 
-CREATE INDEX IFK_Rel_machine_parts_stock ON Stock (Machines_machines_id);
-CREATE INDEX IFK_Rel_Stock_Position ON Stock (PositionEntity_position_entity_id);
-
-
-CREATE TABLE StockTranslation (
-  stock_translation_id SERIAL  NOT NULL ,
-  Stock_stock_id INTEGER   NOT NULL ,
-  Language_language_id INTEGER   NOT NULL ,
-  info VARCHAR(256)   NOT NULL   ,
-PRIMARY KEY(stock_translation_id)    ,
-  FOREIGN KEY(Language_language_id)
-    REFERENCES Language(language_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE,
-  FOREIGN KEY(Stock_stock_id)
-    REFERENCES Stock(stock_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE);
-
-
-CREATE INDEX StockTranslation_FKIndex1 ON StockTranslation (Language_language_id);
-CREATE INDEX StockTranslation_FKIndex2 ON StockTranslation (Stock_stock_id);
-
-
-CREATE INDEX IFK_Rel_stock_language ON StockTranslation (Language_language_id);
-CREATE INDEX IFK_Rel_Stock_Translation ON StockTranslation (Stock_stock_id);
+CREATE INDEX IFK_Rel_assembly_model ON assembly (model_id);
 
 
 CREATE TABLE role_user (
   role_user_id SERIAL  NOT NULL ,
-  roles_role_id INTEGER   NOT NULL ,
-  Users_user_id INTEGER   NOT NULL ,
+  roles_id INTEGER   NOT NULL ,
+  users_id INTEGER   NOT NULL ,
   created_at TIMESTAMP  DEFAULT now() NOT NULL   ,
 PRIMARY KEY(role_user_id)    ,
-  FOREIGN KEY(Users_user_id)
-    REFERENCES Users(user_id)
+  FOREIGN KEY(users_id)
+    REFERENCES users(users_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE,
-  FOREIGN KEY(roles_role_id)
-    REFERENCES roles(role_id)
+  FOREIGN KEY(roles_id)
+    REFERENCES roles(roles_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX role_user_FKIndex1 ON role_user (Users_user_id);
-CREATE INDEX role_user_FKIndex2 ON role_user (roles_role_id);
+CREATE INDEX role_user_FKIndex1 ON role_user (users_id);
+CREATE INDEX role_user_FKIndex2 ON role_user (roles_id);
 
 
-CREATE INDEX IFK_Rel_Role_User_Users ON role_user (Users_user_id);
-CREATE INDEX IFK_Rel_Role_User_Roles ON role_user (roles_role_id);
+CREATE INDEX IFK_Rel_role_user_users ON role_user (users_id);
+CREATE INDEX IFK_Rel_role_user_roles ON role_user (roles_id);
 
 
-CREATE TABLE Sensor_machine (
-  sensor_machine_id SERIAL  NOT NULL ,
-  Sensor_sensor_id INTEGER   NOT NULL ,
-  Machines_machines_id INTEGER   NOT NULL   ,
-PRIMARY KEY(sensor_machine_id)    ,
-  FOREIGN KEY(Machines_machines_id)
-    REFERENCES Machines(machines_id)
+CREATE TABLE stock (
+  stock_id SERIAL  NOT NULL ,
+  position_entity_id INTEGER   NOT NULL ,
+  assembly_id INTEGER   NOT NULL ,
+  serial_number VARCHAR(20)   NOT NULL ,
+  canShowInfo BOOL  DEFAULT false NOT NULL ,
+  canBeSelected BOOL  DEFAULT false NOT NULL ,
+  enable BOOL  DEFAULT true NOT NULL ,
+  created_at TIMESTAMP  DEFAULT now() NOT NULL ,
+  updated_at TIMESTAMP      ,
+PRIMARY KEY(stock_id)    ,
+  FOREIGN KEY(assembly_id)
+    REFERENCES assembly(assembly_id),
+  FOREIGN KEY(position_entity_id)
+    REFERENCES position_entity(position_entity_id)
       ON DELETE CASCADE
-      ON UPDATE CASCADE,
-  FOREIGN KEY(Sensor_sensor_id)
+      ON UPDATE CASCADE);
+
+
+CREATE INDEX stock_FKIndex1 ON stock (assembly_id);
+CREATE INDEX stock_FKIndex2 ON stock (position_entity_id);
+
+
+CREATE INDEX IFK_Rel_assembly_stock ON stock (assembly_id);
+CREATE INDEX IFK_Rel_stock_position ON stock (position_entity_id);
+
+
+CREATE TABLE sensor_stock (
+  sensor_stock_id SERIAL  NOT NULL ,
+  sensor_id INTEGER   NOT NULL ,
+  stock_id INTEGER   NOT NULL   ,
+PRIMARY KEY(sensor_stock_id)    ,
+  FOREIGN KEY(sensor_id)
     REFERENCES Sensor(sensor_id)
       ON DELETE CASCADE
+      ON UPDATE CASCADE,
+  FOREIGN KEY(stock_id)
+    REFERENCES stock(stock_id));
+
+
+CREATE INDEX sensor_stock_FKIndex2 ON sensor_stock (sensor_id);
+CREATE INDEX sensor_stock_stock_FKIndex2 ON sensor_stock (stock_id);
+
+
+CREATE INDEX IFK_Rel_sensor ON sensor_stock (sensor_id);
+CREATE INDEX IFK_Rel_stock_sensor ON sensor_stock (stock_id);
+
+
+CREATE TABLE role_group (
+  role_group_id SERIAL  NOT NULL ,
+  roles_id INTEGER   NOT NULL ,
+  groups_id INTEGER   NOT NULL ,
+  created_at TIMESTAMP      ,
+PRIMARY KEY(role_group_id)    ,
+  FOREIGN KEY(groups_id)
+    REFERENCES groups(groups_id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE,
+  FOREIGN KEY(roles_id)
+    REFERENCES roles(roles_id)
+      ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX Sensor_machine_FKIndex1 ON Sensor_machine (Machines_machines_id);
-CREATE INDEX Sensor_machine_FKIndex2 ON Sensor_machine (Sensor_sensor_id);
+CREATE INDEX role_group_FKIndex1 ON role_group (groups_id);
+CREATE INDEX role_group_FKIndex2 ON role_group (roles_id);
 
 
-CREATE INDEX IFK_Rel_Machine_Sensor ON Sensor_machine (Machines_machines_id);
-CREATE INDEX IFK_Rel_Sensor ON Sensor_machine (Sensor_sensor_id);
+CREATE INDEX IFK_Rel_Role_Group_Groups ON role_group (groups_id);
+CREATE INDEX IFK_Rel_role_group_roles ON role_group (roles_id);
 
 
-CREATE TABLE MachineTranslation (
-  machine_translation_id SERIAL  NOT NULL ,
-  Language_language_id INTEGER   NOT NULL ,
-  Machines_machines_id INTEGER   NOT NULL ,
+CREATE TABLE group_user (
+  group_user_id SERIAL  NOT NULL ,
+  users_id INTEGER   NOT NULL ,
+  groups_id INTEGER   NOT NULL ,
+  created_at TIMESTAMP  DEFAULT now() NOT NULL   ,
+PRIMARY KEY(group_user_id)  ,
+  FOREIGN KEY(users_id)
+    REFERENCES users(users_id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE,
+  FOREIGN KEY(groups_id)
+    REFERENCES groups(groups_id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE);
+
+
+CREATE INDEX group_user_FKIndex2 ON group_user (groups_id);
+
+
+CREATE INDEX IFK_Rel_groups_user_users ON group_user (users_id);
+CREATE INDEX IFK_Rel_groups_user_groups ON group_user (groups_id);
+
+
+CREATE TABLE assembly_translation (
+  assembly_translation_id SERIAL  NOT NULL ,
+  language_id INTEGER   NOT NULL ,
+  assembly_id INTEGER   NOT NULL ,
   name VARCHAR(25)   NOT NULL ,
   info VARCHAR(256)   NOT NULL ,
   shortInfo VARCHAR(256)   NOT NULL   ,
-PRIMARY KEY(machine_translation_id, Language_language_id)    ,
-  FOREIGN KEY(Language_language_id)
-    REFERENCES Language(language_id)
+PRIMARY KEY(assembly_translation_id)    ,
+  FOREIGN KEY(language_id)
+    REFERENCES language(language_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE,
-  FOREIGN KEY(Machines_machines_id)
-    REFERENCES Machines(machines_id)
+  FOREIGN KEY(assembly_id)
+    REFERENCES assembly(assembly_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX MachineTranslation_FKIndex1 ON MachineTranslation (Language_language_id);
-CREATE INDEX MachineTranslation_FKIndex2 ON MachineTranslation (Machines_machines_id);
+CREATE INDEX assembly_translation_FKIndex1 ON assembly_translation (language_id);
+CREATE INDEX assembly_translation_FKIndex2 ON assembly_translation (assembly_id);
 
 
-CREATE INDEX IFK_Rel_language_translation ON MachineTranslation (Language_language_id);
-CREATE INDEX IFK_Rel_machine_translation ON MachineTranslation (Machines_machines_id);
+CREATE INDEX IFK_Rel_language_translation ON assembly_translation (language_id);
+CREATE INDEX IFK_Rel_assembly_translation ON assembly_translation (assembly_id);
 
 
-CREATE TABLE ModelsVersion (
-  models_version_id SERIAL  NOT NULL ,
-  Models_model_id INTEGER   NOT NULL ,
-  PositionEntity_position_entity_id INTEGER   NOT NULL ,
+CREATE TABLE model_version (
+  model_version_id SERIAL  NOT NULL ,
+  position_entity_id INTEGER   NOT NULL ,
+  model_id INTEGER   NOT NULL ,
   path_model VARCHAR(256)   NOT NULL ,
   material VARCHAR(20)    ,
   color VARCHAR(12)    ,
   animated BOOL  DEFAULT False NOT NULL ,
   version INTEGER  DEFAULT 1 NOT NULL ,
   created_at TIMESTAMP  DEFAULT now() NOT NULL ,
-  deleted_at TIMESTAMP    ,
   updated_at TIMESTAMP      ,
-PRIMARY KEY(models_version_id)    ,
-  FOREIGN KEY(PositionEntity_position_entity_id)
-    REFERENCES PositionEntity(position_entity_id)
+PRIMARY KEY(model_version_id)    ,
+  FOREIGN KEY(position_entity_id)
+    REFERENCES position_entity(position_entity_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE,
-  FOREIGN KEY(Models_model_id)
-    REFERENCES Models(model_id)
+  FOREIGN KEY(model_id)
+    REFERENCES model(model_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX ModelsVersion_FKIndex1 ON ModelsVersion (PositionEntity_position_entity_id);
-CREATE INDEX ModelsVersion_FKIndex2 ON ModelsVersion (Models_model_id);
+CREATE INDEX ModelsVersion_FKIndex1 ON model_version (position_entity_id);
+CREATE INDEX ModelsVersion_FKIndex2 ON model_version (model_id);
 
 
-CREATE INDEX IFK_Rel_Model_Position ON ModelsVersion (PositionEntity_position_entity_id);
-CREATE INDEX IFK_Rel_Models_Version ON ModelsVersion (Models_model_id);
+CREATE INDEX IFK_Rel_model_position ON model_version (position_entity_id);
+CREATE INDEX IFK_Rel_models_version ON model_version (model_id);
 
 
-CREATE TABLE Group_user (
-  group_user_id SERIAL  NOT NULL ,
-  Users_user_id INTEGER   NOT NULL ,
-  Groups_group_id INTEGER   NOT NULL ,
-  created_at TIMESTAMP  DEFAULT now() NOT NULL   ,
-PRIMARY KEY(group_user_id)    ,
-  FOREIGN KEY(Users_user_id)
-    REFERENCES Users(user_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE,
-  FOREIGN KEY(Groups_group_id)
-    REFERENCES Groups(group_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE);
-
-
-CREATE INDEX Group_user_FKIndex1 ON Group_user (Users_user_id);
-CREATE INDEX Group_user_FKIndex2 ON Group_user (Groups_group_id);
-
-
-CREATE INDEX IFK_Rel_Group_User_Users ON Group_user (Users_user_id);
-CREATE INDEX IFK_Rel_Group_User_Groups ON Group_user (Groups_group_id);
-
-
-CREATE TABLE Permission_group (
+CREATE TABLE permission_group (
   permission_group_id SERIAL  NOT NULL ,
-  Permissions_permission_id INTEGER   NOT NULL ,
-  Groups_group_id INTEGER   NOT NULL ,
+  permission_id INTEGER   NOT NULL ,
+  groups_id INTEGER   NOT NULL ,
   created_at TIMESTAMP      ,
 PRIMARY KEY(permission_group_id)    ,
-  FOREIGN KEY(Groups_group_id)
-    REFERENCES Groups(group_id)
+  FOREIGN KEY(groups_id)
+    REFERENCES groups(groups_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE,
-  FOREIGN KEY(Permissions_permission_id)
+  FOREIGN KEY(permission_id)
     REFERENCES Permissions(permission_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX Permission_group_FKIndex1 ON Permission_group (Groups_group_id);
-CREATE INDEX Permission_group_FKIndex2 ON Permission_group (Permissions_permission_id);
+CREATE INDEX permission_group_FKIndex1 ON permission_group (groups_id);
+CREATE INDEX permission_group_FKIndex2 ON permission_group (permission_id);
 
 
-CREATE INDEX IFK_Rel_Permission_Group_Group ON Permission_group (Groups_group_id);
-CREATE INDEX IFK_Rel_Permission_Group_Permi ON Permission_group (Permissions_permission_id);
+CREATE INDEX IFK_Rel_permission_group_group ON permission_group (groups_id);
+CREATE INDEX IFK_Rel_permission_group_permi ON permission_group (permission_id);
 
 
-CREATE TABLE Permission_user (
+CREATE TABLE permission_user (
   permission_user_id SERIAL  NOT NULL ,
-  Permissions_permission_id INTEGER   NOT NULL ,
-  Users_user_id INTEGER   NOT NULL ,
+  permission_id INTEGER   NOT NULL ,
+  users_id INTEGER   NOT NULL ,
   created_at TIMESTAMP  DEFAULT now() NOT NULL   ,
 PRIMARY KEY(permission_user_id)    ,
-  FOREIGN KEY(Permissions_permission_id)
+  FOREIGN KEY(permission_id)
     REFERENCES Permissions(permission_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE,
-  FOREIGN KEY(Users_user_id)
-    REFERENCES Users(user_id)
+  FOREIGN KEY(users_id)
+    REFERENCES users(users_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX Permission_user_FKIndex1 ON Permission_user (Permissions_permission_id);
-CREATE INDEX Permission_user_FKIndex2 ON Permission_user (Users_user_id);
+CREATE INDEX permission_user_FKIndex1 ON permission_user (permission_id);
+CREATE INDEX permission_user_FKIndex2 ON permission_user (users_id);
 
 
-CREATE INDEX IFK_Rel_Permission_User_Permis ON Permission_user (Permissions_permission_id);
-CREATE INDEX IFK_Rel_Permission_User_Users ON Permission_user (Users_user_id);
+CREATE INDEX IFK_Rel_permission_user_permis ON permission_user (permission_id);
+CREATE INDEX IFK_Rel_permission_user_users ON permission_user (users_id);
 
 
-CREATE TABLE PartsOfMachine (
-  parts_of_machine_id SERIAL  NOT NULL ,
-  Machines_machines_id INTEGER   NOT NULL ,
-  Machines_related_machines_id INTEGER   NOT NULL   ,
-PRIMARY KEY(parts_of_machine_id, Machines_machines_id, Machines_related_machines_id)    ,
-  FOREIGN KEY(Machines_machines_id)
-    REFERENCES Machines(machines_id)
+CREATE TABLE subassembly (
+  subassembly_id SERIAL  NOT NULL ,
+  child_assembly_id INTEGER   NOT NULL ,
+  position_entity_id INTEGER   NOT NULL ,
+  parent_assembly_id INTEGER   NOT NULL   ,
+PRIMARY KEY(subassembly_id, child_assembly_id)      ,
+  FOREIGN KEY(parent_assembly_id)
+    REFERENCES assembly(assembly_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE,
-  FOREIGN KEY(Machines_related_machines_id)
-    REFERENCES Machines(machines_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE);
-
-
-CREATE INDEX PartsOfMachine_FKIndex1 ON PartsOfMachine (Machines_machines_id);
-CREATE INDEX PartsOfMachine_FKIndex2 ON PartsOfMachine (Machines_related_machines_id);
-
-
-CREATE INDEX IFK_Rel_Machine ON PartsOfMachine (Machines_machines_id);
-CREATE INDEX IFK_Rel_Machine_Related ON PartsOfMachine (Machines_related_machines_id);
-
-
-CREATE TABLE PartsOfModel (
-  parts_of_model_id SERIAL  NOT NULL ,
-  ModelsVersion_related_models_version_id INTEGER   NOT NULL ,
-  ModelsVersion_models_version_id INTEGER   NOT NULL   ,
-PRIMARY KEY(parts_of_model_id)    ,
-  FOREIGN KEY(ModelsVersion_models_version_id)
-    REFERENCES ModelsVersion(models_version_id)
+  FOREIGN KEY(child_assembly_id)
+    REFERENCES assembly(assembly_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE,
-  FOREIGN KEY(ModelsVersion_related_models_version_id)
-    REFERENCES ModelsVersion(models_version_id)
+  FOREIGN KEY(position_entity_id)
+    REFERENCES position_entity(position_entity_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX PartsOfModel_FKIndex1 ON PartsOfModel (ModelsVersion_models_version_id);
-CREATE INDEX PartsOfModel_FKIndex2 ON PartsOfModel (ModelsVersion_related_models_version_id);
+CREATE INDEX subassembly_FKIndex1 ON subassembly (parent_assembly_id);
+CREATE INDEX subassembly_FKIndex2 ON subassembly (child_assembly_id);
+CREATE INDEX subassembly_FKIndex3 ON subassembly (position_entity_id);
 
 
-CREATE INDEX IFK_Rel_PartsOfModel ON PartsOfModel (ModelsVersion_models_version_id);
-CREATE INDEX IFK_Rel_PartsOfModel_Related ON PartsOfModel (ModelsVersion_related_models_version_id);
+CREATE INDEX IFK_Rel_assembly ON subassembly (parent_assembly_id);
+CREATE INDEX IFK_Rel_assembly_child ON subassembly (child_assembly_id);
+CREATE INDEX IFK_Rel_subassembly_position ON subassembly (position_entity_id);
 
 
-CREATE TABLE ModelControl (
+CREATE TABLE model_control (
   model_control_id SERIAL  NOT NULL ,
-  Stock_stock_id INTEGER   NOT NULL ,
+  stock_id INTEGER   NOT NULL ,
   function_model TEXT      ,
 PRIMARY KEY(model_control_id)  ,
-  FOREIGN KEY(Stock_stock_id)
-    REFERENCES Stock(stock_id)
+  FOREIGN KEY(stock_id)
+    REFERENCES stock(stock_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX ModelControl_FKIndex1 ON ModelControl (Stock_stock_id);
+CREATE INDEX model_control_FKIndex1 ON model_control (stock_id);
 
 
-CREATE INDEX IFK_Rel_Model_Control ON ModelControl (Stock_stock_id);
+CREATE INDEX IFK_Rel_model_control ON model_control (stock_id);
 
 
-CREATE TABLE InputModel (
+CREATE TABLE stock_translation (
+  stock_translation_id SERIAL  NOT NULL ,
+  stock_id INTEGER   NOT NULL ,
+  language_id INTEGER   NOT NULL ,
+  info VARCHAR(256)   NOT NULL   ,
+PRIMARY KEY(stock_translation_id)    ,
+  FOREIGN KEY(language_id)
+    REFERENCES language(language_id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE,
+  FOREIGN KEY(stock_id)
+    REFERENCES stock(stock_id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE);
+
+
+CREATE INDEX stock_translation_FKIndex1 ON stock_translation (language_id);
+CREATE INDEX stock_translation_FKIndex2 ON stock_translation (stock_id);
+
+
+CREATE INDEX IFK_Rel_stock_language ON stock_translation (language_id);
+CREATE INDEX IFK_Rel_stock_translation ON stock_translation (stock_id);
+
+
+CREATE TABLE input_model (
   input_model_id SERIAL  NOT NULL ,
-  ModelControl_model_control_id INTEGER   NOT NULL ,
+  dst_model_control_id INTEGER   NOT NULL ,
+  src_model_control_id INTEGER   NOT NULL ,
   position_input INTEGER      ,
 PRIMARY KEY(input_model_id)    ,
-  FOREIGN KEY(ModelControl_model_control_id)
-    REFERENCES ModelControl(model_control_id)
+  FOREIGN KEY(dst_model_control_id)
+    REFERENCES model_control(model_control_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE,
-  FOREIGN KEY(ModelControl_model_control_id)
-    REFERENCES ModelControl(model_control_id)
+  FOREIGN KEY(src_model_control_id)
+    REFERENCES model_control(model_control_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX InputModel_FKIndex1 ON InputModel (ModelControl_model_control_id);
-CREATE INDEX InputModel_FKIndex2 ON InputModel (ModelControl_model_control_id);
+CREATE INDEX input_model_FKIndex1 ON input_model (dst_model_control_id);
+CREATE INDEX input_model_FKIndex2 ON input_model (src_model_control_id);
 
 
-CREATE INDEX IFK_Rel_ModelControl_Input ON InputModel (ModelControl_model_control_id);
-CREATE INDEX IFK_Rel_ModelControl_Input_Sou ON InputModel (ModelControl_model_control_id);
+CREATE INDEX IFK_Rel_model_control_input_ds ON input_model (dst_model_control_id);
+CREATE INDEX IFK_Rel_model_control_input_sr ON input_model (src_model_control_id);
 
 
-CREATE TABLE OutputModel (
+CREATE TABLE output_model (
   output_model_id SERIAL  NOT NULL ,
-  ModelControl_model_control_id INTEGER   NOT NULL ,
+  dst_model_control_id INTEGER   NOT NULL ,
+  src_model_control_id INTEGER   NOT NULL ,
   position_output INTEGER   NOT NULL   ,
 PRIMARY KEY(output_model_id)    ,
-  FOREIGN KEY(ModelControl_model_control_id)
-    REFERENCES ModelControl(model_control_id)
+  FOREIGN KEY(dst_model_control_id)
+    REFERENCES model_control(model_control_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE,
-  FOREIGN KEY(ModelControl_model_control_id)
-    REFERENCES ModelControl(model_control_id)
+  FOREIGN KEY(src_model_control_id)
+    REFERENCES model_control(model_control_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX OutputModel_FKIndex1 ON OutputModel (ModelControl_model_control_id);
-CREATE INDEX OutputModel_FKIndex2 ON OutputModel (ModelControl_model_control_id);
+CREATE INDEX output_model_FKIndex1 ON output_model (dst_model_control_id);
+CREATE INDEX output_model_FKIndex2 ON output_model (src_model_control_id);
 
 
-CREATE INDEX IFK_Rel_ModelControl_Output ON OutputModel (ModelControl_model_control_id);
-CREATE INDEX IFK_Rel_ModelControl_Output_So ON OutputModel (ModelControl_model_control_id);
+CREATE INDEX IFK_Rel_model_control_output_d ON output_model (dst_model_control_id);
+CREATE INDEX IFK_Rel_model_control_output_s ON output_model (src_model_control_id);

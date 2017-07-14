@@ -26,7 +26,7 @@ void Row::addRegister(RegisterValue& registerValue)
 	m_registers.push_back(registerValue);
 }
 
-void Row::setFieldData(Fields* fields)
+void Row::setFieldData(std::shared_ptr<Fields> fields)
 {
 	m_lpFields = fields;
 }

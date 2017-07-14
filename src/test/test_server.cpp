@@ -20,7 +20,7 @@ void test_server()
 	static Assemblies machines;
 	
 	static Concurrency con([]() -> bool { machines = client.requestMachines(); return machines.size() > 0; },
-		[]() { LOGGER_LOG("Response Packet Client", "Machines:"); for (Assembly machine : machines) LOGGER_LOG("Test Server", machine.name); }, 100);
+		[]() { LOGGER_LOG("Response Packet Client", "Machines:"); for (Assembly machine : machines) LOGGER_LOG("Test Server", machine.getInfoAssembly().getName()); }, 100);
 
 	LOGGER_LOG("Test Server", "Post concurrency");
 	

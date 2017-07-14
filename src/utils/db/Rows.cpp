@@ -66,7 +66,7 @@ std::vector<Row>::const_iterator Rows::cend() const
 
 int Rows::size() const
 {
-	return m_rows.size();
+	return (int) m_rows.size();
 }
 
 void Rows::addField(FieldData field)

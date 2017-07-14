@@ -43,8 +43,11 @@ set( CLIENT_INCLUDE
 
 set( UTILS_SRC
 	src/plant/Assembly.cpp
+	src/plant/InfoAssembly.cpp
 	src/plant/Part.cpp
+	src/plant/ModelAssembly.cpp
 	src/plant/ModelControl.cpp
+	src/plant/StockPlant.cpp
 	src/utils/AssemblyUtils.cpp
 	src/utils/Position.cpp
 	src/utils/Logger/Logger.cpp
@@ -63,10 +66,12 @@ set( UTILS_SRC
 
 set ( UTILS_INCLUDE
 	src/plant/Assembly.h
-	src/plant/ObjectPlant.h
+	src/plant/InfoAssembly.h
 	src/plant/Part.h
-	src/plant/PlantException.h
+	src/plant/ModelAssembly.h
 	src/plant/ModelControl.h
+	src/plant/PlantException.h
+	src/plant/StockPlant.h
 	src/plant/sensors/Sensor.h
 	src/plant/sensors/SensorException.h
 	src/utils/AssemblyUtils.h
@@ -87,6 +92,7 @@ set ( UTILS_INCLUDE
 	src/utils/concurrency/Concurrency.h
 	src/utils/concurrency/ConcurrencyException.h
 	src/utils/concurrency/Runnable.h
+	src/utils/db/ObjectDB.h
 	src/utils/network/NetworkException.h
 	src/utils/network/ClientTCP.h
 	src/utils/network/ServerTCP.h

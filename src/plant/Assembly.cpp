@@ -7,7 +7,7 @@ Assembly::Assembly()
 }
 
 Assembly::Assembly(int id, std::string name, std::string info, std::string shortInfo, std::string pn, bool canBeSelected, bool canShowInfo) :
-	assembly_id(id), name(name), info(info), canShowInfo(canShowInfo), shortInfo(shortInfo), pn(pn), canBeSelected(canBeSelected)
+	ObjectDB(id), canShowInfo(canShowInfo), canBeSelected(canBeSelected), infoAssembly(name, info, shortInfo, pn)
 {
 }
 
@@ -126,33 +126,27 @@ bool Assembly::updateToDB(DBAdapter * lpDBAdapter)
 
 void Assembly::operator=(const Row& row)
 {
-	assembly_id = row.get<int>("machine_id");
-	name = row.get<std::string>("path_model");
-	info = row.get<std::string>("info");
-	shortInfo = row.get<std::string>("shortinfo");
-	pn = row.get<std::string>("part_number");
+	m_id = row.get<int>("machine_id");
 	canBeSelected = row.get<bool>("canbeselected");
 	canShowInfo = row.get<bool>("canshowinfo");
+	infoAssembly = row;
 }
 
-Row Assembly::getRow()
+Row Assembly::getRow() const
 {
 	return Row();
 }
 
 void to_json(json& j, const Assembly& m) {
-	j = json{ { "id", m.assembly_id }, {"machineParts", m.parts}, { "name", m.name },{ "info", m.info },{"canShowInfo",m.canShowInfo },{ "shortInfo", m.shortInfo },{"pn", m.pn}, {"canBeSelected", m.canBeSelected} };
+	j = json{ { "id", m.m_id }, {"machineParts", m.parts}, {"canShowInfo",m.canShowInfo }, {"canBeSelected", m.canBeSelected}, { "infoAssembly", m.infoAssembly } };
 }
 
 void from_json(const json& j, Assembly& m) {
-	m.assembly_id = j.at("id").get<int>();
+	m.m_id = j.at("id").get<int>();
 	m.parts = j.at("machineParts");
-	m.name = j.at("name").get<std::string>();
-	m.info = j.at("info").get<std::string>();
 	m.canShowInfo = j.at("canShowInfo").get<bool>();
-	m.shortInfo = j.at("shortInfo").get<std::string>();
-	m.pn = j.at("pn").get<std::string>();
 	m.canBeSelected = j.at("canBeSelected").get<bool>();
+	m.infoAssembly = j.at("infoAssembly");
 }
 
 

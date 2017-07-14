@@ -4,6 +4,7 @@
 #include "RegisterValue.h"
 
 #include <vector>
+#include <memory>
 
 namespace db
 {
@@ -13,7 +14,7 @@ namespace db
 	class Row
 	{
 	protected:
-		Fields* m_lpFields; /* Pointer reference table fields. */
+		std::shared_ptr<Fields> m_lpFields; /* Pointer reference table fields. */
 		std::vector<RegisterValue> m_registers; /* Registers of table. */
 
 	public:
@@ -70,7 +71,7 @@ namespace db
 		/// Sets information about fields.
 		/// </summary>
 		/// <param name="fields">Fields reference.</param>
-		void setFieldData(Fields* fields);
+		void setFieldData(std::shared_ptr<Fields> fields);
 
 		/// <summary>
 		/// Finds register from field's name.
