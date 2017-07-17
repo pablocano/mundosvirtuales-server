@@ -22,16 +22,27 @@ class SubAssembly : public ObjectDB
 {
 protected:
 	
-	Position m_position;
-	std::shared_ptr<Assembly> m_lpAssembly;
+	Position m_position; /* Position of subassembly. */
+	std::shared_ptr<Assembly> m_lpAssembly; /* Pointer to assembly. */
 
 public:
 
-	SubAssembly();
+	/// <summary>
+	/// COnstructor.
+	/// </summary>
+	SubAssembly() : ObjectDB(0, "subassembly"), m_position(), m_lpAssembly(nullptr) {}
 
-	Position getPosition() const;
+	/// <summary>
+	/// Gets position of assembly.
+	/// </summary>
+	/// <returns></returns>
+	Position getPosition() const { return m_position; }
 
-	Assembly getAssembly() const;
+	/// <summary>
+	/// Gets assembly.
+	/// </summary>
+	/// <returns></returns>
+	Assembly& getAssembly() const { return *m_lpAssembly; }
 
 	/// <summary>
 	/// Operator equals with Row.
@@ -47,33 +58,14 @@ public:
 };
 
 /// <summary>
+/// Definition of a vector of assemblies.
+/// </summary>
+typedef std::vector<Assembly> Assemblies;
+
+/// <summary>
 /// Definition of a vector of subassemblies.
 /// </summary>
-class SubAssemblies
-{
-protected:
-	typedef std::vector<SubAssembly> m_subAssemblies;
-
-public:
-	SubAssemblies();
-
-	void push_back(SubAssembly& subAssembly);
-
-	SubAssembly& front();
-
-	SubAssembly& back();
-
-	std::vector<SubAssembly>::iterator begin();
-
-	std::vector<SubAssembly>::iterator end();
-
-	std::vector<SubAssembly>::const_iterator cbegin() const;
-
-	std::vector<SubAssembly>::const_iterator cend() const;
-
-	int size() const;
-};
-
+typedef VectorObjectDB<SubAssembly> SubAssemblies;
 
 /// <summary>
 /// Class that contains all the information about an assembly. An assembly is made of sub-assemblies and parts
@@ -81,22 +73,11 @@ public:
 class Assembly : public ObjectDB
 {
 protected:
-	/// <summary>
-	/// All the sub-assemblies of this assembly
-	/// </summary>
-	SubAssemblies m_subAssemblies;
 
-	/// <summary>
-	/// All the parts that this assembly is made of.
-	/// </summary>
-	Parts m_parts;
-
-	/// <summary>
-	/// Information container.  
-	/// </summary>
-	InfoAssembly m_infoAssembly;
-
-	ModelAssembly m_modelAssembly;
+	SubAssemblies m_subAssemblies; /* All the sub-assemblies of this assembly */
+	Parts m_parts; /* All the parts that this assembly is made of. */
+	InfoAssembly m_infoAssembly; /* Information container. */
+	ModelAssembly m_modelAssembly; /* Information about model. */
 
 public:
 	/// <summary>
@@ -146,11 +127,11 @@ public:
 	/// <returns>Rerturns a row contructed from this object data.</returns>
 	Row getRow() const;
 
-	Assemblies getSubAssemblies() const { return subAssemblies; }
+	SubAssemblies getSubAssemblies() const { return m_subAssemblies; }
 
-	std::vector<Part> getParts() const { return parts; }
+	Parts getParts() const { return m_parts; }
 
-	InfoAssembly getInfoAssembly() const { return infoAssembly; }
+	InfoAssembly getInfoAssembly() const { return m_infoAssembly; }
 
 	friend void to_json(json& j, const Assembly& m);
 

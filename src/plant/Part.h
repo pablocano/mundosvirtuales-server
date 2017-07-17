@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../plant/ObjectPlant.h"
+#include "../utils/db/ObjectDB.h"
 #include "../utils/serialization/json.h" 
 #include <vector>
 #include <string>
@@ -114,7 +114,7 @@ public:
 /// <summary>
 /// Definition of a vector of parts.
 /// </summary>
-typedef std::vector<Part> Parts;
+typedef VectorObjectDB<Part> Parts;
 
 /// <summary>
 /// Return a json representation of the part class.

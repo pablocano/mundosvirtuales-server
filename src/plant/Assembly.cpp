@@ -7,7 +7,7 @@ Assembly::Assembly()
 }
 
 Assembly::Assembly(int id, std::string name, std::string info, std::string shortInfo, std::string pn, bool canBeSelected, bool canShowInfo) :
-	ObjectDB(id), canShowInfo(canShowInfo), canBeSelected(canBeSelected), infoAssembly(name, info, shortInfo, pn)
+	ObjectDB(id), m_infoAssembly(name, info, shortInfo)
 {
 }
 
@@ -149,5 +149,12 @@ void from_json(const json& j, Assembly& m) {
 	m.infoAssembly = j.at("infoAssembly");
 }
 
+void SubAssembly::operator=(const Row & row)
+{
 
+}
 
+Row SubAssembly::getRow() const
+{
+	return Row();
+}
