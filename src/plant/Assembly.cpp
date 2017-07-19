@@ -2,19 +2,6 @@
 #include "../utils/db/Rows.h"
 #include "../utils/logger/Logger.h"
 
-Assembly::Assembly()
-{
-}
-
-Assembly::Assembly(int id, std::string name, std::string info, std::string shortInfo, std::string pn, bool canBeSelected, bool canShowInfo) :
-	ObjectDB(id), m_infoAssembly(name, info, shortInfo)
-{
-}
-
-Assembly::~Assembly()
-{
-}
-
 Assemblies Assembly::loadAssembliesFromDB(DBAdapter* lpDataBase)
 {
 	using namespace db;
@@ -80,48 +67,6 @@ Assemblies Assembly::loadAssembliesFromDB(DBAdapter* lpDataBase)
 	}
 
 	return assemblies;
-}
-
-bool Assembly::loadFromDB(DBAdapter* lpDBAdapter, int id)
-{
-	try
-	{
-		Rows rows_assemblies = lpDBAdapter->query("SELECT machines.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.model_id = machines.Models_model_id) INNER JOIN modelsversion ON ((models.model_id = modelsversion.Models_model_id) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
-
-		return true;
-	}
-	catch (const std::exception& e)
-	{
-		LOGGER_ERROR("Assembly", e.what());
-		return false;
-	}
-}
-
-bool Assembly::saveToDB(DBAdapter* lpDBAdapter)
-{
-	try
-	{
-
-		return true;
-	}
-	catch (const std::exception& e)
-	{
-		LOGGER_ERROR("Assembly", e.what());
-		return false;
-	}
-}
-
-bool Assembly::updateToDB(DBAdapter * lpDBAdapter)
-{
-	try
-	{
-		return true;
-	}
-	catch (const std::exception& e)
-	{
-		LOGGER_ERROR("Part", e.what());
-		return false;
-	}
 }
 
 void Assembly::operator=(const Row& row)

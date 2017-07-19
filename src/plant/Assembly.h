@@ -28,9 +28,9 @@ protected:
 public:
 
 	/// <summary>
-	/// COnstructor.
+	/// Constructor.
 	/// </summary>
-	SubAssembly() : ObjectDB(0, "subassembly"), m_position(), m_lpAssembly(nullptr) {}
+	SubAssembly() : ObjectDB(0, "subassembly", nullptr), m_position(), m_lpAssembly(nullptr) {}
 
 	/// <summary>
 	/// Gets position of assembly.
@@ -83,7 +83,7 @@ public:
 	/// <summary>
 	/// Default constructor
 	/// </summary>
-	Assembly();
+	Assembly::Assembly() : ObjectDB(0, "assembly", nullptr) {}
 
 	/// <summary>
 	/// Constructor
@@ -95,7 +95,8 @@ public:
 	/// <param name="pn">The part number of this assembly.</param>
 	/// <param name="canBeSelected">If this assembly can be selected in the virtual environment.</param>
 	/// <param name="canShowInfo">If this assembly has some info to shown.</param>
-	Assembly(int id, std::string name, std::string info, std::string shortInfo, std::string pn, bool canBeSelected = false, bool canShowInfo = false);
+	Assembly(int id, std::string name, std::string info, std::string shortInfo, std::string pn, bool canBeSelected = false, bool canShowInfo = false) :
+		ObjectDB(id, "assembly", nullptr), m_infoAssembly(name, info, shortInfo) {}
 	
 	/// <summary>
 	/// Constructor object from row.
@@ -106,7 +107,7 @@ public:
 	/// <summary>
 	/// Destructor
 	/// </summary>
-	~Assembly();
+	~Assembly() {}
 
 	/// <summary>
 	/// Load Assemblies from database.

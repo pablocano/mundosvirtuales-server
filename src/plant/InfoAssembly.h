@@ -27,7 +27,7 @@ public:
 	/// <summary>
 	/// Constructor.
 	/// </summary>
-	InfoAssembly() : ObjectDB(0, "assembly_translation"), m_name("NO NAME"), m_info(), m_shortInfo() {}
+	InfoAssembly() : ObjectDB(0, "assembly_translation", nullptr), m_name("NO NAME"), m_info(), m_shortInfo() {}
 
 	/// <summary>
 	/// Constructor.
@@ -35,7 +35,8 @@ public:
 	/// <param name="name">The name of the machine shown in the game.</param>
 	/// <param name="info">The description of this assembly.</param>
 	/// <param name="shortInfo">A little description about the assembly.</param>
-	InfoAssembly(std::string name, std::string info, std::string shortInfo) : ObjectDB(0, "assembly_translation"), m_name(name), m_info(info), m_shortInfo(shortInfo) {}
+	InfoAssembly(std::string name, std::string info, std::string shortInfo) :
+		ObjectDB(0, "assembly_translation", nullptr), m_name(name), m_info(info), m_shortInfo(shortInfo) {}
 
 	/// <summary>
 	/// Gets Name.

@@ -25,16 +25,6 @@ bool StockPlant::getCanShowInfo() const
 	return m_canShowInfo;
 }
 
-bool StockPlant::loadFromDB(DBAdapter* lpDBAdapter, int id)
-{
-	return false;
-}
-
-bool StockPlant::saveToDB(DBAdapter* lpDBAdapter)
-{
-	return false;
-}
-
 void StockPlant::setFromRow(DBAdapter* lpDBAdapter, const Row& row)
 {
 	m_assembly.loadFromDB(lpDBAdapter, row.get<int>("assembly_id"));

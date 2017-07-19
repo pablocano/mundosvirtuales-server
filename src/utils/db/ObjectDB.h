@@ -15,6 +15,7 @@ class ObjectDB
 private:
 	int m_id; /* Identified of register in table. */
 	std::string m_tableName; /* Name of table in Database. */
+	DBAdapter* m_lpDBAdapter; /* Pointer to Database functions. */
 
 public:
 
@@ -23,7 +24,7 @@ public:
 	/// </summary>
 	/// <param name="id"></param>
 	/// <param name="tableName"></param>
-	ObjectDB(int id, const std::string tableName) : m_id(id), m_tableName(tableName) {}
+	ObjectDB(int id, const std::string tableName, DBAdapter* lpDBAdapter) : m_id(id), m_tableName(tableName), m_lpDBAdapter(lpDBAdapter) {}
 
 	/// <summary>
 	/// 
@@ -55,6 +56,15 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
+	/// <param name="lpDBAdapter"></param>
+	void setDBAdapter(DBAdapter* lpDBAdapter)
+	{
+		m_lpDBAdapter = lpDBAdapter;
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
 	/// <returns></returns>
 	std::string getIDFieldName() const
 	{
@@ -73,25 +83,22 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <param name="lpDBAdapter"></param>
 	/// <returns></returns>
-	Row getRowFromDB(DBAdapter* lpDBAdapter) const
+	Row getRowFromDB() const
 	{
-		Rows rows = lpDBAdapter->query("SELECT " + getFieldsSelect() + " from " + m_tableName + " " + getJoin() + " where " + getWhere() + ";");
+		Rows rows = m_lpDBAdapter->query("SELECT " + getFieldsSelect() + " from " + m_tableName + " " + getJoin() + " where " + getWhere() + ";");
 		return rows.front();
 	}
 
 	/// <summary>
 	/// Load properties this object from database.
 	/// </summary>
-	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
-	/// <param name="id">Identifier of Assembly in the database.</param>
 	/// <returns>Returns true if the load was successful, false otherwise.</returns>
-	bool loadFromDB(DBAdapter* lpDBAdapter)
+	bool loadFromDB()
 	{
 		try
 		{
-			*this = getRowFromDB(lpDBAdapter);
+			*this = getRowFromDB();
 			return true;
 		}
 		catch (const std::exception &e)
@@ -104,21 +111,20 @@ public:
 	/// <summary>
 	/// Save Assembly to database.
 	/// </summary>
-	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
 	/// <returns>Returns true if this object was saved successfully, false otherwise.</returns>
-	bool saveToDB(DBAdapter* lpDBAdapter)
+	bool saveToDB()
 	{
 		try
 		{
 			Row row = getRow();
 			std::string where = getWhere();
-			if (lpDBAdapter->countQuery(m_tableName, where) > 0)
+			if (m_lpDBAdapter->countQuery(m_tableName, where) > 0)
 			{
-				return lpDBAdapter->update(m_tableName, row, where);
+				return m_lpDBAdapter->update(m_tableName, row, where);
 			}
 			else
 			{
-				return lpDBAdapter->insert(m_tableName, row);
+				return m_lpDBAdapter->insert(m_tableName, row);
 			}
 		}
 		catch (const std::exception &e)
@@ -174,19 +180,21 @@ public:
 template<typename T>
 class VectorObjectDB
 {
+static_assert(std::is_base_of<ObjectDB, T>::value, "T must derive from ObjectDB");
+
 protected:
-	typedef std::vector<T> m_objects;
+	std::vector<std::shared_ptr<T>> m_objects;
 
 public:
 	VectorObjectDB() : m_objects() {}
 
-	bool loadFromDB(DBAdapter* lpDBAdapter)
+	bool loadFromDB()
 	{
 		try
 		{
-			for (auto obj = m_object.begin(); obj != m_objects.end(); ++obj)
+			for (std::shared_ptr<T> obj : m_objects)
 			{
-				*obj = obj.getRowFromDB(lpDBAdapter);
+				obj->loadFromDB();
 			}
 			return true;
 		}
@@ -197,16 +205,15 @@ public:
 		}
 	}
 
-	bool loadFromDB(DBAdapter* lpDBAdapter, std::vector<int> ids)
+	bool loadFromDB(DBAdapter* lpDBAdapter, std::string table, std::vector<int> ids)
 	{
 		try
 		{
 			for (int id : ids)
 			{
-				T obj;
-				obj.setID(id);
-				obj.loadFromDB(lpDBAdapter);
-				push_back(obj);
+				std::shared_ptr<ObjectDB> obj(new T(id, table, lpDBAdapter));
+				if(obj->loadFromDB())
+					push_back(obj);
 			}
 			return true;
 		}
@@ -217,20 +224,15 @@ public:
 		}
 	}
 
-	bool saveToDB(DBAdapter* lpDBAdapter)
+	bool saveToDB()
 	{
 		try
 		{
-			Row row = getRow();
-			std::string where = getWhere();
-			if (lpDBAdapter->countQuery(m_tableName, where) > 0)
+			for (std::shared_ptr<T> obj : m_objects)
 			{
-				return lpDBAdapter->update(m_tableName, row, where);
+				obj->saveToDB();
 			}
-			else
-			{
-				return lpDBAdapter->insert(m_tableName, row);
-			}
+			return true;
 		}
 		catch (const std::exception &e)
 		{
@@ -239,37 +241,37 @@ public:
 		}
 	}
 
-	void push_back(T& obj) 
+	void push_back(std::shared_ptr<T>& obj)
 	{ 
 		m_objects.push_back(obj);
 	}
 
-	T& front() const
+	std::shared_ptr<T> front() const
 	{
 		return m_objects.front();
 	}
 
-	T& back() const
+	std::shared_ptr<T> back() const
 	{
 		return m_objects.back();
 	}
 
-	std::vector<T>::iterator begin()
+	auto begin()
 	{
 		return m_objects.begin();
 	}
 
-	std::vector<T>::iterator end()
+	auto end()
 	{
 		return m_objects.end();
 	}
 
-	std::vector<T>::const_iterator cbegin() const
+	auto cbegin() const
 	{
 		return m_objects.cbegin();
 	}
 
-	std::vector<T>::const_iterator cend() const
+	auto cend() const
 	{
 		return m_objects.cend();
 	}

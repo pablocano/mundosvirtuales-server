@@ -20,7 +20,7 @@ public:
 	/// <summary>
 	/// Constructor.
 	/// </summary>
-	ModelAssembly() : ObjectDB(0, "model"), m_path_model(), m_material(), m_color(), m_animated(false), m_version(-1) {}
+	ModelAssembly() : ObjectDB(0, "model", nullptr), m_path_model(), m_material(), m_color(), m_animated(false), m_version(-1) {}
 
 	/// <summary>
 	/// Constructor.
@@ -31,7 +31,7 @@ public:
 	/// <param name="animated"></param>
 	/// <param name="version"></param>
 	ModelAssembly(std::string path_model, std::string material, std::string color, bool animated = 0, int version = -1) :
-		ObjectDB(0, "model"), m_path_model(path_model), m_material(material), m_color(color), m_animated(animated), m_version(version) {}
+		ObjectDB(0, "model", nullptr), m_path_model(path_model), m_material(material), m_color(color), m_animated(animated), m_version(version) {}
 
 	/// <summary>
 	/// 
