@@ -86,7 +86,8 @@ public:
 	/// <returns></returns>
 	Row getRowFromDB() const
 	{
-		Rows rows = m_lpDBAdapter->query("SELECT " + getFieldsSelect() + " FROM " + m_tableName + " " + getJoin() + " WHERE " + getWhere() + ";");
+		std::string query = "SELECT " + getFieldsSelect() + " FROM " + m_tableName + " " + getJoin() + " WHERE " + getWhere() + ";";
+		Rows rows = m_lpDBAdapter->query(query);
 		if (rows.isEmpty())
 		{
 			Row row;
@@ -182,7 +183,7 @@ public:
 	/// Gets a row.
 	/// </summary>
 	/// <returns>Returns a row constructed from this object's data.</returns>
-	Row getRow() const
+	virtual Row getRow() const
 	{
 		return Row();
 	}
@@ -191,7 +192,7 @@ public:
 	/// Operator equals with Row.
 	/// </summary>
 	/// <param name="row">Row reference.</param>
-	void operator=(const Row& row)
+	virtual void operator=(const Row& row)
 	{
 		setID(row);
 	}

@@ -59,7 +59,7 @@ public:
 	/// <summary>
 	/// Gets Assembly.
 	/// </summary>
-	Assembly getAssembly() const;
+	const Assembly& getAssembly() const;
 
 	/// <summary>
 	/// Gets Serial Number.
@@ -86,7 +86,7 @@ public:
 	/// </summary>
 	Position getPosition() const;
 
-	SubStock getSubStock() const;
+	const SubStock& getSubStock() const;
 
 	/// <summary>
 	/// Update stock to database.

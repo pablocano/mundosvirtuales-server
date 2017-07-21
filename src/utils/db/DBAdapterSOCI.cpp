@@ -52,7 +52,7 @@ Rows DBAdapterSOCI::query(std::string query) const
 			type = TypeData::DB_LONG_LONG;
 			break;
 		case soci::dt_date:
-			type = TypeData::DB_STRING;
+			type = TypeData::DB_DATE;
 			break;
 		}
 
@@ -66,7 +66,7 @@ Rows DBAdapterSOCI::query(std::string query) const
 		rows.push_back(Row()); // New row
 		Row& row = rows.back(); // Get last added row 
 
-		for (std::size_t i = 0; i != it->size(); ++i)
+		for (std::size_t i = 0; i < it->size(); ++i)
 		{
 			const soci::column_properties & props = it->get_properties(i);
 			IndicatorField indicator = (it->get_indicator(i) == soci::i_null) ? IndicatorField::IS_NULL : (it->get_indicator(i) == soci::i_truncated) ? IndicatorField::IS_TRUNCATED : IndicatorField::IS_OK;

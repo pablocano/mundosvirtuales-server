@@ -43,9 +43,9 @@ public:
 
 	std::string getPN() const;
 
-	InfoAssembly getInfo() const;
+	const InfoAssembly& getInfo() const;
 
-	ModelAssembly getModel() const;
+	const ModelAssembly& getModel() const;
 
 	/// <summary>
 	/// Operator equals with Row.

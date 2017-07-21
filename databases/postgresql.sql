@@ -80,7 +80,7 @@ CREATE TABLE Permissions (
   permission VARCHAR(30)   NOT NULL ,
   created_at TIMESTAMP  DEFAULT now() NOT NULL ,
   deleted_at TIMESTAMP    ,
-  updated_at TIMESTAMP      ,
+  updated_at TIMESTAMP  DEFAULT now()    ,
 PRIMARY KEY(permission_id));
 
 
@@ -95,7 +95,7 @@ CREATE TABLE users (
   active BOOL  DEFAULT true NOT NULL ,
   created_at TIMESTAMP  DEFAULT now() NOT NULL ,
   deleted_at TIMESTAMP    ,
-  updated_at TIMESTAMP      ,
+  updated_at TIMESTAMP  DEFAULT now()    ,
 PRIMARY KEY(users_id));
 
 
@@ -130,7 +130,7 @@ CREATE TABLE groups (
   name VARCHAR(25)   NOT NULL ,
   created_at TIMESTAMP  DEFAULT now() NOT NULL ,
   deleted_at TIMESTAMP    ,
-  updated_at TIMESTAMP      ,
+  updated_at TIMESTAMP  DEFAULT now()    ,
 PRIMARY KEY(groups_id));
 
 
@@ -145,7 +145,7 @@ CREATE TABLE model_version (
   animated BOOL  DEFAULT False NOT NULL ,
   version INTEGER  DEFAULT 1 NOT NULL ,
   created_at TIMESTAMP  DEFAULT now() NOT NULL ,
-  updated_at TIMESTAMP      ,
+  updated_at TIMESTAMP  DEFAULT now()    ,
 PRIMARY KEY(model_version_id)  ,
   FOREIGN KEY(model_id)
     REFERENCES model(model_id)
@@ -246,7 +246,7 @@ CREATE TABLE stock (
   canBeSelected BOOL  DEFAULT false NOT NULL ,
   enable BOOL  DEFAULT true NOT NULL ,
   created_at TIMESTAMP  DEFAULT now() NOT NULL ,
-  updated_at TIMESTAMP      ,
+  updated_at TIMESTAMP  DEFAULT now()    ,
 PRIMARY KEY(stock_id)    ,
   FOREIGN KEY(assembly_id)
     REFERENCES assembly(assembly_id),

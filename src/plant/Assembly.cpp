@@ -12,12 +12,12 @@ std::string Assembly::getPN() const
 	return m_pn;
 }
 
-InfoAssembly Assembly::getInfo() const
+const InfoAssembly& Assembly::getInfo() const
 {
 	return m_infoAssembly;
 }
 
-ModelAssembly Assembly::getModel() const
+const ModelAssembly& Assembly::getModel() const
 {
 	return m_modelAssembly;
 }

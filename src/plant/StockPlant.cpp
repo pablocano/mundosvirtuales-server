@@ -6,12 +6,13 @@ StockPlant StockPlant::loadStockPlant(DBAdapter *lpDataBase)
 	StockPlant plant;
 
 	plant.setDBAdapter(lpDataBase);
+	plant.setID(1); // ID of plant.
 	plant.loadFromDB();
 
 	return plant;
 }
 
-Assembly StockPlant::getAssembly() const
+const Assembly& StockPlant::getAssembly() const
 {
 	return Assemblies::getInstance().getDictAssemblies()[m_assembly_id];
 }
@@ -41,7 +42,7 @@ Position StockPlant::getPosition() const
 	return m_position;
 }
 
-SubStock StockPlant::getSubStock() const
+const SubStock& StockPlant::getSubStock() const
 {
 	return m_subStock;
 }
@@ -54,7 +55,7 @@ bool StockPlant::updateToDB(DBAdapter * lpDBAdapter)
 void StockPlant::operator=(const Row& row)
 {
 	this->m_assembly_id		= row.get<int>("assembly_id");
-	this->m_position_id		= row.get<int>("position_id");
+	this->m_position_id		= row.get<int>("position_entity_id");
 	this->m_sn				= row.get<std::string>("serial_number");
 	this->m_canBeSelected	= row.get<bool>("canBeSelected");
 	this->m_canShowInfo		= row.get<bool>("canShowInfo");
@@ -63,7 +64,7 @@ void StockPlant::operator=(const Row& row)
 	ObjectDB objDB(this->m_position_id, "position_entity", getDBAdapter() );
 	Row rowPosition = objDB.getRowFromDB();
 	this->m_position.m_pos = Vectorf3D(rowPosition.get<float>("pos_x"), rowPosition.get<float>("pos_y"), rowPosition.get<float>("pos_z"));
-	this->m_position.m_rot = Vectorf3D(rowPosition.get<float>("rot_x"), rowPosition.get<float>("rot_y"), rowPosition.get<float>("rot_z"));
+	this->m_position.m_rot = Vectorf3D(rowPosition.get<float>("rot_roll"), rowPosition.get<float>("rot_pitch"), rowPosition.get<float>("rot_yaw"));
 }
 
 Row StockPlant::getRow() const

@@ -10,7 +10,7 @@ uint32_t ClientPlant::m_indexPacketRequest = 0;
 
 StockPlant ClientPlant::requestStockPlant()
 {
-	StockPlant machines;
+	StockPlant plant;
 
 	if (m_tcpComm.connected())
 	{
@@ -29,7 +29,7 @@ StockPlant ClientPlant::requestStockPlant()
 			try
 			{
 				json parseJSON = json::parse(packetResponse.m_lpContent);
-				machines = parseJSON.at("machines");
+				plant = parseJSON.at("plant");
 			}
 			catch (std::exception e)
 			{
@@ -39,5 +39,5 @@ StockPlant ClientPlant::requestStockPlant()
 			
 	}	
 
-	return machines;
+	return plant;
 }
