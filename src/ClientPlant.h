@@ -4,7 +4,8 @@
 #include "utils/communication/ResponsePacketClient.h"
 #include "utils/network/TcpComm.h"
 #include "utils/network/ClientTCP.h"
-#include "plant/Assembly.h"
+#include "plant/StockPlant.h"
+
 
 /// <summary>
 /// Class allows sending requests and responding packets to the server.  
@@ -24,7 +25,7 @@ public:
 	/// Gets machines, this function makes request to server.
 	/// </summary>
 	/// <returns>Returns machines.</returns>
-	Assemblies requestMachines();
+	StockPlant requestMachines();
 
 	static uint32_t m_indexPacketRequest; /* Count request packet. */
 };

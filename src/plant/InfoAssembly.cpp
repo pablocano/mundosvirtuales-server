@@ -17,7 +17,6 @@ std::string InfoAssembly::getShortInfo() const
 
 void InfoAssembly::operator=(const Row& row)
 {
-	
 	ObjectDB::operator=(row);
 	this->m_name		= row.get<std::string>("name");
 	this->m_info		= row.get<std::string>("info");
@@ -46,13 +45,15 @@ Row InfoAssembly::getRow() const
 
 void to_json(json& j, const InfoAssembly& m) {
 	j = json{ 
-		{ "m_name",			m.m_path_name },
+		{ "m_id",			m.getID() },
+		{ "m_name",			m.m_name },
 		{ "m_info",			m.m_info },
 		{ "m_shortInfo",	m.m_shortInfo } };
 }
 
 void from_json(const json& j, InfoAssembly& m) {
-	m.m_path_name	= j.at("m_name").get<std::string>();
+	m.setID(j.at("m_id").get<int>());
+	m.m_name		= j.at("m_name").get<std::string>();
 	m.m_info		= j.at("m_info").get<std::string>();
 	m.m_shortInfo	= j.at("m_shortInfo").get<std::string>();
 }

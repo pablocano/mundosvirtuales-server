@@ -85,6 +85,6 @@ void from_json(const json& j, ModelAssembly& m) {
 	m.m_path_model	= j.at("m_path_model").get<std::string>();
 	m.m_material	= j.at("m_material").get<std::string>();
 	m.m_color		= j.at("m_color").get<std::string>();
-	m.m_animated	= j.at("m_animated").get<std::string>();
-	m.m_version		= j.at("m_version").get<std::string>();
+	m.m_animated	= j.at("m_animated").get<bool>();
+	m.m_version		= j.at("m_version").get<int>();
 }

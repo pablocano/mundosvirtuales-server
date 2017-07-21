@@ -10,7 +10,7 @@ namespace db
 	class Rows
 	{
 	protected:
-		Fields m_fields;
+		std::shared_ptr<Fields> m_fields;
 		std::vector<Row> m_rows;
 
 		void setFields();
@@ -40,6 +40,6 @@ namespace db
 
 		void addField(FieldData field);
 
-		Fields* getFields();
+		std::shared_ptr<Fields> getFields();
 	};
 }

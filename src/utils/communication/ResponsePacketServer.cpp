@@ -1,6 +1,7 @@
 #include "ResponsePacketServer.h"
 #include "../logger/Logger.h"
 #include "../AssemblyUtils.h"
+#include "../../plant/StockPlant.h"
 
 using json = nlohmann::json;
 
@@ -25,9 +26,10 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 	case Command::GET_ASSEMBLIES:
 		LOGGER_LOG("ResponsePacketServerPlant", "Get machines");
 		{
-			Assemblies machines = Assembly::loadAssembliesFromDB(m_lpDBAdapter);
+			StockPlant::updateDictAssembliesFromDB(m_lpDBAdapter);
+			StockPlant plant = StockPlant::loadStockPlant();
 			
-			json j = json{ {"machines", machines} };
+			json j = json{ {"plant", plant} };
 			std::string data = j.dump();
 
 			sendResponse(tcpComm, packet, (char*)data.c_str());

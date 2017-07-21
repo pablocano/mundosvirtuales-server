@@ -20,6 +20,22 @@ Row& Row::operator=(const Row& row)
 	return *this;
 }
 
+Row& Row::operator+(const Row & row)
+{
+	Row rowRet;
+	std::shared_ptr<Fields> fieldData( new Fields(*m_lpFields));
+
+	for (int pos = 0; pos < row.m_lpFields->size(); ++pos)
+		fieldData->push_back(row.m_lpFields->at(pos));
+	
+	rowRet.setFieldData(fieldData);
+
+	for (RegisterValue reg : row.m_registers)
+		
+
+	return rowRet;
+}
+
 void Row::addRegister(RegisterValue& registerValue)
 {
 	registerValue.setFieldData(&m_lpFields->at(m_registers.size()));

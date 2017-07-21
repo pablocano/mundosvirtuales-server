@@ -44,7 +44,6 @@ set( CLIENT_INCLUDE
 set( UTILS_SRC
 	src/plant/Assembly.cpp
 	src/plant/InfoAssembly.cpp
-	src/plant/Part.cpp
 	src/plant/ModelAssembly.cpp
 	src/plant/ModelControl.cpp
 	src/plant/StockPlant.cpp
@@ -67,7 +66,6 @@ set( UTILS_SRC
 set ( UTILS_INCLUDE
 	src/plant/Assembly.h
 	src/plant/InfoAssembly.h
-	src/plant/Part.h
 	src/plant/ModelAssembly.h
 	src/plant/ModelControl.h
 	src/plant/PlantException.h

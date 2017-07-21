@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS stock_translation CASCADE;
 
 DROP TABLE IF EXISTS model_control CASCADE;
 
-DROP TABLE IF EXISTS subassembly CASCADE;
+DROP TABLE IF EXISTS substock CASCADE;
 
 DROP TABLE IF EXISTS permission_user CASCADE;
 
@@ -431,34 +431,34 @@ CREATE INDEX IFK_Rel_permission_group_group ON permission_group (groups_id);
 CREATE INDEX IFK_Rel_permission_group_permi ON permission_group (permission_id);
 
 
-CREATE TABLE subassembly (
-  subassembly_id SERIAL  NOT NULL ,
-  child_assembly_id INTEGER   NOT NULL ,
-  position_entity_id INTEGER   NOT NULL ,
-  parent_assembly_id INTEGER   NOT NULL   ,
-PRIMARY KEY(subassembly_id, child_assembly_id)      ,
-  FOREIGN KEY(parent_assembly_id)
-    REFERENCES assembly(assembly_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE,
-  FOREIGN KEY(child_assembly_id)
-    REFERENCES assembly(assembly_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE,
+CREATE TABLE substock (
+  substock_id SERIAL  NOT NULL ,
+  parent_stock_id INTEGER   NOT NULL ,
+  child_stock_id INTEGER   NOT NULL ,
+  position_entity_id INTEGER   NOT NULL   ,
+PRIMARY KEY(substock_id)      ,
   FOREIGN KEY(position_entity_id)
     REFERENCES position_entity(position_entity_id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE,
+  FOREIGN KEY(child_stock_id)
+    REFERENCES stock(stock_id)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE,
+  FOREIGN KEY(parent_stock_id)
+    REFERENCES stock(stock_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX subassembly_FKIndex1 ON subassembly (parent_assembly_id);
-CREATE INDEX subassembly_FKIndex2 ON subassembly (child_assembly_id);
-CREATE INDEX subassembly_FKIndex3 ON subassembly (position_entity_id);
+CREATE INDEX subassembly_FKIndex3 ON substock (position_entity_id);
+CREATE INDEX substock_FKIndex2 ON substock (child_stock_id);
+CREATE INDEX substock_FKIndex3 ON substock (parent_stock_id);
 
 
-CREATE INDEX IFK_Rel_assembly ON subassembly (parent_assembly_id);
-CREATE INDEX IFK_Rel_assembly_child ON subassembly (child_assembly_id);
-CREATE INDEX IFK_Rel_subassembly_position ON subassembly (position_entity_id);
+CREATE INDEX IFK_Rel_subassembly_position ON substock (position_entity_id);
+CREATE INDEX IFK_Rel_substock_child ON substock (child_stock_id);
+CREATE INDEX IFK_Rel_substock_parent ON substock (parent_stock_id);
 
 
 CREATE TABLE model_control (

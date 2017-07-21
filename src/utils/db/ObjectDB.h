@@ -109,6 +109,16 @@ public:
 	}
 
 	/// <summary>
+	/// Load properties this object from database.
+	/// </summary>
+	/// <returns>Returns true if the load was successful, false otherwise.</returns>
+	bool loadFromDB(int id)
+	{
+		setID(id);
+		return loadFromDB();
+	}
+
+	/// <summary>
 	/// Save Assembly to database.
 	/// </summary>
 	/// <returns>Returns true if this object was saved successfully, false otherwise.</returns>
@@ -165,15 +175,24 @@ public:
 	/// Gets a row.
 	/// </summary>
 	/// <returns>Returns a row constructed from this object's data.</returns>
-	virtual Row getRow() const = 0;
+	Row getRow() const
+	{
+		return Row();
+	}
 
 	/// <summary>
 	/// Operator equals with Row.
 	/// </summary>
 	/// <param name="row">Row reference.</param>
-	virtual void operator=(const Row& row)
+	void operator=(const Row& row)
 	{
 		setID(row);
+	}
+
+protected:
+	DBAdapter* getDBAdapter() const
+	{
+		return m_lpDBAdapter;
 	}
 };
 

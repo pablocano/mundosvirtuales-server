@@ -161,4 +161,6 @@ namespace db
 		std::string s = std::string(lpS);
 		return s;
 	}
+
+	typedef std::vector<RegisterValue> Registers;
 }

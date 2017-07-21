@@ -15,7 +15,7 @@ namespace db
 	{
 	protected:
 		std::shared_ptr<Fields> m_lpFields; /* Pointer reference table fields. */
-		std::vector<RegisterValue> m_registers; /* Registers of table. */
+		Registers m_registers; /* Registers of table. */
 
 	public:
 
@@ -36,6 +36,13 @@ namespace db
 		/// <param name="row">Reference row.</param>
 		/// <returns>Returns a reference to itself.</returns>
 		Row& operator=(const Row& row);
+
+		/// <summary>
+		/// Operator plus, concatentate rows.
+		/// </summary>
+		/// <param name="row">Reference row.</param>
+		/// <returns>Returns a reference to itself.</returns>
+		Row& operator+(const Row& row);
 
 		/// <summary>
 		/// Adds a Register from a value.

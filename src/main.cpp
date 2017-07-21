@@ -14,15 +14,15 @@ void observerLogDataBase(std::string type, std::chrono::system_clock::time_point
 	static DBAdapterSOCI dataBase("proter", "postgres", "127.0.0.1", 5432, "test123");
 
 	Row row;
-	Fields fieldData;
+	std::shared_ptr<Fields> fieldData( new Fields() );
 
-	fieldData.push_back(FieldData("Users_user_id", TypeData::DB_INTEGER));
-	fieldData.push_back(FieldData("type_log", TypeData::DB_STRING));
-	fieldData.push_back(FieldData("source", TypeData::DB_STRING));
-	fieldData.push_back(FieldData("message", TypeData::DB_STRING));
-	fieldData.push_back(FieldData("created_at", TypeData::DB_DATE));
+	fieldData->push_back(FieldData("Users_user_id", TypeData::DB_INTEGER));
+	fieldData->push_back(FieldData("type_log", TypeData::DB_STRING));
+	fieldData->push_back(FieldData("source", TypeData::DB_STRING));
+	fieldData->push_back(FieldData("message", TypeData::DB_STRING));
+	fieldData->push_back(FieldData("created_at", TypeData::DB_DATE));
 
-	row.setFieldData(&fieldData);
+	row.setFieldData(fieldData);
 
 	row.addRegisterPerValue<int>(1); // Root user.
 	row.addRegisterPerValue<std::string>(type);
