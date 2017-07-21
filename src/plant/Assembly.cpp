@@ -38,7 +38,7 @@ Row Assembly::getRow() const
 	fieldData->push_back(FieldData(this->getIDFieldName(), TypeData::DB_INTEGER));
 	fieldData->push_back(FieldData("part_number", TypeData::DB_STRING));
 	fieldData->push_back(FieldData("assembly_translation_id", TypeData::DB_INTEGER));
-	fieldData->push_back(FieldData("mdoel_id", TypeData::DB_INTEGER));
+	fieldData->push_back(FieldData("model_id", TypeData::DB_INTEGER));
 
 	row.setFieldData(fieldData);
 
@@ -85,5 +85,35 @@ void to_json(json & j, const Assemblies & m)
 
 void from_json(const json & j, Assemblies & m)
 {
+
+}
+
+DictAssemblies & Assemblies::getDictAssemblies() 
+{
+	return m_dictAssemblies;
+}
+
+void Assemblies::updateDictAssembliesFromDB(DBAdapter * lpDataBase)
+{
+	using namespace db;
+
+	try
+	{
+		Rows rows_assemblies = lpDataBase->query("SELECT * FROM assembly;");
+
+		for (auto it = rows_assemblies.begin(); it != rows_assemblies.end(); ++it)
+		{
+			int id = it->get<int>("assembly_id");
+
+			if (m_dictAssemblies.find(id) != m_dictAssemblies.end())
+			{
+				m_dictAssemblies[id] = Assembly(*it);
+			}
+		}
+	}
+	catch (const std::exception &e)
+	{
+		LOGGER_ERROR("Assemblies", e.what());
+	}
 
 }

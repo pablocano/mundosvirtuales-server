@@ -86,8 +86,15 @@ public:
 	/// <returns></returns>
 	Row getRowFromDB() const
 	{
-		Rows rows = m_lpDBAdapter->query("SELECT " + getFieldsSelect() + " from " + m_tableName + " " + getJoin() + " where " + getWhere() + ";");
-		return rows.front();
+		Rows rows = m_lpDBAdapter->query("SELECT " + getFieldsSelect() + " FROM " + m_tableName + " " + getJoin() + " WHERE " + getWhere() + ";");
+		if (rows.isEmpty())
+		{
+			Row row;
+			row.setFieldData(rows.getFields());
+			return row;
+		}
+		else
+			return rows.front();
 	}
 
 	/// <summary>

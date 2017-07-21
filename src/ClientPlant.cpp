@@ -8,7 +8,7 @@ using json = nlohmann::json;
 
 uint32_t ClientPlant::m_indexPacketRequest = 0;
 
-StockPlant ClientPlant::requestMachines()
+StockPlant ClientPlant::requestStockPlant()
 {
 	StockPlant machines;
 
@@ -16,7 +16,7 @@ StockPlant ClientPlant::requestMachines()
 	{
 		HeaderPacketComm header;
 		PacketComm packetRequest;
-		packetRequest.m_header.m_command = Command::GET_ASSEMBLIES;
+		packetRequest.m_header.m_command = Command::GET_PLANT;
 		packetRequest.m_header.m_idResponse = ++ClientPlant::m_indexPacketRequest;
 
 		std::unique_ptr<char[]> packetTCP = packetRequest.packing();

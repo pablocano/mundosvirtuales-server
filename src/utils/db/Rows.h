@@ -38,6 +38,8 @@ namespace db
 
 		int size() const;
 
+		bool isEmpty() const;
+
 		void addField(FieldData field);
 
 		std::shared_ptr<Fields> getFields();

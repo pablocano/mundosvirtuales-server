@@ -2,7 +2,7 @@
 
 using namespace db;
 
-Rows::Rows() : m_fields(), m_rows() {}
+Rows::Rows() : m_fields(new Fields()), m_rows() {}
 
 Rows::Rows(const Rows & rows)
 {
@@ -67,6 +67,11 @@ std::vector<Row>::const_iterator Rows::cend() const
 int Rows::size() const
 {
 	return (int) m_rows.size();
+}
+
+bool db::Rows::isEmpty() const
+{
+	return m_rows.size() <= 0;
 }
 
 void Rows::addField(FieldData field)

@@ -24,12 +24,6 @@ typedef std::vector<int> IDStock;
 class StockPlant : public ObjectDB
 {
 public:
-	
-	/// <summary>
-	/// Load Assemblies from database.
-	/// </summary>
-	/// <param name="m_lpDataBase">Pointer to the database handle.</param>
-	static void updateDictAssembliesFromDB(DBAdapter* m_lpDataBase);
 
 	static StockPlant loadStockPlant(DBAdapter* lpDataBase);
 
@@ -43,7 +37,6 @@ protected:
 	bool m_canShowInfo; /* This flag is used to know if the stock can be showed.  */
 	bool m_enable; /* This flag is used to know if the stock is enabled. */
 	SubStock m_subStock; /* All the sub-assemblies of this assembly */
-	SubStock m_stock; /* All the parts that this assembly is made of. */
 
 public:
 	/// <summary>
@@ -66,7 +59,7 @@ public:
 	/// <summary>
 	/// Gets Assembly.
 	/// </summary>
-	std::shared_ptr<Assembly> getAssembly() const;
+	Assembly getAssembly() const;
 
 	/// <summary>
 	/// Gets Serial Number.
@@ -92,6 +85,8 @@ public:
 	/// Gets position.
 	/// </summary>
 	Position getPosition() const;
+
+	SubStock getSubStock() const;
 
 	/// <summary>
 	/// Update stock to database.

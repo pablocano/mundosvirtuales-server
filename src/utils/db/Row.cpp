@@ -9,8 +9,7 @@ Row::Row() : m_lpFields(nullptr), m_registers() {}
 
 Row::Row(const Row & row)
 {
-	m_lpFields = row.m_lpFields;
-	m_registers = row.m_registers;
+	*this = row;
 }
 
 Row& Row::operator=(const Row& row)
@@ -18,22 +17,6 @@ Row& Row::operator=(const Row& row)
 	m_lpFields = row.m_lpFields;
 	m_registers = row.m_registers;
 	return *this;
-}
-
-Row& Row::operator+(const Row & row)
-{
-	Row rowRet;
-	std::shared_ptr<Fields> fieldData( new Fields(*m_lpFields));
-
-	for (int pos = 0; pos < row.m_lpFields->size(); ++pos)
-		fieldData->push_back(row.m_lpFields->at(pos));
-	
-	rowRet.setFieldData(fieldData);
-
-	for (RegisterValue reg : row.m_registers)
-		
-
-	return rowRet;
 }
 
 void Row::addRegister(RegisterValue& registerValue)
@@ -102,4 +85,9 @@ std::string Row::getSQLUpdateRegisterValues() const
 		ss << m_lpFields->at(pos).getName() << " = " << m_registers.at(pos).getSQLValue();
 
 	return ss.str();
+}
+
+bool db::Row::isEmpty() const
+{
+	return m_registers.size() <= 0;
 }

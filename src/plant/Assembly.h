@@ -99,12 +99,12 @@ void from_json(const json& j, Assembly& m);
 /// <summary>
 /// Dict Assemblies.
 /// </summary>
-typedef std::map<int, std::shared_ptr<Assembly>> DictAssemblies;
+typedef std::map<int, Assembly> DictAssemblies;
 
 class Assemblies
 {
 private:
-	static DictAssemblies m_dictAssemblies;
+	DictAssemblies m_dictAssemblies;
 
 public:
 	static Assemblies& getInstance()
@@ -113,13 +113,20 @@ public:
 		return instance;
 	}
 private:
-	Assemblies() {}
+	Assemblies() : m_dictAssemblies() {}
 
 public:
 	Assemblies(Assemblies const&) = delete;
 	void operator=(Assemblies const&) = delete;
 
-	DictAssemblies getDictAssemblies() { return m_dictAssemblies; }
+	DictAssemblies& getDictAssemblies();
+
+	Assembly& operator[](int id)
+	{
+		return m_dictAssemblies[id];
+	}
+
+	void updateDictAssembliesFromDB(DBAdapter* lpDataBase);
 	
 	friend void to_json(json& j, const Assemblies& m);
 

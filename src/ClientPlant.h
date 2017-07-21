@@ -22,10 +22,10 @@ public:
 		ClientTCP(ip.c_str(), PORT_SERVERPLANT, std::shared_ptr<ResponsePacketClientPlant>(new ResponsePacketClientPlant()), closeClientFn) {}
 
 	/// <summary>
-	/// Gets machines, this function makes request to server.
+	/// Gets stock, this function makes request to server.
 	/// </summary>
-	/// <returns>Returns machines.</returns>
-	StockPlant requestMachines();
+	/// <returns>Returns stock.</returns>
+	StockPlant requestStockPlant();
 
 	static uint32_t m_indexPacketRequest; /* Count request packet. */
 };

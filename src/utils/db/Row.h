@@ -38,13 +38,6 @@ namespace db
 		Row& operator=(const Row& row);
 
 		/// <summary>
-		/// Operator plus, concatentate rows.
-		/// </summary>
-		/// <param name="row">Reference row.</param>
-		/// <returns>Returns a reference to itself.</returns>
-		Row& operator+(const Row& row);
-
-		/// <summary>
 		/// Adds a Register from a value.
 		/// </summary>
 		template<typename T>
@@ -104,5 +97,8 @@ namespace db
 		/// </summary>
 		/// <returns>Returns a string for making an update query with this object.</returns>
 		std::string getSQLUpdateRegisterValues() const;
+
+
+		bool isEmpty() const;
 	};
 }

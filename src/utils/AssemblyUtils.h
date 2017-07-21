@@ -1,3 +1,5 @@
+#pragma once
+
 #include "serialization/json.h"
 #include "Position.h"
 

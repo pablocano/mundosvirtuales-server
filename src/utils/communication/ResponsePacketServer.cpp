@@ -26,10 +26,22 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 	case Command::GET_ASSEMBLIES:
 		LOGGER_LOG("ResponsePacketServerPlant", "Get machines");
 		{
-			StockPlant::updateDictAssembliesFromDB(m_lpDBAdapter);
-			StockPlant plant = StockPlant::loadStockPlant();
+			Assemblies::getInstance().updateDictAssembliesFromDB(m_lpDBAdapter);
+			StockPlant plant = StockPlant::loadStockPlant(m_lpDBAdapter);
 			
 			json j = json{ {"plant", plant} };
+			std::string data = j.dump();
+
+			sendResponse(tcpComm, packet, (char*)data.c_str());
+		}
+		break;
+	case Command::GET_PLANT:
+		LOGGER_LOG("ResponsePacketServerPlant", "Get PLANT");
+		{
+			Assemblies::getInstance().updateDictAssembliesFromDB(m_lpDBAdapter);
+			StockPlant plant = StockPlant::loadStockPlant(m_lpDBAdapter);
+
+			json j = json{ { "plant", plant } };
 			std::string data = j.dump();
 
 			sendResponse(tcpComm, packet, (char*)data.c_str());

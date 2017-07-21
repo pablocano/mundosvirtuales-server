@@ -1,32 +1,7 @@
 #include "StockPlant.h"
 
 
-void StockPlant::updateDictAssembliesFromDB(DBAdapter* lpDataBase)
-{
-	using namespace db;
-
-	try
-	{
-		Rows rows_assemblies = lpDataBase->query("SELECT assembly.machines_id AS machine_id, machines.canshowinfo AS canshowinfo, machines.canbeselected AS canbeselected, machinetranslation.name AS name, machines.part_number AS part_number, modelsversion.path_model AS path_model, modelsversion.color AS color, modelsversion.animated AS animated, modelsversion.material AS material, machinetranslation.info AS info, machinetranslation.shortInfo AS shortinfo FROM machines INNER JOIN models ON (models.model_id = machines.Models_model_id) INNER JOIN modelsversion ON ((models.model_id = modelsversion.Models_model_id) AND (models.current_version = modelsversion.version)) INNER JOIN machinetranslation ON ((machinetranslation.Machines_machines_id = machines.machines_id) AND (machinetranslation.Language_language_id = 1))");
-
-		for (auto it = rows_assemblies.begin(); it != rows_assemblies.end(); ++it)
-		{
-			int id = it->get<int>("assembly_id");
-
-			if (m_dictAssemblies.find(id) != m_dictAssemblies.end())
-			{
-				m_dictAssemblies[id] = std::shared_ptr<Assembly>(new Assembly(*it));
-			}
-		}
-	}
-	catch (const std::exception &e)
-	{
-		LOGGER_ERROR("SockPlant", e.what());
-	}
-
-}
-
-StockPlant StockPlant::loadStockPlant(DBAdapter * lpDataBase)
+StockPlant StockPlant::loadStockPlant(DBAdapter *lpDataBase)
 {
 	StockPlant plant;
 
@@ -36,9 +11,9 @@ StockPlant StockPlant::loadStockPlant(DBAdapter * lpDataBase)
 	return plant;
 }
 
-std::shared_ptr<Assembly> StockPlant::getAssembly() const
+Assembly StockPlant::getAssembly() const
 {
-	return m_dictAssemblies[m_assembly_id];
+	return Assemblies::getInstance().getDictAssemblies()[m_assembly_id];
 }
 
 std::string StockPlant::getSN() const
@@ -64,6 +39,11 @@ bool StockPlant::getCanShowInfo() const
 Position StockPlant::getPosition() const
 {
 	return m_position;
+}
+
+SubStock StockPlant::getSubStock() const
+{
+	return m_subStock;
 }
 
 bool StockPlant::updateToDB(DBAdapter * lpDBAdapter)
@@ -115,14 +95,14 @@ Row StockPlant::getRow() const
 void to_json(json& j, const StockPlant& m) {
 	j = json{
 	{ "m_id",				m.getID() },
-	{ "m_assembly_id",		m.getAssembly()->getID() },
+	{ "m_assembly_id",		m.getAssembly().getID() },
 	{ "m_position_id",		m.m_position_id },
 	{ "m_position",			m.getPosition() },
 	{ "m_sn",				m.getSN() },
 	{ "m_canBeSelected",	m.getCanBeSelected() },
 	{ "m_canShowInfo",		m.getCanShowInfo() },
 	{ "m_enable",			m.isEnable() },
-	{ "m_dictAssemblies",	m.m_dictAssemblies } };
+	{ "m_subStock",			m.getSubStock() } };
 }
 
 void from_json(const json& j, StockPlant& m) {
@@ -134,5 +114,5 @@ void from_json(const json& j, StockPlant& m) {
 	m.m_canBeSelected	= j.at("m_canBeSelected").get<bool>();
 	m.m_canShowInfo		= j.at("m_canShowInfo").get<bool>();
 	m.m_enable			= j.at("m_enable").get<bool>();
-	m.m_dictAssemblies	= j.at("m_dictAssemblies");
+	m.m_subStock		= j.at("m_subStock");
 }
