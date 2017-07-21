@@ -47,6 +47,28 @@ const SubStock& StockPlant::getSubStock() const
 	return m_subStock;
 }
 
+bool StockPlant::loadFromDB()
+{
+	bool ret = ObjectDB::loadFromDB();
+
+	if (ret)
+	{
+		Rows rows = getDBAdapter()->query("select child_stock_id from substock where parent_stock_id = " + std::to_string(getID()) + ";");
+
+		for (Row row : rows)
+		{
+			StockPlant stock;
+			stock.setDBAdapter(getDBAdapter());
+			stock.setID(row.get<int>("child_stock_id"));
+			stock.loadFromDB();
+
+			m_subStock.push_back(stock);
+		}
+	}
+
+	return ret;
+}
+
 bool StockPlant::updateToDB(DBAdapter * lpDBAdapter)
 {
 	return false;
@@ -54,6 +76,7 @@ bool StockPlant::updateToDB(DBAdapter * lpDBAdapter)
 
 void StockPlant::operator=(const Row& row)
 {
+	this->setID(row.get<int>("stock_id"));
 	this->m_assembly_id		= row.get<int>("assembly_id");
 	this->m_position_id		= row.get<int>("position_entity_id");
 	this->m_sn				= row.get<std::string>("serial_number");
@@ -96,7 +119,7 @@ Row StockPlant::getRow() const
 void to_json(json& j, const StockPlant& m) {
 	j = json{
 	{ "m_id",				m.getID() },
-	{ "m_assembly_id",		m.getAssembly().getID() },
+	{ "m_assembly_id",		m.m_assembly_id },
 	{ "m_position_id",		m.m_position_id },
 	{ "m_position",			m.getPosition() },
 	{ "m_sn",				m.getSN() },

@@ -42,19 +42,7 @@ public:
 	/// <summary>
 	/// Constructor.
 	/// </summary>
-	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_position(), m_sn("SN"), m_canBeSelected(false), m_canShowInfo(false), m_enable(false) {}
-
-	/// <summary>
-	/// Constructor.
-	/// </summary>
-	/// <param name="assembly"></param>
-	/// <param name="position"></param>
-	/// <param name="sn"></param>
-	/// <param name="canBeSelected"></param>
-	/// <param name="canShowInfo"></param>
-	/// <param name="enable"></param>
-	StockPlant(int assembly_id, Position position, std::string sn, bool canBeSelected = false, bool canShowInfo = false, bool enable = false) :
-		ObjectDB(0, "stock", nullptr), m_assembly_id(assembly_id), m_position(position), m_sn(sn), m_canBeSelected(canBeSelected), m_canShowInfo(canShowInfo), m_enable(enable) {}
+	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_position_id(), m_position(), m_sn("SN"), m_canBeSelected(false), m_canShowInfo(false), m_enable(false) {}
 
 	/// <summary>
 	/// Gets Assembly.
@@ -87,6 +75,8 @@ public:
 	Position getPosition() const;
 
 	const SubStock& getSubStock() const;
+
+	bool loadFromDB();
 
 	/// <summary>
 	/// Update stock to database.
