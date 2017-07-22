@@ -24,16 +24,14 @@ std::unique_ptr<PacketComm> ResponsePacketClientPlant::process_packet(PacketComm
 	switch (packet.m_header.m_command)
 	{
 	case Command::CLOSE_CONNECTION:
-		LOGGER_LOG("Response Packet Client", "Close Connection");
+		LOGGER_LOG("ResponsePacketServerPlant", "CLOSE_CONNECTION");
 		tcpComm.closeSocket();
 		break;
-	case Command::RESPONSE_COMMAND:
-		LOGGER_LOG("Response Packet Client", "RESPONSE");
-		m_queueResponsePacket.add(packet);
-		break;
 	case Command::NONE:
+		LOGGER_LOG("ResponsePacketServerPlant", "NONE");
+		break;
 	default:
-		LOGGER_LOG("Response Packet Client", "None command");
+		m_queueResponsePacket.add(packet);
 	}
 
 	return responsePacket;

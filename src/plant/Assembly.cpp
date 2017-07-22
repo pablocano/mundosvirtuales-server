@@ -26,7 +26,9 @@ void Assembly::operator=(const Row& row)
 {
 	ObjectDB::operator=(row);
 	this->m_pn = row.get<std::string>("part_number");
+	this->m_infoAssembly.setDBAdapter(getDBAdapter());
 	this->m_infoAssembly.loadFromDB(row.get<int>("assembly_translation_id"));
+	this->m_modelAssembly.setDBAdapter(getDBAdapter());
 	this->m_modelAssembly.loadFromDB(row.get<int>("model_id"));
 }
 
@@ -48,6 +50,11 @@ Row Assembly::getRow() const
 	row.addRegisterPerValue<int>(this->getModel().getID());
 
 	return row;
+}
+
+std::string Assembly::getIDFieldName() const
+{
+	return "assembly." + ObjectDB::getIDFieldName();
 }
 
 std::string Assembly::getWhere() const
@@ -78,17 +85,7 @@ void from_json(const json& j, Assembly& m) {
 	m.m_modelAssembly = j.at("m_modelAssembly");
 }
 
-void to_json(json & j, const Assemblies & m)
-{
-
-}
-
-void from_json(const json & j, Assemblies & m)
-{
-
-}
-
-DictAssemblies & Assemblies::getDictAssemblies() 
+DictAssemblies& Assemblies::getDictAssemblies()
 {
 	return m_dictAssemblies;
 }
@@ -99,16 +96,16 @@ void Assemblies::updateDictAssembliesFromDB(DBAdapter * lpDataBase)
 
 	try
 	{
-		Rows rows_assemblies = lpDataBase->query("SELECT * FROM assembly;");
+		Rows rows_assemblies = lpDataBase->query("SELECT assembly_id FROM assembly;");
 
 		for (auto it = rows_assemblies.begin(); it != rows_assemblies.end(); ++it)
 		{
 			int id = it->get<int>("assembly_id");
-
-			if (m_dictAssemblies.find(id) != m_dictAssemblies.end())
-			{
-				m_dictAssemblies[id] = Assembly(*it);
-			}
+			Assembly assembly;
+			assembly.setDBAdapter(lpDataBase);
+			assembly.setID(id);
+			assembly.loadFromDB();
+			m_dictAssemblies[id] = assembly;
 		}
 	}
 	catch (const std::exception &e)
@@ -116,4 +113,35 @@ void Assemblies::updateDictAssembliesFromDB(DBAdapter * lpDataBase)
 		LOGGER_ERROR("Assemblies", e.what());
 	}
 
+}
+
+void to_json(json &j, const Assemblies &m)
+{
+	j = json{ { "m_dictAssemblies",	m.m_dictAssemblies } };
+}
+
+void from_json(const json& j, Assemblies& m)
+{
+	m.m_dictAssemblies = j.at("m_dictAssemblies").get<DictAssemblies>();
+}
+
+void to_json(json &j, const DictAssemblies &m)
+{
+	std::map<std::string, Assembly> temp;
+	for (auto &i : m)
+	{
+		temp[std::to_string(i.first)] = i.second;
+	}
+
+	j = temp;
+}
+
+void from_json(const json& j, DictAssemblies& m)
+{
+	auto jj = j.get<std::map<std::string, json>>();
+
+	for (auto &i : jj)
+	{
+		m[std::stoi(i.first)] = i.second.get<Assembly>();
+	}
 }

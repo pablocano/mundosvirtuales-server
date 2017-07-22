@@ -7,6 +7,7 @@ using json = nlohmann::json;
 
 ResponsePacketServerPlant::ResponsePacketServerPlant(DBAdapter* lpDBAdapter) : m_lpDBAdapter(lpDBAdapter)
 {
+	Assemblies::getInstance().updateDictAssembliesFromDB(m_lpDBAdapter);
 }
 
 ResponsePacketServerPlant::~ResponsePacketServerPlant()
@@ -21,55 +22,51 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 	switch (packet.m_header.m_command)
 	{
 	case Command::GET_INFO_PLANT:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get info plant");
+		LOGGER_LOG("ResponsePacketServerPlant", "GET_INFO_PLANT");
 		break;
 	case Command::GET_ASSEMBLIES:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get machines");
+		LOGGER_LOG("ResponsePacketServerPlant", "GET_ASSEMBLIES");
 		{
 			Assemblies::getInstance().updateDictAssembliesFromDB(m_lpDBAdapter);
-			StockPlant plant = StockPlant::loadStockPlant(m_lpDBAdapter);
 			
-			json j = json{ {"plant", plant} };
+			json j = json{ {"assemblies", Assemblies::getInstance() } };
 			std::string data = j.dump();
 
 			sendResponse(tcpComm, packet, (char*)data.c_str());
 		}
 		break;
 	case Command::GET_PLANT:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get PLANT");
+		LOGGER_LOG("ResponsePacketServerPlant", "GET_PLANT");
 		{
-			Assemblies::getInstance().updateDictAssembliesFromDB(m_lpDBAdapter);
-			StockPlant plant = StockPlant::loadStockPlant(m_lpDBAdapter);
+			Plant::getInstance().updatePlantFromDB(m_lpDBAdapter);
 
-			json j = json{ { "plant", plant } };
+			json j = json{ { "plant", Plant::getInstance() } };
 			std::string data = j.dump();
 
 			sendResponse(tcpComm, packet, (char*)data.c_str());
 		}
 		break;
-	case Command::GET_LIST_ASSEMBLIES:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get list machines");
+	case Command::GET_MODEL_ASSEMBLY:
+		LOGGER_LOG("ResponsePacketServerPlant", "GET_MODEL_ASSEMBLY");
 		break;
-	case Command::GET_MODEL_ASSEMBLIES:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get model machines");
-		break;
-	case Command::GET_INFO_ASSEMBLIES:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get info machine");
+	case Command::GET_INFO_ASSEMBLY:
+		LOGGER_LOG("ResponsePacketServerPlant", "GET_INFO_ASSEMBLY");
 		break;
 	case Command::GET_MAINTENANCE_ASSEMBLY:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get maintenance");
+		LOGGER_LOG("ResponsePacketServerPlant", "GET_MAINTENANCE_ASSEMBLY");
 		break;
 	case Command::GET_LIST_SENSORS:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get list sensors");
+		LOGGER_LOG("ResponsePacketServerPlant", "GET_LIST_SENSORS");
 		break;
 	case Command::GET_SENSORS:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get sensors");
+		LOGGER_LOG("ResponsePacketServerPlant", "GET_SENSORS");
 		break;
 	case Command::CLOSE_CONNECTION:
-		LOGGER_LOG("ResponsePacketServerPlant", "Close Connection");
+		LOGGER_LOG("ResponsePacketServerPlant", "CLOSE_CONNECTION");
+		tcpComm.closeSocket();
 		break;
 	case Command::GET_VERSION_ID:
-		LOGGER_LOG("ResponsePacketServerPlant", "Get Version ID");
+		LOGGER_LOG("ResponsePacketServerPlant", "GET_VERSION_ID");
 		{
 			try
 			{
@@ -90,7 +87,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 		}
 		break;
 	case Command::NEW_ASSEMBLY:
-		LOGGER_LOG("ResponsePacketServerPlant", "New Assembly");
+		LOGGER_LOG("ResponsePacketServerPlant", "NEW_ASSEMBLY");
 		{
 			try
 			{
@@ -113,7 +110,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 		}
 		break;
 	case Command::UPDATE_ASSEMBLY:
-		LOGGER_LOG("ResponsePacketServerPlant", "Update Assembly");
+		LOGGER_LOG("ResponsePacketServerPlant", "UPDATE_ASSEMBLY");
 		{
 			try
 			{
@@ -133,13 +130,9 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 			}
 		}
 		break;
-	case Command::RESPONSE_COMMAND:
-		LOGGER_LOG("ResponsePacketServerPlant", "RESPONSE");
-		m_queueResponsePacket.add(packet);
-		break;
 	case Command::NONE:
 	default:
-		LOGGER_LOG("ResponsePacketServerPlant", "None command");
+		LOGGER_LOG("ResponsePacketServerPlant", "NONE");
 	}
 
 	if (packet.sizeContent() > 0)

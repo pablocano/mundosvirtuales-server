@@ -1,4 +1,9 @@
 #include "StockPlant.h"
+#include "StockPlant.h"
+#include "StockPlant.h"
+#include "StockPlant.h"
+#include "StockPlant.h"
+#include "StockPlant.h"
 
 
 StockPlant StockPlant::loadStockPlant(DBAdapter *lpDataBase)
@@ -139,4 +144,51 @@ void from_json(const json& j, StockPlant& m) {
 	m.m_canShowInfo		= j.at("m_canShowInfo").get<bool>();
 	m.m_enable			= j.at("m_enable").get<bool>();
 	m.m_subStock		= j.at("m_subStock");
+}
+
+const StockPlant& Plant::getPlant() const
+{
+	return m_plant;
+}
+
+const StockPlant & Plant::at(std::string sn) const
+{
+	return at(m_plant, sn);
+}
+
+const StockPlant& Plant::at(const StockPlant & stock, std::string sn) const
+{
+	if (stock.getSN() == sn)
+	{
+		return stock;
+	}
+	else
+	{
+		if (stock.getSubStock().size() > 0)
+		{
+			for (StockPlant s : stock.getSubStock())
+			{
+				at(s, sn);
+			}
+		}
+	}
+
+	static StockPlant s;
+	return s;
+}
+
+void Plant::updatePlantFromDB(DBAdapter * lpDataBase)
+{
+	m_plant = StockPlant::loadStockPlant(lpDataBase); // TODO: optimize
+}
+
+void to_json(json & j, const Plant & m)
+{
+	j = json{
+		{ "m_plant",	m.m_plant } };
+}
+
+void from_json(const json & j, Plant & m)
+{
+	m.m_plant = j.at("m_plant");
 }

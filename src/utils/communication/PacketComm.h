@@ -34,20 +34,18 @@
 typedef enum _Command
 {
 	NONE,
-	RESPONSE_COMMAND,
 	CLOSE_CONNECTION,
 	GET_INFO_PLANT,
+	GET_PLANT,
 	GET_ASSEMBLIES,
-	GET_LIST_ASSEMBLIES,
-	GET_MODEL_ASSEMBLIES,
-	GET_INFO_ASSEMBLIES,
+	GET_MODEL_ASSEMBLY,
+	GET_INFO_ASSEMBLY,
 	GET_MAINTENANCE_ASSEMBLY,
 	GET_LIST_SENSORS,
 	GET_SENSORS,
 	GET_VERSION_ID,
 	NEW_ASSEMBLY,
 	UPDATE_ASSEMBLY,
-	GET_PLANT
 } Command;
 
 /// <summary>
@@ -140,6 +138,16 @@ typedef STRUCT_PACKET _PacketComm
 	}
 
 	/// <summary>
+	/// Gets index of current packet.
+	/// </summary>
+	/// <returns></returns>
+	uint32_t getIndexRequest()
+	{
+		static uint32_t index = 0;
+		return ++index;
+	}
+
+	/// <summary>
 	/// Packing Communication Packet. 
 	/// </summary>
 	/// <returns>Returns smart pointer with data Packet (header + payload).</returns>
@@ -148,6 +156,7 @@ typedef STRUCT_PACKET _PacketComm
 		std::unique_ptr<char[]> p(new char[size()]());
 		uint32_t key[4] = KEY_CRYPT;
 		m_header.m_size = sizeContent();
+		m_header.m_idResponse = m_header.m_idResponse ? m_header.m_idResponse : getIndexRequest();
 		std::memcpy(p.get(), &m_header, SIZE_HEADER_PACKET);
 
 #ifdef COMM_ENCRYPTED
@@ -195,7 +204,7 @@ typedef STRUCT_PACKET _PacketComm
 	bool _PacketComm::operator ==(const _PacketComm &packet) const
 	{
 		uint32_t _sizeContent = std::min<int>(sizeContent(), packet.sizeContent());
-		return (m_header.m_command == Command::RESPONSE_COMMAND && (m_header.m_idResponse == packet.m_header.m_idResponse)) ||
+		return ((m_header.m_command == packet.m_header.m_command) && (m_header.m_idResponse == packet.m_header.m_idResponse)) ||
 			(m_header == packet.m_header && (sizeContent() == _sizeContent && strncmp(m_lpContent, packet.m_lpContent, _sizeContent - 1)));
 	}
 } PacketComm;

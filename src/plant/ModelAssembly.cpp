@@ -62,6 +62,11 @@ Row ModelAssembly::getRow() const
 	return row;
 }
 
+std::string ModelAssembly::getIDFieldName() const
+{
+	return "model." + ObjectDB::getIDFieldName();
+}
+
 std::string ModelAssembly::getJoin() const
 {
 	return "LEFT JOIN model_version ON ((model.model_id = model_version.model_id) AND (model.current_version = model_version.version))";
@@ -69,7 +74,7 @@ std::string ModelAssembly::getJoin() const
 
 std::string ModelAssembly::getFieldsSelect() const
 {
-	return "model_id, path_model, material, color, animated, version";
+	return "model.model_id, path_model, material, color, animated, version";
 }
 
 void to_json(json& j, const ModelAssembly& m) {

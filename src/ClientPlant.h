@@ -25,7 +25,9 @@ public:
 	/// Gets stock, this function makes request to server.
 	/// </summary>
 	/// <returns>Returns stock.</returns>
-	StockPlant requestStockPlant();
+	bool requestPlant(Plant& plant);
+
+	bool requestAssemblies(Assemblies& assemblies);
 
 	static uint32_t m_indexPacketRequest; /* Count request packet. */
 };

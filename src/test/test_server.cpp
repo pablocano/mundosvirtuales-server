@@ -17,10 +17,18 @@ void test_server()
 
 	client.start();
 
-	static StockPlant plant;
+	static Assemblies &assemblies = Assemblies::getInstance();
+	static Plant &plant = Plant::getInstance();
 	
-	static Concurrency con([]() -> bool { plant = client.requestStockPlant(); return plant.isEnable(); },
-		[]() { LOGGER_LOG("Response Packet Client", "Machines:"); for (StockPlant machine : plant.getSubStock()) LOGGER_LOG("Test Server", machine.getAssembly().getInfo().getName()); }, 100);
+	static Concurrency con([]() -> bool { 
+		if (client.requestAssemblies(assemblies))
+		{
+			return client.requestPlant(plant);
+		}
+		else
+			return false;
+	},
+		[]() { LOGGER_LOG("Response Packet Client", "Plant:"); for (StockPlant machine : plant.getPlant().getSubStock()) LOGGER_LOG("Test Server", machine.getAssembly().getInfo().getName()); }, 100);
 
 	LOGGER_LOG("Test Server", "Post concurrency");
 	

@@ -66,16 +66,7 @@ public:
 	/// 
 	/// </summary>
 	/// <returns></returns>
-	std::string getIDFieldName() const
-	{
-		return m_tableName + "_id = " + std::to_string(m_id);
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <returns></returns>
-	std::string getTableName() const 
+	std::string getTableName() const
 	{ 
 		return m_tableName;
 	}
@@ -106,8 +97,12 @@ public:
 	{
 		try
 		{
-			*this = getRowFromDB();
-			return true;
+			if (getID() > 0)
+			{
+				*this = getRowFromDB();
+				return true;
+			}
+			return false;
 		}
 		catch (const std::exception &e)
 		{
@@ -156,7 +151,7 @@ public:
 	/// 
 	/// </summary>
 	/// <returns></returns>
-	std::string getWhere() const
+	virtual std::string getIDFieldName() const
 	{
 		return m_tableName + "_id = " + std::to_string(m_id);
 	}
@@ -165,7 +160,16 @@ public:
 	/// 
 	/// </summary>
 	/// <returns></returns>
-	std::string getFieldsSelect() const
+	virtual std::string getWhere() const
+	{
+		return getIDFieldName();
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	virtual std::string getFieldsSelect() const
 	{
 		return "*"; // Gets all fields
 	}
@@ -174,7 +178,7 @@ public:
 	/// 
 	/// </summary>
 	/// <returns></returns>
-	std::string getJoin() const
+	virtual std::string getJoin() const
 	{
 		return "";
 	}

@@ -19,7 +19,7 @@ bool ResponsePacket::sendResponse(SocketClientTcp& tcpComm, PacketComm& packet, 
 {
 	HeaderPacketComm header;
 	PacketComm responsePacket;
-	responsePacket.m_header.m_command = Command::RESPONSE_COMMAND;
+	responsePacket.m_header.m_command = packet.m_header.m_command;
 	responsePacket.m_header.m_idResponse = packet.m_header.m_idResponse;
 	responsePacket.m_header.m_statusComm = statusServer;
 

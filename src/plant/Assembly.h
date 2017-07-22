@@ -62,6 +62,11 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
+	std::string getIDFieldName() const;
+
+	/// <summary>
+	/// 
+	/// </summary>
 	/// <returns></returns>
 	std::string getWhere() const;
 
@@ -101,6 +106,10 @@ void from_json(const json& j, Assembly& m);
 /// </summary>
 typedef std::map<int, Assembly> DictAssemblies;
 
+void from_json(const json& j, DictAssemblies& m);
+
+void to_json(json &j, const DictAssemblies &m);
+
 class Assemblies
 {
 private:
@@ -121,12 +130,17 @@ public:
 
 	DictAssemblies& getDictAssemblies();
 
-	Assembly& operator[](int id)
+	const Assembly& operator[](int id)
 	{
 		return m_dictAssemblies[id];
 	}
 
 	void updateDictAssembliesFromDB(DBAdapter* lpDataBase);
+
+	void setAssemblies(json j)
+	{
+		from_json(j, *this);
+	}
 	
 	friend void to_json(json& j, const Assemblies& m);
 

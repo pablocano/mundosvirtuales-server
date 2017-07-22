@@ -25,6 +25,11 @@ class StockPlant : public ObjectDB
 {
 public:
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="lpDataBase"></param>
+	/// <returns></returns>
 	static StockPlant loadStockPlant(DBAdapter* lpDataBase);
 
 protected:
@@ -74,6 +79,10 @@ public:
 	/// </summary>
 	Position getPosition() const;
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
 	const SubStock& getSubStock() const;
 
 	bool loadFromDB();
@@ -102,6 +111,49 @@ public:
 	friend void from_json(const json& j, StockPlant& m);
 };
 
+
+
 void to_json(json& j, const StockPlant& m);
 
 void from_json(const json& j, StockPlant& m);
+
+class Plant
+{
+private:
+	StockPlant m_plant;
+
+public:
+	static Plant& getInstance()
+	{
+		static Plant instance;
+		return instance;
+	}
+private:
+	Plant() : m_plant() {}
+
+public:
+	Plant(Plant const&) = delete;
+	void operator=(Plant const&) = delete;
+
+	const StockPlant& getPlant() const;
+
+	const StockPlant& at(std::string sn) const;
+
+	const StockPlant& at(const StockPlant& stock, std::string sn) const;
+
+	void updatePlantFromDB(DBAdapter* lpDataBase);
+
+	void setPlant(json j)
+	{
+		from_json(j, *this);
+	}
+
+	friend void to_json(json& j, const Plant& m);
+
+	friend void from_json(const json& j, Plant& m);
+};
+
+
+void to_json(json& j, const Plant& m);
+
+void from_json(const json& j, Plant& m);

@@ -78,6 +78,11 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
+	std::string getIDFieldName() const;
+
+	/// <summary>
+	/// 
+	/// </summary>
 	/// <returns></returns>
 	std::string getJoin() const;
 

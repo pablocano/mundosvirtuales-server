@@ -6,18 +6,14 @@
 
 using json = nlohmann::json;
 
-uint32_t ClientPlant::m_indexPacketRequest = 0;
-
-StockPlant ClientPlant::requestStockPlant()
+bool ClientPlant::requestPlant(Plant& plant)
 {
-	StockPlant plant;
 
 	if (m_tcpComm.connected())
 	{
 		HeaderPacketComm header;
 		PacketComm packetRequest;
 		packetRequest.m_header.m_command = Command::GET_PLANT;
-		packetRequest.m_header.m_idResponse = ++ClientPlant::m_indexPacketRequest;
 
 		std::unique_ptr<char[]> packetTCP = packetRequest.packing();
 		m_tcpComm.send(packetTCP.get(), packetRequest.size());
@@ -29,7 +25,7 @@ StockPlant ClientPlant::requestStockPlant()
 			try
 			{
 				json parseJSON = json::parse(packetResponse.m_lpContent);
-				plant = parseJSON.at("plant");
+				plant.setPlant(parseJSON.at("plant"));
 			}
 			catch (std::exception e)
 			{
@@ -39,5 +35,36 @@ StockPlant ClientPlant::requestStockPlant()
 			
 	}	
 
-	return plant;
+	return plant.getPlant().isEnable();
+}
+
+bool ClientPlant::requestAssemblies(Assemblies& assemblies)
+{
+	if (m_tcpComm.connected())
+	{
+		HeaderPacketComm header;
+		PacketComm packetRequest;
+		packetRequest.m_header.m_command = Command::GET_ASSEMBLIES;
+
+		std::unique_ptr<char[]> packetTCP = packetRequest.packing();
+		m_tcpComm.send(packetTCP.get(), packetRequest.size());
+
+		PacketComm packetResponse = m_lpResponsePacket->get_response(packetRequest);
+
+		if ((packetResponse.m_header.m_idResponse == packetRequest.m_header.m_idResponse) && packetResponse.sizeContent() > 0)
+		{
+			try
+			{
+				json parseJSON = json::parse(packetResponse.m_lpContent);
+				assemblies.setAssemblies(parseJSON.at("assemblies"));
+			}
+			catch (std::exception e)
+			{
+				LOGGER_ERROR("Response Packet Client", e.what());
+			}
+		}
+
+	}
+
+	return assemblies.getDictAssemblies().size() > 0;
 }
