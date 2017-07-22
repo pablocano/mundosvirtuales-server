@@ -61,11 +61,11 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 	case Command::GET_SENSORS:
 		LOGGER_LOG("ResponsePacketServerPlant", "GET_SENSORS");
 		break;
-	case Command::CLOSE_CONNECTION:
+	case Command::CLOSE_CONNECTION: // OK
 		LOGGER_LOG("ResponsePacketServerPlant", "CLOSE_CONNECTION");
 		tcpComm.closeSocket();
 		break;
-	case Command::GET_VERSION_ID:
+	case Command::GET_VERSION_ID: // OK
 		LOGGER_LOG("ResponsePacketServerPlant", "GET_VERSION_ID");
 		{
 			try
@@ -74,8 +74,18 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 				int version = parseJSON.at("version").get<int>();
 				int assembly_id = parseJSON.at("id").get<int>();
 				
-				json j = json{ { "version", version + 1 }, { "id", assembly_id } };
-				std::string data = j.dump();
+				std::string data;
+				if (Assemblies::getInstance().existAssembly(assembly_id))
+				{
+					Assembly& assembly = Assemblies::getInstance()[assembly_id];
+					json j = json{ { "version", assembly.getModel().getVersion() },{ "id", assembly_id } };
+					data = j.dump();
+				}
+				else
+				{
+					json j = json{ { "version", -1 },{ "id", assembly_id } };
+					data = j.dump();
+				}
 					
 				sendResponse(tcpComm, packet, (char *) data.c_str(), StatusServer::OK_RESPONSE);
 			}

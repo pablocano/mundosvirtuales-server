@@ -130,6 +130,11 @@ public:
 
 	DictAssemblies& getDictAssemblies();
 
+	bool existAssembly(int id) const
+	{
+		return m_dictAssemblies.find(id) != m_dictAssemblies.end();
+	}
+
 	const Assembly& operator[](int id)
 	{
 		return m_dictAssemblies[id];
