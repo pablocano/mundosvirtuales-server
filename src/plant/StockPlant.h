@@ -54,6 +54,11 @@ public:
 	/// </summary>
 	const Assembly& getAssembly() const;
 
+	void setAssemblyID(int id)
+	{
+		m_assembly_id = id;
+	}
+
 	/// <summary>
 	/// Gets Serial Number.
 	/// </summary>
@@ -78,6 +83,11 @@ public:
 	/// Gets position.
 	/// </summary>
 	Position getPosition() const;
+
+	void setPosition(const Position& position)
+	{
+		m_position = position;
+	}
 
 	/// <summary>
 	/// 
@@ -141,7 +151,11 @@ public:
 
 	const StockPlant& at(const StockPlant& stock, std::string sn) const;
 
+	void loadPlantFromDB(DBAdapter* lpDataBase);
+
 	void updatePlantFromDB(DBAdapter* lpDataBase);
+
+	bool createStock(DBAdapter* lpDataBase, int idAssembly, AssemblyComm& assemblyComm);
 
 	void setPlant(json j)
 	{

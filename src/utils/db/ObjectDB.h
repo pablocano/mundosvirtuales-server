@@ -130,21 +130,27 @@ public:
 		try
 		{
 			Row row = getRow();
-			std::string where = getWhere();
-			if (m_lpDBAdapter->countQuery(m_tableName, where) > 0)
+			if (!row.isEmpty())
 			{
-				return m_lpDBAdapter->update(m_tableName, row, where);
-			}
-			else
-			{
-				return m_lpDBAdapter->insert(m_tableName, row);
+				std::string where = getWhere();
+				if (getID() > 0 && m_lpDBAdapter->countQuery(m_tableName, where) > 0)
+				{
+					return m_lpDBAdapter->update(m_tableName, row, where);
+				}
+				else
+				{
+					int id = m_lpDBAdapter->insert(m_tableName, row);
+					setID(id);
+					return getID() > 0;
+				}
 			}
 		}
 		catch (const std::exception &e)
 		{
 			LOGGER_ERROR("ObjectDB", e.what());
-			return false;
 		}
+
+		return false;
 	}
 
 	/// <summary>

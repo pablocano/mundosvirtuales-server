@@ -187,6 +187,12 @@ struct Position
 	Vectorf3D m_rot;
 
 	Position() : m_pos(), m_rot() {}
+
+	Position& operator=(const Position& position)
+	{
+		m_pos = position.m_pos, m_rot = position.m_rot;
+		return *this;
+	}
 };
 
 void to_json(json& j, const Vectorf3D& m);

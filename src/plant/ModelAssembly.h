@@ -42,6 +42,15 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
+	/// <param name="path"></param>
+	void setPathModel(std::string path)
+	{
+		m_path_model = path;
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
 	/// <returns></returns>
 	std::string getMaterial() const;
 
@@ -62,6 +71,11 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	int getVersion() const;
+
+	void setVersion(int version)
+	{
+		m_version = version;
+	}
 
 	/// <summary>
 	/// Operator equals with Row.

@@ -32,6 +32,15 @@ void Assembly::operator=(const Row& row)
 	this->m_modelAssembly.loadFromDB(row.get<int>("model_id"));
 }
 
+void Assembly::operator=(const AssemblyComm& assemblyComm)
+{
+	this->m_pn = assemblyComm.m_part_number;
+	this->m_infoAssembly.setDBAdapter(getDBAdapter());
+	this->m_modelAssembly.setDBAdapter(getDBAdapter());
+	this->m_modelAssembly.setPathModel(assemblyComm.m_name);
+	this->m_modelAssembly.setVersion(assemblyComm.m_version);
+}
+
 Row Assembly::getRow() const
 {
 	Row row;
@@ -72,6 +81,14 @@ std::string Assembly::getFieldsSelect() const
 	return "assembly.assembly_id as assembly_id, assembly.model_id as model_id, assembly.part_number as part_number, assembly_translation.assembly_translation_id as assembly_translation_id";
 }
 
+bool Assembly::saveToDB()
+{
+	if (ObjectDB::saveToDB())
+		return m_infoAssembly.saveToDB() && m_modelAssembly.saveToDB();
+	else
+		return false;
+}
+
 void to_json(json& j, const Assembly& m) {
 	j = json{ 
 		{"m_id",				m.getID() },
@@ -90,7 +107,7 @@ DictAssemblies& Assemblies::getDictAssemblies()
 	return m_dictAssemblies;
 }
 
-void Assemblies::updateDictAssembliesFromDB(DBAdapter * lpDataBase)
+void Assemblies::loadDictAssembliesFromDB(DBAdapter *lpDataBase)
 {
 	using namespace db;
 
@@ -113,6 +130,27 @@ void Assemblies::updateDictAssembliesFromDB(DBAdapter * lpDataBase)
 		LOGGER_ERROR("Assemblies", e.what());
 	}
 
+}
+
+void Assemblies::updateDictAssembliesFromDB(DBAdapter *lpDataBase)
+{
+	loadDictAssembliesFromDB(lpDataBase);
+}
+
+int Assemblies::createAssembly(DBAdapter* lpDataBase, const AssemblyComm& assemblyComm)
+{
+	updateDictAssembliesFromDB(lpDataBase);
+
+	Assembly assembly;
+	assembly.setDBAdapter(lpDataBase);
+	assembly = assemblyComm;
+	
+	if (assembly.saveToDB() && assembly.getID() > 0)
+	{
+		Assemblies::getInstance().getDictAssemblies()[assembly.getID()] = assembly;
+	}
+
+	return assembly.getID();
 }
 
 void to_json(json &j, const Assemblies &m)

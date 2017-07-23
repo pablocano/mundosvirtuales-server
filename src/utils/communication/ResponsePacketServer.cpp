@@ -7,7 +7,8 @@ using json = nlohmann::json;
 
 ResponsePacketServerPlant::ResponsePacketServerPlant(DBAdapter* lpDBAdapter) : m_lpDBAdapter(lpDBAdapter)
 {
-	Assemblies::getInstance().updateDictAssembliesFromDB(m_lpDBAdapter);
+	Assemblies::getInstance().loadDictAssembliesFromDB(m_lpDBAdapter);
+	Plant::getInstance().loadPlantFromDB(m_lpDBAdapter);
 }
 
 ResponsePacketServerPlant::~ResponsePacketServerPlant()
@@ -24,7 +25,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 	case Command::GET_INFO_PLANT:
 		LOGGER_LOG("ResponsePacketServerPlant", "GET_INFO_PLANT");
 		break;
-	case Command::GET_ASSEMBLIES:
+	case Command::GET_ASSEMBLIES: // OK
 		LOGGER_LOG("ResponsePacketServerPlant", "GET_ASSEMBLIES");
 		{
 			Assemblies::getInstance().updateDictAssembliesFromDB(m_lpDBAdapter);
@@ -35,7 +36,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 			sendResponse(tcpComm, packet, (char*)data.c_str());
 		}
 		break;
-	case Command::GET_PLANT:
+	case Command::GET_PLANT: // OK
 		LOGGER_LOG("ResponsePacketServerPlant", "GET_PLANT");
 		{
 			Plant::getInstance().updatePlantFromDB(m_lpDBAdapter);
@@ -77,7 +78,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 				std::string data;
 				if (Assemblies::getInstance().existAssembly(assembly_id))
 				{
-					Assembly& assembly = Assemblies::getInstance()[assembly_id];
+					const Assembly& assembly = Assemblies::getInstance()[assembly_id];
 					json j = json{ { "version", assembly.getModel().getVersion() },{ "id", assembly_id } };
 					data = j.dump();
 				}
@@ -96,18 +97,19 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 			}
 		}
 		break;
-	case Command::NEW_ASSEMBLY:
+	case Command::NEW_ASSEMBLY: // OK
 		LOGGER_LOG("ResponsePacketServerPlant", "NEW_ASSEMBLY");
 		{
 			try
 			{
 				json parseJSON = json::parse(packet.m_lpContent);
 				std::string s(packet.m_lpContent);
-				AssemblyComm assembly = parseJSON;
+				AssemblyComm assemblyComm = parseJSON;
 				
-				// TODO: Save assembly.
+				int idAssembly = Assemblies::getInstance().createAssembly(m_lpDBAdapter, assemblyComm);
+				Plant::getInstance().createStock(m_lpDBAdapter, idAssembly, assemblyComm);
 				
-				json j = json{ { "id", 3 } };
+				json j = json{ { "id", idAssembly } };
 				std::string data = j.dump();
 
 				sendResponse(tcpComm, packet, (char *)data.c_str(), StatusServer::OK_RESPONSE);

@@ -54,6 +54,13 @@ public:
 	void operator=(const Row& row);
 
 	/// <summary>
+	/// Operator equals with AssemblyComm.
+	/// </summary>
+	/// <param name="row">AssemblyComm reference.</param>
+	void operator=(const AssemblyComm& assemblyComm);
+
+private:
+	/// <summary>
 	/// Gets a row.
 	/// </summary>
 	/// <returns>Rerturns a row contructed from this object data.</returns>
@@ -82,9 +89,19 @@ public:
 	/// <returns></returns>
 	std::string getFieldsSelect() const;
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	bool saveToDB();
+
+public:
+
 	friend void to_json(json& j, const Assembly& m);
 
 	friend void from_json(const json& j, Assembly& m);
+
+	friend class Assemblies;
 };
 
 /// <summary>
@@ -140,7 +157,11 @@ public:
 		return m_dictAssemblies[id];
 	}
 
+	void loadDictAssembliesFromDB(DBAdapter* lpDataBase);
+
 	void updateDictAssembliesFromDB(DBAdapter* lpDataBase);
+
+	int createAssembly(DBAdapter* lpDataBase, const AssemblyComm& assemblyComm);
 
 	void setAssemblies(json j)
 	{

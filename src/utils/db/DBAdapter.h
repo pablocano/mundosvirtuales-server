@@ -32,9 +32,9 @@ namespace db
 
 		virtual int countQuery(std::string table, std::string where) const = 0;
 
-		virtual bool insert(const std::string& table, const Rows& rows) = 0;
+		virtual std::vector<int> insert(const std::string& table, const Rows& rows) = 0;
 
-		virtual bool insert(const std::string& table, const Row& row) = 0;
+		virtual int insert(const std::string& table, const Row& row) = 0;
 
 		virtual bool update(const std::string& table, const Rows& rows, const std::string name_id) = 0;
 

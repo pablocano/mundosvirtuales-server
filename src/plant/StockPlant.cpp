@@ -1,9 +1,6 @@
 #include "StockPlant.h"
-#include "StockPlant.h"
-#include "StockPlant.h"
-#include "StockPlant.h"
-#include "StockPlant.h"
-#include "StockPlant.h"
+
+#include <map>
 
 
 StockPlant StockPlant::loadStockPlant(DBAdapter *lpDataBase)
@@ -173,19 +170,43 @@ const StockPlant& Plant::at(const StockPlant & stock, std::string sn) const
 		}
 	}
 
-	static StockPlant s;
+	static StockPlant s; // return default stock
 	return s;
 }
 
-void Plant::updatePlantFromDB(DBAdapter * lpDataBase)
+void Plant::loadPlantFromDB(DBAdapter* lpDataBase)
 {
-	m_plant = StockPlant::loadStockPlant(lpDataBase); // TODO: optimize
+	m_plant = StockPlant::loadStockPlant(lpDataBase);
+}
+
+void Plant::updatePlantFromDB(DBAdapter* lpDataBase)
+{
+	loadPlantFromDB(lpDataBase); // TODO: optimize
+}
+
+bool Plant::createStock(DBAdapter* lpDataBase, int idAssembly, AssemblyComm& assemblyComm)
+{
+	updatePlantFromDB(lpDataBase);
+	std::map<int, std::vector<int>> idInstances;
+
+	for (AssemblyRelation& assemblyRelation : assemblyComm.m_listAssemblyRelations)
+	{
+		if (assemblyRelation.m_id_assembly > 0)
+		{
+			// TODO: falta codigo aca
+			StockPlant stock;
+			stock.setDBAdapter(lpDataBase);
+			stock.setPosition(assemblyRelation.m_position);
+			stock.setAssemblyID(idAssembly);			
+		}
+	}
+
+	return true;
 }
 
 void to_json(json & j, const Plant & m)
 {
-	j = json{
-		{ "m_plant",	m.m_plant } };
+	j = json{ { "m_plant",	m.m_plant } };
 }
 
 void from_json(const json & j, Plant & m)

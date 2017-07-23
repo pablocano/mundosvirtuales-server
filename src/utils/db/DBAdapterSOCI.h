@@ -21,9 +21,9 @@ namespace db
 
 		int countQuery(std::string table, std::string where) const;
 
-		bool insert(const std::string& table, const Rows& rows);
+		std::vector<int> insert(const std::string& table, const Rows& rows);
 
-		bool insert(const std::string& table, const Row& row);
+		int insert(const std::string& table, const Row& row);
 
 		bool update(const std::string& table, const Rows& rows, const std::string name_id);
 

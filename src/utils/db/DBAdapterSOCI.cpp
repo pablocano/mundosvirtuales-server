@@ -121,8 +121,9 @@ int DBAdapterSOCI::countQuery(std::string table, std::string where) const
 	return counts;
 }
 
-bool DBAdapterSOCI::insert(const std::string& table, const Rows & rows)
+std::vector<int> DBAdapterSOCI::insert(const std::string& table, const Rows & rows)
 {
+	std::vector<int> ids(rows.size(), -1);
 	try
 	{
 		std::string connectString = get_str_connection();
@@ -133,21 +134,24 @@ bool DBAdapterSOCI::insert(const std::string& table, const Rows & rows)
 		for (auto row = rows.cbegin(); row != rows.cend(); ++row)
 		{
 			std::stringstream ss;
-			ss << "insert into " << table << row->getSQLFieldNames() << " values" << row->getSQLRegisterValues() << ";";
-			sql << ss.str();
+			ss << "INSERT INTO " << table << row->getSQLFieldNames() << " VALUES" << row->getSQLRegisterValues() << " RETURNING " << table << "_id" << ";";
+			std::string query = ss.str();
+			int id;
+			sql << query, soci::into(id);
+			ids.push_back(id);
 		}
 
 		tr.commit();
-		return true;
 	}
 	catch (const std::exception &e)
 	{
 		LOGGER_ERROR("DBAdapterSOCI", e.what());
-		return false;
 	}
+
+	return ids;
 }
 
-bool DBAdapterSOCI::insert(const std::string& table, const Row & row)
+int DBAdapterSOCI::insert(const std::string& table, const Row & row)
 {
 	try
 	{
@@ -155,15 +159,16 @@ bool DBAdapterSOCI::insert(const std::string& table, const Row & row)
 		soci::session sql(db_engine, connectString);
 
 		std::stringstream ss;
-		ss << "insert into " << table << row.getSQLFieldNames() << " values" << row.getSQLRegisterValues() << ";";
+		ss << "INSERT INTO " << table << row.getSQLFieldNames() << " VALUES" << row.getSQLRegisterValues() << " RETURNING " << table << "_id" << ";";
 		std::string query = ss.str();
-		sql << query;
-		return true;
+		int id;
+		sql << query, soci::into(id);
+		return id;
 	}
 	catch(const std::exception &e)
 	{
 		LOGGER_ERROR("DBAdapterSOCI", e.what());
-		return false;
+		return -1;
 	}
 }
 
