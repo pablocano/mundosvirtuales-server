@@ -164,7 +164,8 @@ public:
 
 	virtual bool saveToDB()
 	{
-		return saveToDB(getRow());
+		Row row = getRow();
+		return saveToDB(row);
 	}
 
 	/// <summary>

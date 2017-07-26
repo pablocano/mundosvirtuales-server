@@ -38,7 +38,7 @@ bool Assembly::loadFromDB()
 {
 	int id = getDBAdapter()->query("SELECT assembly_translation_id as id FROM assembly_translation WHERE ((assembly_id = " + std::to_string(getID()) + ") AND (language_id = 1));").front().get<int>("id"); // TODO: language id fixed
 	m_infoAssembly.setID(id);
-	m_infoAssembly.loadFromDB();
+
 	return ObjectDB::loadFromDB() && m_infoAssembly.loadFromDB() && m_modelAssembly.loadFromDB();
 }
 

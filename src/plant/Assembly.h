@@ -100,7 +100,7 @@ private:
 	/// Gets a row.
 	/// </summary>
 	/// <returns>Rerturns a row contructed from this object data.</returns>
-	Row getRow() const;
+	Row& getRow() const;
 
 	/// <summary>
 	/// 

@@ -147,7 +147,7 @@ public:
 	/// Gets a row.
 	/// </summary>
 	/// <returns>Rerturns a row contructed from this object data.</returns>
-	Row getRow() const;
+	Row& getRow() const;
 
 	friend void to_json(json& j, const StockPlant& m);
 

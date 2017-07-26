@@ -58,7 +58,7 @@ public:
 	/// Gets a row.
 	/// </summary>
 	/// <returns>Returns a row constructed from this object's data.</returns>
-	Row getRow() const;
+	Row& getRow() const;
 
 	friend void to_json(json& j, const InfoAssembly& m);
 
