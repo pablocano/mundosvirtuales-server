@@ -140,7 +140,7 @@ void from_json(const json& j, StockPlant& m) {
 	m.m_canBeSelected	= j.at("m_canBeSelected").get<bool>();
 	m.m_canShowInfo		= j.at("m_canShowInfo").get<bool>();
 	m.m_enable			= j.at("m_enable").get<bool>();
-	m.m_subStock		= j.at("m_subStock");
+	m.m_subStock		= j.at("m_subStock").get<std::vector<StockPlant> >();
 }
 
 const StockPlant& Plant::getPlant() const
