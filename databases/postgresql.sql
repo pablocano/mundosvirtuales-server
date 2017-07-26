@@ -12,6 +12,56 @@ DROP TABLE IF EXISTS permission_user CASCADE;
 
 DROP TABLE IF EXISTS permission_group CASCADE;
 
+DROP TABLE IF EXISTS assembly_translation CASCADE;
+
+DROP TABLE IF EXISTS group_user CASCADE;
+
+DROP TABLE IF EXISTS role_group CASCADE;
+
+DROP TABLE IF EXISTS sensor_stock CASCADE;
+
+DROP TABLE IF EXISTS stock CASCADE;
+
+DROP TABLE IF EXISTS role_user CASCADE;
+
+DROP TABLE IF EXISTS assembly CASCADE;
+
+DROP TABLE IF EXISTS translate CASCADE;
+
+DROP TABLE IF EXISTS logger CASCADE;
+
+DROP TABLE IF EXISTS groups CASCADE;
+
+DROP TABLE IF EXISTS users CASCADE;
+
+DROP TABLE IF EXISTS language CASCADE;
+
+DROP TABLE IF EXISTS position_entity CASCADE;
+
+DROP TABLE IF EXISTS roles CASCADE;
+
+DROP TABLE IF EXISTS Sensor CASCADE;
+
+DROP TABLE IF EXISTS model CASCADE;
+
+DROP TABLE IF EXISTS Permissions CASCADE;
+
+DROP TABLE IF EXISTS Plant CASCADE;
+
+DROP TABLE IF EXISTS output_model CASCADE;
+
+DROP TABLE IF EXISTS input_model CASCADE;
+
+DROP TABLE IF EXISTS stock_translation CASCADE;
+
+DROP TABLE IF EXISTS model_control CASCADE;
+
+DROP TABLE IF EXISTS substock CASCADE;
+
+DROP TABLE IF EXISTS permission_user CASCADE;
+
+DROP TABLE IF EXISTS permission_group CASCADE;
+
 DROP TABLE IF EXISTS model_version CASCADE;
 
 DROP TABLE IF EXISTS assembly_translation CASCADE;
@@ -48,12 +98,49 @@ DROP TABLE IF EXISTS model CASCADE;
 
 DROP TABLE IF EXISTS Permissions CASCADE;
 
+DROP TABLE IF EXISTS Plant CASCADE;
+
+CREATE TABLE plant (
+  plant_id SERIAL  NOT NULL ,
+  name VARCHAR(25)   NOT NULL ,
+  value VARCHAR(256)  DEFAULT ''  ,
+  type_value VARCHAR(12)  DEFAULT 'STRING' NOT NULL   ,
+PRIMARY KEY(plant_id));
+
+
+
+
 CREATE TABLE language (
   language_id SERIAL  NOT NULL ,
   iso_country_code VARCHAR(25)   NOT NULL ,
   iso_language_code VARCHAR(25)   NOT NULL ,
   codepage VARCHAR(25)      ,
 PRIMARY KEY(language_id));
+
+
+
+
+CREATE TABLE Permissions (
+  permission_id SERIAL  NOT NULL ,
+  permission VARCHAR(30)   NOT NULL ,
+  created_at TIMESTAMP  DEFAULT now() NOT NULL ,
+  deleted_at TIMESTAMP    ,
+  updated_at TIMESTAMP  DEFAULT now()    ,
+PRIMARY KEY(permission_id));
+
+
+
+
+CREATE TABLE model (
+  model_id SERIAL  NOT NULL ,
+  path_model VARCHAR(256)   NOT NULL ,
+  material VARCHAR(20)    ,
+  color VARCHAR(12)    ,
+  animated BOOL  DEFAULT False NOT NULL ,
+  version INTEGER  DEFAULT 1 NOT NULL ,
+  created_at TIMESTAMP  DEFAULT now() NOT NULL ,
+  updated_at TIMESTAMP  DEFAULT now()    ,
+PRIMARY KEY(model_id));
 
 
 
@@ -67,25 +154,6 @@ CREATE TABLE position_entity (
   rot_pitch FLOAT  DEFAULT 0.0  ,
   rot_yaw FLOAT  DEFAULT 0.0    ,
 PRIMARY KEY(position_entity_id));
-
-
-
-
-CREATE TABLE model (
-  model_id SERIAL  NOT NULL ,
-  current_version INTEGER  DEFAULT 1    ,
-PRIMARY KEY(model_id));
-
-
-
-
-CREATE TABLE Permissions (
-  permission_id SERIAL  NOT NULL ,
-  permission VARCHAR(30)   NOT NULL ,
-  created_at TIMESTAMP  DEFAULT now() NOT NULL ,
-  deleted_at TIMESTAMP    ,
-  updated_at TIMESTAMP  DEFAULT now()    ,
-PRIMARY KEY(permission_id));
 
 
 
@@ -136,27 +204,22 @@ PRIMARY KEY(groups_id));
 
 
 
-CREATE TABLE model_version (
-  model_version_id SERIAL  NOT NULL ,
-  model_id INTEGER   NOT NULL ,
-  path_model VARCHAR(256)   NOT NULL ,
-  material VARCHAR(20)    ,
-  color VARCHAR(12)    ,
-  animated BOOL  DEFAULT False NOT NULL ,
-  version INTEGER  DEFAULT 1 NOT NULL ,
-  created_at TIMESTAMP  DEFAULT now() NOT NULL ,
-  updated_at TIMESTAMP  DEFAULT now()    ,
-PRIMARY KEY(model_version_id)  ,
-  FOREIGN KEY(model_id)
-    REFERENCES model(model_id)
+CREATE TABLE translate (
+  translate_id SERIAL  NOT NULL ,
+  language_id INTEGER   NOT NULL ,
+  name VARCHAR(20)   NOT NULL ,
+  value VARCHAR(256)   NOT NULL   ,
+PRIMARY KEY(translate_id, language_id)  ,
+  FOREIGN KEY(language_id)
+    REFERENCES language(language_id)
       ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
-CREATE INDEX ModelsVersion_FKIndex2 ON model_version (model_id);
+CREATE INDEX translate_FKIndex1 ON translate (language_id);
 
 
-CREATE INDEX IFK_Rel_models_version ON model_version (model_id);
+CREATE INDEX IFK_Rel_translate ON translate (language_id);
 
 
 CREATE TABLE logger (
@@ -178,24 +241,6 @@ CREATE INDEX logger_FKIndex1 ON logger (users_id);
 CREATE INDEX IFK_Rel_Log ON logger (users_id);
 
 
-CREATE TABLE translate (
-  translate_id SERIAL  NOT NULL ,
-  language_id INTEGER   NOT NULL ,
-  name VARCHAR(20)   NOT NULL ,
-  value VARCHAR(256)   NOT NULL   ,
-PRIMARY KEY(translate_id, language_id)  ,
-  FOREIGN KEY(language_id)
-    REFERENCES language(language_id)
-      ON DELETE CASCADE
-      ON UPDATE CASCADE);
-
-
-CREATE INDEX translate_FKIndex1 ON translate (language_id);
-
-
-CREATE INDEX IFK_Rel_translate ON translate (language_id);
-
-
 CREATE TABLE assembly (
   assembly_id SERIAL  NOT NULL ,
   model_id INTEGER   NOT NULL ,
@@ -203,14 +248,13 @@ CREATE TABLE assembly (
 PRIMARY KEY(assembly_id)  ,
   FOREIGN KEY(model_id)
     REFERENCES model(model_id)
-      ON DELETE CASCADE
       ON UPDATE CASCADE);
 
 
 CREATE INDEX assembly_FKIndex1 ON assembly (model_id);
 
 
-CREATE INDEX IFK_Rel_assembly_model ON assembly (model_id);
+CREATE INDEX IFK_Rel_model ON assembly (model_id);
 
 
 CREATE TABLE stock (
@@ -517,3 +561,15 @@ CREATE INDEX output_model_FKIndex2 ON output_model (src_model_control_id);
 
 CREATE INDEX IFK_Rel_model_control_output_d ON output_model (dst_model_control_id);
 CREATE INDEX IFK_Rel_model_control_output_s ON output_model (src_model_control_id);
+
+
+
+
+INSERT INTO Language (language_id, iso_country_code, iso_language_code, codepage)
+VALUES (1, 'es_CL', 'CL', 'ISO-8859-1');
+
+INSERT INTO Plant (name, value, type_value)
+VALUES ('name', 'Proter', 'STRING');
+
+INSERT INTO users (users_id, username, password_user, first_name, last_name, active, created_at)
+VALUES (1, 'root', 'test123', '_', '_', true, now());

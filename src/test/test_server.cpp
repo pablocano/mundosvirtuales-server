@@ -37,6 +37,48 @@ void test_server()
 	LOGGER_LOG("Test Server", "Pre sleep");
 }
 
+bool test_get_assemblies(ClientPlant& client)
+{
+	LOGGER_LOG("Test Server", "start test GET_ASSEMBLIES");
+
+	client.start();
+
+	static Assemblies &assemblies = Assemblies::getInstance();
+	static Plant &plant = Plant::getInstance();
+
+	if (client.requestAssemblies(assemblies))
+	{
+		if (client.requestPlant(plant))
+			return true;
+	}
+
+	return false;
+}
+
+void test_new_assembly(ClientPlant& client)
+{
+	LOGGER_LOG("Test Server", "start test NEW_ASSEMBLY");
+
+	client.start();
+
+	static Assemblies &assemblies = Assemblies::getInstance();
+	static Plant &plant = Plant::getInstance();
+
+	AssemblyComm assemblyComm;
+
+	assemblyComm.m_part_number = "PN_TEST_1";
+	assemblyComm.m_version = 1;
+	assemblyComm.m_name = "/Game/Models/Test";
+
+	json j_new_assembly = json({ assemblyComm });
+
+	std::string s = client.request(Command::NEW_ASSEMBLY, j_new_assembly.dump());
+
+	LOGGER_LOG("Test Server", s);
+
+	LOGGER_LOG("Test Server", "end test NEW_ASSEMBLY");
+}
+
 void test_concurrency()
 {
 	Concurrency con(
@@ -51,6 +93,10 @@ void test_concurrency()
 
 int main()
 {
+	ClientPlant client("localhost");
+	LOGGER_LOG("Test Server", "Starting Client");
+
+	//test_new_assembly(client);
 	test_server();
 
 	LOGGER_LOG("Test Server", "Press enter to finish");

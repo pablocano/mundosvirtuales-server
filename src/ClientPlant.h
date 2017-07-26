@@ -27,7 +27,18 @@ public:
 	/// <returns>Returns stock.</returns>
 	bool requestPlant(Plant& plant);
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="assemblies"></param>
+	/// <returns></returns>
 	bool requestAssemblies(Assemblies& assemblies);
 
-	static uint32_t m_indexPacketRequest; /* Count request packet. */
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="command"></param>
+	/// <param name="s"></param>
+	/// <returns></returns>
+	std::string ClientPlant::request(Command command, std::string s);
 };

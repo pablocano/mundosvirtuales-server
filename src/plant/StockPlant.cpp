@@ -3,13 +3,18 @@
 #include <map>
 
 
-StockPlant StockPlant::loadStockPlant(DBAdapter *lpDataBase)
+StockPlant StockPlant::loadStockPlant(DBAdapter *lpDBAdapter)
 {
 	StockPlant plant;
 
-	plant.setDBAdapter(lpDataBase);
-	plant.setID(1); // ID of plant.
-	plant.loadFromDB();
+	plant.setDBAdapter(lpDBAdapter);
+	int idPlant = Plant::getIDRootPlant(lpDBAdapter);
+	
+	if (idPlant > 0)
+	{
+		plant.setID(idPlant);
+		plant.loadFromDB();
+	}
 
 	return plant;
 }
@@ -17,6 +22,16 @@ StockPlant StockPlant::loadStockPlant(DBAdapter *lpDataBase)
 const Assembly& StockPlant::getAssembly() const
 {
 	return Assemblies::getInstance().getDictAssemblies()[m_assembly_id];
+}
+
+int StockPlant::getAssemblyID() const
+{
+	return m_assembly_id;
+}
+
+void StockPlant::setAssemblyID(int id)
+{
+	m_assembly_id = id;
 }
 
 std::string StockPlant::getSN() const
@@ -44,9 +59,19 @@ Position StockPlant::getPosition() const
 	return m_position;
 }
 
+void StockPlant::setPosition(const Position & position)
+{
+	m_position = position;
+}
+
 const SubStock& StockPlant::getSubStock() const
 {
 	return m_subStock;
+}
+
+void StockPlant::addStock(StockPlant & stock)
+{
+	m_subStock.push_back(stock);
 }
 
 bool StockPlant::loadFromDB()
@@ -71,9 +96,15 @@ bool StockPlant::loadFromDB()
 	return ret;
 }
 
-bool StockPlant::updateToDB(DBAdapter * lpDBAdapter)
+bool StockPlant::saveToDB()
 {
-	return false;
+	if (m_position_id <= 0)
+		m_position_id = savePositionToDB(m_position, getDBAdapter());
+
+	if (m_position_id)
+		return ObjectDB::saveToDB();
+	else
+		return false;
 }
 
 void StockPlant::operator=(const Row& row)
@@ -86,18 +117,58 @@ void StockPlant::operator=(const Row& row)
 	this->m_canShowInfo		= row.get<bool>("canShowInfo");
 	this->m_enable			= row.get<bool>("enable");
 
-	ObjectDB objDB(this->m_position_id, "position_entity", getDBAdapter() );
+	this->m_position = loadPositionFromDB(this->m_position_id, getDBAdapter());
+}
+
+Position StockPlant::loadPositionFromDB(int position_id, DBAdapter* lpDBAdapter)
+{
+	ObjectDB objDB(position_id, "position_entity", lpDBAdapter);
 	Row rowPosition = objDB.getRowFromDB();
-	this->m_position.m_pos = Vectorf3D(rowPosition.get<float>("pos_x"), rowPosition.get<float>("pos_y"), rowPosition.get<float>("pos_z"));
-	this->m_position.m_rot = Vectorf3D(rowPosition.get<float>("rot_roll"), rowPosition.get<float>("rot_pitch"), rowPosition.get<float>("rot_yaw"));
+	Position position;
+	position.m_pos = Vectorf3D(rowPosition.get<float>("pos_x"), rowPosition.get<float>("pos_y"), rowPosition.get<float>("pos_z"));
+	position.m_rot = Vectorf3D(rowPosition.get<float>("rot_roll"), rowPosition.get<float>("rot_pitch"), rowPosition.get<float>("rot_yaw"));
+
+	return position;
+}
+
+int StockPlant::savePositionToDB(const Position& position, DBAdapter* lpDBAdapter)
+{
+	ObjectDB objDB(0, "position_entity", lpDBAdapter);
+	Row rowPosition = objDB.getRowFromDB();
+	
+	Row row;
+	std::shared_ptr<Fields> fieldData(new Fields());
+
+	fieldData->push_back(FieldData(objDB.getIDFieldName(), TypeData::DB_INTEGER, true));
+	fieldData->push_back(FieldData("pos_x",		TypeData::DB_DOUBLE));
+	fieldData->push_back(FieldData("pos_y",		TypeData::DB_DOUBLE));
+	fieldData->push_back(FieldData("pos_z",		TypeData::DB_DOUBLE));
+	fieldData->push_back(FieldData("rot_roll",	TypeData::DB_DOUBLE));
+	fieldData->push_back(FieldData("rot_pitch",	TypeData::DB_DOUBLE));
+	fieldData->push_back(FieldData("rot_yaw",	TypeData::DB_DOUBLE));
+
+	row.setFieldData(fieldData);
+
+	row.addRegisterPerValue<int>(objDB.getID());
+	row.addRegisterPerValue<double>(position.m_pos.x);
+	row.addRegisterPerValue<double>(position.m_pos.y);
+	row.addRegisterPerValue<double>(position.m_pos.z);
+	row.addRegisterPerValue<double>(position.m_rot.x);
+	row.addRegisterPerValue<double>(position.m_rot.y);
+	row.addRegisterPerValue<double>(position.m_rot.z);
+
+	if (objDB.saveToDB(row))
+		return objDB.getID();
+	else
+		return -1;
 }
 
 Row StockPlant::getRow() const
 {
 	Row row;
-	std::shared_ptr<Fields> fieldData;
+	std::shared_ptr<Fields> fieldData(new Fields());
 
-	fieldData->push_back(FieldData(this->getIDFieldName(), TypeData::DB_INTEGER));
+	fieldData->push_back(FieldData(this->getIDFieldName(), TypeData::DB_INTEGER, true));
 	fieldData->push_back(FieldData("assembly_id", TypeData::DB_INTEGER));
 	fieldData->push_back(FieldData("position_entity_id", TypeData::DB_INTEGER));
 	fieldData->push_back(FieldData("serial_number", TypeData::DB_STRING));
@@ -148,7 +219,33 @@ const StockPlant& Plant::getPlant() const
 	return m_plant;
 }
 
-const StockPlant & Plant::at(std::string sn) const
+const StockPlant& Plant::at(int id) const
+{
+	return at(m_plant, id);
+}
+
+const StockPlant& Plant::at(const StockPlant & stock, int id) const
+{
+	if (stock.getID() == id)
+	{
+		return stock;
+	}
+	else
+	{
+		if (stock.getSubStock().size() > 0)
+		{
+			for (StockPlant s : stock.getSubStock())
+			{
+				at(s, id);
+			}
+		}
+	}
+
+	static StockPlant s; // return default stock
+	return s;
+}
+
+const StockPlant& Plant::at(std::string sn) const
 {
 	return at(m_plant, sn);
 }
@@ -174,34 +271,140 @@ const StockPlant& Plant::at(const StockPlant & stock, std::string sn) const
 	return s;
 }
 
-void Plant::loadPlantFromDB(DBAdapter* lpDataBase)
+int Plant::getIDRootPlant(DBAdapter * lpDBAdapter)
 {
-	m_plant = StockPlant::loadStockPlant(lpDataBase);
-}
-
-void Plant::updatePlantFromDB(DBAdapter* lpDataBase)
-{
-	loadPlantFromDB(lpDataBase); // TODO: optimize
-}
-
-bool Plant::createStock(DBAdapter* lpDataBase, int idAssembly, AssemblyComm& assemblyComm)
-{
-	updatePlantFromDB(lpDataBase);
-	std::map<int, std::vector<int>> idInstances;
-
-	for (AssemblyRelation& assemblyRelation : assemblyComm.m_listAssemblyRelations)
+	Rows rows = lpDBAdapter->query("SELECT * FROM plant;");
+	for (Row& row : rows)
 	{
-		if (assemblyRelation.m_id_assembly > 0)
+		if (row.get<std::string>("name") == "root_stock_id")
 		{
-			// TODO: falta codigo aca
-			StockPlant stock;
-			stock.setDBAdapter(lpDataBase);
-			stock.setPosition(assemblyRelation.m_position);
-			stock.setAssemblyID(idAssembly);			
+			return std::stoi(row.get<std::string>("value"));
 		}
+	}
+	return -1;
+}
+
+bool Plant::setIDRootPlant(DBAdapter * lpDBAdapter, int id)
+{
+	if (lpDBAdapter->countQuery("plant", "name = 'root_stock_id'") > 0)
+	{
+		lpDBAdapter->query("INSERT INTO plant(name, value, value_type) VALUES('root_stock_id', " + std::to_string(id) + ", 'INTEGER');");
+	}
+	else
+	{
+		lpDBAdapter->query("UPDATE plant SET value = " + std::to_string(id) + " WHERE name = 'root_stock_id';");
 	}
 
 	return true;
+}
+
+void Plant::loadPlantFromDB(DBAdapter* lpDBAdapter)
+{
+	m_plant = StockPlant::loadStockPlant(lpDBAdapter);
+}
+
+void Plant::updatePlantFromDB(DBAdapter* lpDBAdapter)
+{
+	// loadPlantFromDB(lpDBAdapter); // TODO: optimize
+}
+
+StockPlant Plant::newStock(DBAdapter * lpDBAdapter, int idAssembly)
+{
+	StockPlant stock;
+	stock.setDBAdapter(lpDBAdapter);
+	stock.setAssemblyID(idAssembly);
+
+	stock.saveToDB();
+
+	return stock;
+}
+
+bool Plant::processRelation(DBAdapter * lpDBAdapter, int idAssembly, AssemblyComm& assemblyComm)
+{
+	//static std::map<int, std::vector<StockPlant>> dictStock;
+
+	//updatePlantFromDB(lpDBAdapter);
+
+	//StockPlant& rootStock = newStock(lpDBAdapter, idAssembly, assemblyComm);
+
+	//if (!m_plant.isValidID())
+	//{
+	//	m_plant = rootStock;
+	//	setIDRootPlant(lpDBAdapter, rootStock.getID());
+	//}
+
+	//for (AssemblyRelation& assemblyRelation : assemblyComm.m_listAssemblyRelations)
+	//{
+	//	StockPlant& stock = newStock(lpDBAdapter, assemblyComm.m_id_assembly);
+	//	
+	//	if (!m_plant.isValidID())
+	//	{
+	//		m_plant = stock;
+	//		setIDRootPlant(lpDBAdapter, stock.getID());
+	//	}
+	//	else
+	//	{
+
+	//	}
+	//	
+	//	insertStock(stock)
+	//	if (dictStock.find(assemblyRelation.m_id_instance) == dictStock.end())
+	//	{
+	//		// Doesn't exist assembly
+	//		StockPlant stock;
+	//		stock.setDBAdapter(lpDBAdapter);
+	//		stock.setPosition(assemblyRelation.m_position);
+	//		if (Assemblies::getInstance().existAssembly(idAssembly))
+	//		{
+	//			stock.setAssemblyID(idAssembly);
+	//		}
+	//		
+	//		if (stock.saveToDB())
+	//		{
+	//			stockInstances[std::to_string(assemblyRelation.m_id_instance)] = stock;
+
+
+	//		}
+
+	//	}
+
+	//	if (assemblyRelation.m_id_assembly > 0)
+	//	{
+	//		// TODO: falta codigo aca
+	//		StockPlant stock;
+	//		stock.setDBAdapter(lpDBAdapter);
+	//		stock.setPosition(assemblyRelation.m_position);
+	//		stock.setAssemblyID(idAssembly);			
+	//	}
+	//}
+
+	return true;
+}
+
+bool Plant::insertStock(StockPlant& root, StockPlant& stock, int parent_assembly_id)
+{
+	if (root.getAssemblyID() == parent_assembly_id)
+	{
+		root.addStock(stock);
+		return true;
+	}
+	else
+	{
+		if (root.getSubStock().size() > 0)
+		{
+			for (StockPlant s : root.getSubStock())
+			{
+				insertStock(s, stock, parent_assembly_id);
+			}
+		}
+		else
+			return false;
+	}
+}
+
+void Plant::setPlant(json j)
+{
+	from_json(j, *this);
 }
 
 void to_json(json & j, const Plant & m)

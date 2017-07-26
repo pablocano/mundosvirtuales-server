@@ -22,6 +22,33 @@ const ModelAssembly& Assembly::getModel() const
 	return m_modelAssembly;
 }
 
+void Assembly::setID(int id)
+{
+	ObjectDB::setID(id);
+	m_infoAssembly.setAssemblyID(id);
+}
+
+void Assembly::setID(const Row & row)
+{
+	ObjectDB::setID(row);
+	m_infoAssembly.setAssemblyID(getID());
+}
+
+bool Assembly::loadFromDB()
+{
+	int id = getDBAdapter()->query("SELECT assembly_translation_id as id FROM assembly_translation WHERE ((assembly_id = " + std::to_string(getID()) + ") AND (language_id = 1));").front().get<int>("id"); // TODO: language id fixed
+	m_infoAssembly.setID(id);
+	m_infoAssembly.loadFromDB();
+	return ObjectDB::loadFromDB() && m_infoAssembly.loadFromDB() && m_modelAssembly.loadFromDB();
+}
+
+void Assembly::setDBAdapter(DBAdapter * lpDBAdapter)
+{
+	ObjectDB::setDBAdapter(lpDBAdapter);
+	m_infoAssembly.setDBAdapter(lpDBAdapter);
+	m_modelAssembly.setDBAdapter(lpDBAdapter);
+}
+
 void Assembly::operator=(const Row& row)
 {
 	ObjectDB::operator=(row);
@@ -44,47 +71,28 @@ void Assembly::operator=(const AssemblyComm& assemblyComm)
 Row Assembly::getRow() const
 {
 	Row row;
-	std::shared_ptr<Fields> fieldData;
+	std::shared_ptr<Fields> fieldData(new Fields());
 
-	fieldData->push_back(FieldData(this->getIDFieldName(), TypeData::DB_INTEGER));
+	fieldData->push_back(FieldData(this->getIDFieldName(), TypeData::DB_INTEGER, true));
 	fieldData->push_back(FieldData("part_number", TypeData::DB_STRING));
-	fieldData->push_back(FieldData("assembly_translation_id", TypeData::DB_INTEGER));
 	fieldData->push_back(FieldData("model_id", TypeData::DB_INTEGER));
 
 	row.setFieldData(fieldData);
 
 	row.addRegisterPerValue<int>(this->getID());
 	row.addRegisterPerValue<std::string>(this->getPN());
-	row.addRegisterPerValue<int>(this->getInfo().getID());
 	row.addRegisterPerValue<int>(this->getModel().getID());
 
 	return row;
 }
 
-std::string Assembly::getIDFieldName() const
-{
-	return "assembly." + ObjectDB::getIDFieldName();
-}
-
-std::string Assembly::getWhere() const
-{
-	return "(" + ObjectDB::getWhere() + ") AND ( assembly_translation.language_id = 1 )"; // TODO: define default language
-}
-
-std::string Assembly::getJoin() const
-{
-	return "LEFT JOIN assembly_translation ON (assembly.assembly_id = assembly_translation.assembly_id)";
-}
-
-std::string Assembly::getFieldsSelect() const
-{
-	return "assembly.assembly_id as assembly_id, assembly.model_id as model_id, assembly.part_number as part_number, assembly_translation.assembly_translation_id as assembly_translation_id";
-}
-
 bool Assembly::saveToDB()
 {
-	if (ObjectDB::saveToDB())
-		return m_infoAssembly.saveToDB() && m_modelAssembly.saveToDB();
+	if (m_modelAssembly.saveToDB() && ObjectDB::saveToDB())
+	{
+		m_infoAssembly.setAssemblyID(getID());
+		return m_infoAssembly.saveToDB();
+	}
 	else
 		return false;
 }
@@ -92,14 +100,16 @@ bool Assembly::saveToDB()
 void to_json(json& j, const Assembly& m) {
 	j = json{ 
 		{"m_id",				m.getID() },
+		{"m_pn",				m.getPN() },
 		{"m_infoAssembly",		m.getInfo()},
 		{"m_modelAssembly",		m.getModel() } };
 }
 
 void from_json(const json& j, Assembly& m) {
 	m.setID(j.at("m_id").get<int>());
-	m.m_infoAssembly = j.at("m_infoAssembly");
-	m.m_modelAssembly = j.at("m_modelAssembly");
+	m.m_pn				= j.at("m_pn");
+	m.m_infoAssembly	= j.at("m_infoAssembly");
+	m.m_modelAssembly	= j.at("m_modelAssembly");
 }
 
 DictAssemblies& Assemblies::getDictAssemblies()
@@ -107,19 +117,24 @@ DictAssemblies& Assemblies::getDictAssemblies()
 	return m_dictAssemblies;
 }
 
-void Assemblies::loadDictAssembliesFromDB(DBAdapter *lpDataBase)
+bool Assemblies::existAssembly(int id) const
+{
+	return m_dictAssemblies.find(id) != m_dictAssemblies.end();
+}
+
+void Assemblies::loadDictAssembliesFromDB(DBAdapter *lpDBAdapter)
 {
 	using namespace db;
 
 	try
 	{
-		Rows rows_assemblies = lpDataBase->query("SELECT assembly_id FROM assembly;");
+		Rows rows_assemblies = lpDBAdapter->query("SELECT assembly_id FROM assembly;");
 
 		for (auto it = rows_assemblies.begin(); it != rows_assemblies.end(); ++it)
 		{
 			int id = it->get<int>("assembly_id");
 			Assembly assembly;
-			assembly.setDBAdapter(lpDataBase);
+			assembly.setDBAdapter(lpDBAdapter);
 			assembly.setID(id);
 			assembly.loadFromDB();
 			m_dictAssemblies[id] = assembly;
@@ -132,17 +147,17 @@ void Assemblies::loadDictAssembliesFromDB(DBAdapter *lpDataBase)
 
 }
 
-void Assemblies::updateDictAssembliesFromDB(DBAdapter *lpDataBase)
+void Assemblies::updateDictAssembliesFromDB(DBAdapter *lpDBAdapter)
 {
-	loadDictAssembliesFromDB(lpDataBase);
+	loadDictAssembliesFromDB(lpDBAdapter);
 }
 
-int Assemblies::createAssembly(DBAdapter* lpDataBase, const AssemblyComm& assemblyComm)
+int Assemblies::createAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm)
 {
-	updateDictAssembliesFromDB(lpDataBase);
+	updateDictAssembliesFromDB(lpDBAdapter);
 
 	Assembly assembly;
-	assembly.setDBAdapter(lpDataBase);
+	assembly.setDBAdapter(lpDBAdapter);
 	assembly = assemblyComm;
 	
 	if (assembly.saveToDB() && assembly.getID() > 0)
@@ -151,6 +166,11 @@ int Assemblies::createAssembly(DBAdapter* lpDataBase, const AssemblyComm& assemb
 	}
 
 	return assembly.getID();
+}
+
+void Assemblies::setAssemblies(json j)
+{
+	from_json(j, *this);
 }
 
 void to_json(json &j, const Assemblies &m)

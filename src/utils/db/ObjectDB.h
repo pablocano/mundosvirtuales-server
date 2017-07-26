@@ -39,25 +39,34 @@ public:
 	/// 
 	/// </summary>
 	/// <param name="id"></param>
-	void setID(int id) 
+	virtual void setID(int id) 
 	{ 
 		m_id = id;
+	}
+
+	bool isValidID()
+	{
+		return getID() > 0;
 	}
 
 	/// <summary>
 	/// 
 	/// </summary>
 	/// <param name="row"></param>
-	void setID(const Row &row) 
+	virtual void setID(const Row &row) 
 	{ 
 		m_id = row.get<int>(getIDFieldName());
+		if (m_id <= 0)
+		{
+			m_id = row.get<int>(m_tableName + "_id");
+		}
 	}
 
 	/// <summary>
 	/// 
 	/// </summary>
 	/// <param name="lpDBAdapter"></param>
-	void setDBAdapter(DBAdapter* lpDBAdapter)
+	virtual void setDBAdapter(DBAdapter* lpDBAdapter)
 	{
 		m_lpDBAdapter = lpDBAdapter;
 	}
@@ -93,7 +102,7 @@ public:
 	/// Load properties this object from database.
 	/// </summary>
 	/// <returns>Returns true if the load was successful, false otherwise.</returns>
-	bool loadFromDB()
+	virtual bool loadFromDB()
 	{
 		try
 		{
@@ -122,14 +131,14 @@ public:
 	}
 
 	/// <summary>
-	/// Save Assembly to database.
+	/// 
 	/// </summary>
-	/// <returns>Returns true if this object was saved successfully, false otherwise.</returns>
-	bool saveToDB()
+	/// <param name="row"></param>
+	/// <returns></returns>
+	bool saveToDB(Row& row)
 	{
 		try
 		{
-			Row row = getRow();
 			if (!row.isEmpty())
 			{
 				std::string where = getWhere();
@@ -153,13 +162,18 @@ public:
 		return false;
 	}
 
+	virtual bool saveToDB()
+	{
+		return saveToDB(getRow());
+	}
+
 	/// <summary>
 	/// 
 	/// </summary>
 	/// <returns></returns>
 	virtual std::string getIDFieldName() const
 	{
-		return m_tableName + "_id = " + std::to_string(m_id);
+		return m_tableName + "." + m_tableName + "_id";
 	}
 
 	/// <summary>
@@ -168,7 +182,7 @@ public:
 	/// <returns></returns>
 	virtual std::string getWhere() const
 	{
-		return getIDFieldName();
+		return getIDFieldName() + " = " + std::to_string(m_id);
 	}
 
 	/// <summary>

@@ -28,9 +28,9 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <param name="lpDataBase"></param>
+	/// <param name="lpDBAdapter"></param>
 	/// <returns></returns>
-	static StockPlant loadStockPlant(DBAdapter* lpDataBase);
+	static StockPlant loadStockPlant(DBAdapter* lpDBAdapter);
 
 protected:
 	
@@ -54,10 +54,17 @@ public:
 	/// </summary>
 	const Assembly& getAssembly() const;
 
-	void setAssemblyID(int id)
-	{
-		m_assembly_id = id;
-	}
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	int getAssemblyID() const;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="id"></param>
+	void setAssemblyID(int id);
 
 	/// <summary>
 	/// Gets Serial Number.
@@ -84,10 +91,11 @@ public:
 	/// </summary>
 	Position getPosition() const;
 
-	void setPosition(const Position& position)
-	{
-		m_position = position;
-	}
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="position"></param>
+	void setPosition(const Position& position);
 
 	/// <summary>
 	/// 
@@ -95,20 +103,45 @@ public:
 	/// <returns></returns>
 	const SubStock& getSubStock() const;
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="stock"></param>
+	void addStock(StockPlant& stock);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
 	bool loadFromDB();
 
 	/// <summary>
-	/// Update stock to database.
+	/// 
 	/// </summary>
-	/// <param name="lpDBAdapter">Pointer to the database handle.</param>
-	/// <returns>Returns true if this object was updated successfully, false otherwise.</returns>
-	bool updateToDB(DBAdapter* lpDBAdapter);
+	/// <returns></returns>
+	bool saveToDB();
 
 	/// <summary>
 	/// Operator equals with Row.
 	/// </summary>
 	/// <param name="row">Row reference.</param>
 	void operator=(const Row& row);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="position_id"></param>
+	/// <param name="lpDBAdapter"></param>
+	/// <returns></returns>
+	static Position loadPositionFromDB(int position_id, DBAdapter* lpDBAdapter);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="position"></param>
+	/// <param name="lpDBAdapter"></param>
+	/// <returns></returns>
+	int savePositionToDB(const Position& position, DBAdapter* lpDBAdapter);
 
 	/// <summary>
 	/// Gets a row.
@@ -120,7 +153,6 @@ public:
 
 	friend void from_json(const json& j, StockPlant& m);
 };
-
 
 
 void to_json(json& j, const StockPlant& m);
@@ -147,20 +179,29 @@ public:
 
 	const StockPlant& getPlant() const;
 
+	const StockPlant& at(int id) const;
+
+	const StockPlant& Plant::at(const StockPlant & stock, int id) const;
+
 	const StockPlant& at(std::string sn) const;
 
 	const StockPlant& at(const StockPlant& stock, std::string sn) const;
 
-	void loadPlantFromDB(DBAdapter* lpDataBase);
+	static int getIDRootPlant(DBAdapter* lpDBAdapter);
 
-	void updatePlantFromDB(DBAdapter* lpDataBase);
+	static bool setIDRootPlant(DBAdapter* lpDBAdapter, int id);
 
-	bool createStock(DBAdapter* lpDataBase, int idAssembly, AssemblyComm& assemblyComm);
+	void loadPlantFromDB(DBAdapter* lpDBAdapter);
 
-	void setPlant(json j)
-	{
-		from_json(j, *this);
-	}
+	void updatePlantFromDB(DBAdapter* lpDBAdapter);
+
+	StockPlant newStock(DBAdapter* lpDBAdapter, int idAssembly);
+
+	bool processRelation(DBAdapter * lpDBAdapter, int idAssembly, AssemblyComm& assemblyComm);
+
+	bool insertStock(StockPlant& root, StockPlant& stock, int parent_assembly_id);
+
+	void setPlant(json j);
 
 	friend void to_json(json& j, const Plant& m);
 

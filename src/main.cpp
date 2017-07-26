@@ -11,10 +11,10 @@ void observerLogDataBase(std::string type, std::chrono::system_clock::time_point
 {
 	using namespace db;
 
-	static DBAdapterSOCI dataBase("test_proter", "postgres", "127.0.0.1", 5432, "test123");
+	static DBAdapterSOCI dataBase("proter2", "postgres", "127.0.0.1", 5432, "test123");
 
 	Row row;
-	std::shared_ptr<Fields> fieldData( new Fields() );
+	std::shared_ptr<Fields> fieldData(new Fields());
 
 	fieldData->push_back(FieldData("users_id", TypeData::DB_INTEGER));
 	fieldData->push_back(FieldData("type_log", TypeData::DB_STRING));
@@ -35,10 +35,10 @@ void observerLogDataBase(std::string type, std::chrono::system_clock::time_point
 
 int main()
 {
-	DBAdapterSOCI dataBase("test_proter", "postgres", "127.0.0.1", 5432, "test123");
+	DBAdapterSOCI dataBase("proter2", "postgres", "127.0.0.1", 5432, "test123");
 	ServerPlant server(&dataBase);
 
-	LOGGER_ADD_OBSERVER(observerLogDataBase);
+	// LOGGER_ADD_OBSERVER(observerLogDataBase); // TODO: first to use, it is necessary to fix mistake
 	
 	LOGGER_LOG("Server", "Starting Server");
 

@@ -41,11 +41,47 @@ public:
 	/// </summary>
 	~Assembly() {}
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
 	std::string getPN() const;
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
 	const InfoAssembly& getInfo() const;
 
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
 	const ModelAssembly& getModel() const;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="id"></param>
+	void setID(int id);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="row"></param>
+	virtual void setID(const Row &row);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	bool loadFromDB();
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="lpDBAdapter"></param>
+	void setDBAdapter(DBAdapter* lpDBAdapter);
 
 	/// <summary>
 	/// Operator equals with Row.
@@ -65,29 +101,6 @@ private:
 	/// </summary>
 	/// <returns>Rerturns a row contructed from this object data.</returns>
 	Row getRow() const;
-
-	/// <summary>
-	/// 
-	/// </summary>
-	std::string getIDFieldName() const;
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <returns></returns>
-	std::string getWhere() const;
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <returns></returns>
-	std::string getJoin() const;
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <returns></returns>
-	std::string getFieldsSelect() const;
 
 	/// <summary>
 	/// 
@@ -147,26 +160,20 @@ public:
 
 	DictAssemblies& getDictAssemblies();
 
-	bool existAssembly(int id) const
-	{
-		return m_dictAssemblies.find(id) != m_dictAssemblies.end();
-	}
+	bool existAssembly(int id) const;
 
 	const Assembly& operator[](int id)
 	{
 		return m_dictAssemblies[id];
 	}
 
-	void loadDictAssembliesFromDB(DBAdapter* lpDataBase);
+	void loadDictAssembliesFromDB(DBAdapter* lpDBAdapter);
 
-	void updateDictAssembliesFromDB(DBAdapter* lpDataBase);
+	void updateDictAssembliesFromDB(DBAdapter* lpDBAdapter);
 
-	int createAssembly(DBAdapter* lpDataBase, const AssemblyComm& assemblyComm);
+	int createAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm);
 
-	void setAssemblies(json j)
-	{
-		from_json(j, *this);
-	}
+	void setAssemblies(json j);
 	
 	friend void to_json(json& j, const Assemblies& m);
 

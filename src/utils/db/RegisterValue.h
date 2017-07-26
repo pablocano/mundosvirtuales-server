@@ -26,7 +26,7 @@ namespace db
 		void* m_value; /* Pointer that reference to register value. */
 		int m_size; /* Size of value. */
 		IndicatorField m_indicator; /* Status of register. */
-		FieldData* m_fieldData; /* Information about field. */
+		const FieldData* m_fieldData; /* Information about field. */
 
 	public:
 
@@ -99,13 +99,13 @@ namespace db
 		/// Gets field informartion.
 		/// </summary>
 		/// <returns></returns>
-		FieldData getFieldData();
+		const FieldData& getFieldData();
 
 		/// <summary>
 		/// Sets field information.
 		/// </summary>
 		/// <param name="field">Information field.</param>
-		void setFieldData(FieldData* field);
+		void setFieldData(const FieldData& field);
 
 		/// <summary>
 		/// Gets a string with stored value.

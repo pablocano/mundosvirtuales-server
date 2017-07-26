@@ -41,9 +41,9 @@ void ModelAssembly::operator=(const Row& row)
 Row ModelAssembly::getRow() const
 {
 	Row row;
-	std::shared_ptr<Fields> fieldData;
+	std::shared_ptr<Fields> fieldData(new Fields());
 
-	fieldData->push_back(FieldData(this->getIDFieldName(), TypeData::DB_INTEGER));
+	fieldData->push_back(FieldData(this->getIDFieldName(), TypeData::DB_INTEGER, true));
 	fieldData->push_back(FieldData("path_model", TypeData::DB_STRING));
 	fieldData->push_back(FieldData("material", TypeData::DB_STRING));
 	fieldData->push_back(FieldData("color", TypeData::DB_STRING));
@@ -60,21 +60,6 @@ Row ModelAssembly::getRow() const
 	row.addRegisterPerValue<int>(this->getVersion());
 
 	return row;
-}
-
-std::string ModelAssembly::getIDFieldName() const
-{
-	return "model." + ObjectDB::getIDFieldName();
-}
-
-std::string ModelAssembly::getJoin() const
-{
-	return "LEFT JOIN model_version ON ((model.model_id = model_version.model_id) AND (model.current_version = model_version.version))";
-}
-
-std::string ModelAssembly::getFieldsSelect() const
-{
-	return "model.model_id, path_model, material, color, animated, version";
 }
 
 void to_json(json& j, const ModelAssembly& m) {
