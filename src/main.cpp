@@ -7,11 +7,11 @@
 #include <iostream>
 #include <string>
 
+static DBAdapterSOCI dataBase("test_proter", "postgres", "127.0.0.1", 5432, "test123");
+
 void observerLogDataBase(std::string type, std::chrono::system_clock::time_point date, std::string source, std::string message)
 {
 	using namespace db;
-
-	static DBAdapterSOCI dataBase("proter2", "postgres", "127.0.0.1", 5432, "test123");
 
 	Row row;
 	std::shared_ptr<Fields> fieldData(new Fields());
@@ -35,7 +35,6 @@ void observerLogDataBase(std::string type, std::chrono::system_clock::time_point
 
 int main()
 {
-	DBAdapterSOCI dataBase("proter2", "postgres", "127.0.0.1", 5432, "test123");
 	ServerPlant server(&dataBase);
 
 	// LOGGER_ADD_OBSERVER(observerLogDataBase); // TODO: first to use, it is necessary to fix mistake

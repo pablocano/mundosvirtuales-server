@@ -133,12 +133,8 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 		{
 			try
 			{
-				/*json parseJSON = json::parse(packet.m_lpContent);
-				int version = parseJSON.at("version").get<int>();
-				int assembly_id = parseJSON.at("id").get<int>();
-
-				json j = json{ { "version", version + 1 },{ "id", assembly_id } };
-				std::string data = j.dump();*/
+				json parseJSON = json::parse(packet.m_lpContent);
+				AssemblyComm assemblyComm = parseJSON.at(0);
 
 				sendResponse(tcpComm, packet, nullptr, StatusServer::OK_RESPONSE);
 			}

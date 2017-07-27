@@ -19,6 +19,14 @@ DBAdapterSOCI::DBAdapterSOCI(std::string _db_name, std::string _db_user, std::st
 {
 }
 
+void DBAdapterSOCI::onlyQuery(std::string query) const
+{
+	std::string connectString = get_str_connection();
+	soci::session sql(db_engine, connectString);
+
+	sql << query;
+}
+
 Rows DBAdapterSOCI::query(std::string query) const
 {
 	Rows rows;

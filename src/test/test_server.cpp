@@ -41,8 +41,6 @@ bool test_get_assemblies(ClientPlant& client)
 {
 	LOGGER_LOG("Test Server", "start test GET_ASSEMBLIES");
 
-	client.start();
-
 	static Assemblies &assemblies = Assemblies::getInstance();
 	static Plant &plant = Plant::getInstance();
 
@@ -55,11 +53,9 @@ bool test_get_assemblies(ClientPlant& client)
 	return false;
 }
 
-void test_new_assembly(ClientPlant& client)
+void test_new_assembly1(ClientPlant& client)
 {
-	LOGGER_LOG("Test Server", "start test NEW_ASSEMBLY");
-
-	client.start();
+	LOGGER_LOG("Test Server", "NEW_ASSEMBLY 1");
 
 	static Assemblies &assemblies = Assemblies::getInstance();
 	static Plant &plant = Plant::getInstance();
@@ -68,15 +64,42 @@ void test_new_assembly(ClientPlant& client)
 
 	assemblyComm.m_part_number = "PN_TEST_1";
 	assemblyComm.m_version = 1;
-	assemblyComm.m_name = "/Game/Models/Test";
+	assemblyComm.m_name = "/Game/Models/Test1";
 
 	json j_new_assembly = json({ assemblyComm });
 
 	std::string s = client.request(Command::NEW_ASSEMBLY, j_new_assembly.dump());
 
 	LOGGER_LOG("Test Server", s);
+}
 
-	LOGGER_LOG("Test Server", "end test NEW_ASSEMBLY");
+void test_new_assembly2(ClientPlant& client)
+{
+	LOGGER_LOG("Test Server", "NEW_ASSEMBLY 2");
+
+	static Assemblies &assemblies = Assemblies::getInstance();
+	static Plant &plant = Plant::getInstance();
+
+	AssemblyComm assemblyComm;
+
+	assemblyComm.m_part_number = "PN_TEST_2";
+	assemblyComm.m_version = 1;
+	assemblyComm.m_name = "/Game/Models/Test2";
+
+	AssemblyRelation assemblyRelation;
+
+	assemblyRelation.m_id_assembly = 1;
+	assemblyRelation.m_id_instance = 1;
+	assemblyRelation.m_position.m_pos.x = 100;
+	assemblyRelation.m_position.m_rot.y = 100;
+
+	assemblyComm.m_listAssemblyRelations.push_back(assemblyRelation);
+
+	json j_new_assembly = json({ assemblyComm });
+
+	std::string s = client.request(Command::NEW_ASSEMBLY, j_new_assembly.dump());
+
+	LOGGER_LOG("Test Server", s);
 }
 
 void test_concurrency()
@@ -96,8 +119,12 @@ int main()
 	ClientPlant client("localhost");
 	LOGGER_LOG("Test Server", "Starting Client");
 
-	//test_new_assembly(client);
-	test_server();
+	client.start();
+
+	test_new_assembly1(client);
+
+	test_new_assembly2(client);
+	//test_server();
 
 	LOGGER_LOG("Test Server", "Press enter to finish");
 	std::getchar();

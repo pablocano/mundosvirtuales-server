@@ -195,11 +195,15 @@ public:
 
 	void updatePlantFromDB(DBAdapter* lpDBAdapter);
 
+	StockPlant newStock(DBAdapter* lpDBAdapter, int idAssembly, const Position& position);
+	
 	StockPlant newStock(DBAdapter* lpDBAdapter, int idAssembly);
 
-	bool processRelation(DBAdapter * lpDBAdapter, int idAssembly, AssemblyComm& assemblyComm);
+	bool processRelation(DBAdapter* lpDBAdapter, int idAssembly, AssemblyComm& assemblyComm);
 
-	bool insertStock(StockPlant& root, StockPlant& stock, int parent_assembly_id);
+	int insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id);
+
+	int saveRelationToDB(DBAdapter* lpDBAdapter, int parent_id, int child_id);
 
 	void setPlant(json j);
 

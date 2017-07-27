@@ -30,6 +30,8 @@ namespace db
 
 		void set_language(std::string lang);
 
+		virtual void onlyQuery(std::string query) const = 0;
+
 		virtual Rows query(std::string query) const = 0;
 
 		virtual int countQuery(std::string table, std::string where) const = 0;

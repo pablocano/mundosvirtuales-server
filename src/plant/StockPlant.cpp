@@ -288,11 +288,11 @@ bool Plant::setIDRootPlant(DBAdapter * lpDBAdapter, int id)
 {
 	if (lpDBAdapter->countQuery("plant", "name = 'root_stock_id'") > 0)
 	{
-		lpDBAdapter->query("INSERT INTO plant(name, value, value_type) VALUES('root_stock_id', " + std::to_string(id) + ", 'INTEGER');");
+		lpDBAdapter->onlyQuery("UPDATE plant SET value = " + std::to_string(id) + " WHERE name = 'root_stock_id';");
 	}
 	else
 	{
-		lpDBAdapter->query("UPDATE plant SET value = " + std::to_string(id) + " WHERE name = 'root_stock_id';");
+		lpDBAdapter->onlyQuery("INSERT INTO plant(name, value, type_value) VALUES('root_stock_id', " + std::to_string(id) + ", 'INTEGER');");
 	}
 
 	return true;
@@ -308,10 +308,11 @@ void Plant::updatePlantFromDB(DBAdapter* lpDBAdapter)
 	// loadPlantFromDB(lpDBAdapter); // TODO: optimize
 }
 
-StockPlant Plant::newStock(DBAdapter * lpDBAdapter, int idAssembly)
+StockPlant Plant::newStock(DBAdapter* lpDBAdapter, int idAssembly, const Position& position)
 {
 	StockPlant stock;
 	stock.setDBAdapter(lpDBAdapter);
+	stock.setPosition(position);
 	stock.setAssemblyID(idAssembly);
 
 	stock.saveToDB();
@@ -319,74 +320,59 @@ StockPlant Plant::newStock(DBAdapter * lpDBAdapter, int idAssembly)
 	return stock;
 }
 
-bool Plant::processRelation(DBAdapter * lpDBAdapter, int idAssembly, AssemblyComm& assemblyComm)
+StockPlant Plant::newStock(DBAdapter* lpDBAdapter, int idAssembly)
 {
-	//static std::map<int, std::vector<StockPlant>> dictStock;
+	Position pos;
+	return newStock(lpDBAdapter, idAssembly, pos);
+}
 
-	//updatePlantFromDB(lpDBAdapter);
+bool Plant::processRelation(DBAdapter* lpDBAdapter, int idAssembly, AssemblyComm& assemblyComm)
+{
+	static std::map<int, std::vector<StockPlant>> dictStock;
 
-	//StockPlant& rootStock = newStock(lpDBAdapter, idAssembly, assemblyComm);
+	updatePlantFromDB(lpDBAdapter);
 
-	//if (!m_plant.isValidID())
-	//{
-	//	m_plant = rootStock;
-	//	setIDRootPlant(lpDBAdapter, rootStock.getID());
-	//}
+	for (AssemblyRelation& assemblyRelation : assemblyComm.m_listAssemblyRelations)
+	{
+		StockPlant& stock = newStock(lpDBAdapter, idAssembly, assemblyRelation.m_position);
 
-	//for (AssemblyRelation& assemblyRelation : assemblyComm.m_listAssemblyRelations)
-	//{
-	//	StockPlant& stock = newStock(lpDBAdapter, assemblyComm.m_id_assembly);
-	//	
-	//	if (!m_plant.isValidID())
-	//	{
-	//		m_plant = stock;
-	//		setIDRootPlant(lpDBAdapter, stock.getID());
-	//	}
-	//	else
-	//	{
-
-	//	}
-	//	
-	//	insertStock(stock)
-	//	if (dictStock.find(assemblyRelation.m_id_instance) == dictStock.end())
-	//	{
-	//		// Doesn't exist assembly
-	//		StockPlant stock;
-	//		stock.setDBAdapter(lpDBAdapter);
-	//		stock.setPosition(assemblyRelation.m_position);
-	//		if (Assemblies::getInstance().existAssembly(idAssembly))
-	//		{
-	//			stock.setAssemblyID(idAssembly);
-	//		}
-	//		
-	//		if (stock.saveToDB())
-	//		{
-	//			stockInstances[std::to_string(assemblyRelation.m_id_instance)] = stock;
-
-
-	//		}
-
-	//	}
-
-	//	if (assemblyRelation.m_id_assembly > 0)
-	//	{
-	//		// TODO: falta codigo aca
-	//		StockPlant stock;
-	//		stock.setDBAdapter(lpDBAdapter);
-	//		stock.setPosition(assemblyRelation.m_position);
-	//		stock.setAssemblyID(idAssembly);			
-	//	}
-	//}
+		if (!m_plant.isValidID())
+		{
+			// Update root plant
+			m_plant = stock;
+			setIDRootPlant(lpDBAdapter, stock.getID());
+		}
+		else
+		{
+			int child_stock_id = insertStock(lpDBAdapter, m_plant, stock, assemblyRelation.m_id_assembly);
+			if (child_stock_id > 0)
+			{
+				saveRelationToDB(lpDBAdapter, stock.getID(), child_stock_id);
+			}
+			else
+			{
+				dictStock[idAssembly].push_back(stock);
+			}
+		}
+	}
 
 	return true;
 }
 
-bool Plant::insertStock(StockPlant& root, StockPlant& stock, int parent_assembly_id)
+int Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id)
 {
-	if (root.getAssemblyID() == parent_assembly_id)
+	if (root.getAssemblyID() == child_assembly_id)
 	{
-		root.addStock(stock);
-		return true;
+		stock.addStock(root);
+
+		if (m_plant.getID() == root.getID())
+		{
+			// Update root plant
+			m_plant = stock;
+			setIDRootPlant(lpDBAdapter, stock.getID());
+		}
+		
+		return root.getID();
 	}
 	else
 	{
@@ -394,12 +380,35 @@ bool Plant::insertStock(StockPlant& root, StockPlant& stock, int parent_assembly
 		{
 			for (StockPlant s : root.getSubStock())
 			{
-				insertStock(s, stock, parent_assembly_id);
+				insertStock(lpDBAdapter, s, stock, child_assembly_id);
 			}
 		}
-		else
-			return false;
+		
+		return -1;
 	}
+}
+
+int Plant::saveRelationToDB(DBAdapter* lpDBAdapter, int parent_id, int child_id)
+{
+	ObjectDB objDB(0, "subStock", lpDBAdapter);
+
+	Row row;
+	std::shared_ptr<Fields> fieldData(new Fields());
+
+	fieldData->push_back(FieldData(objDB.getIDFieldName(), TypeData::DB_INTEGER, true));
+	fieldData->push_back(FieldData("parent_stock_id", TypeData::DB_INTEGER));
+	fieldData->push_back(FieldData("child_stock_id", TypeData::DB_INTEGER));
+
+	row.setFieldData(fieldData);
+
+	row.addRegisterPerValue<int>(objDB.getID());
+	row.addRegisterPerValue<int>(parent_id);
+	row.addRegisterPerValue<int>(child_id);
+
+	if (objDB.saveToDB(row))
+		return objDB.getID();
+	else
+		return -1;
 }
 
 void Plant::setPlant(json j)
