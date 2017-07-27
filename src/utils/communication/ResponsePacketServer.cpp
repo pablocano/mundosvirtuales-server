@@ -136,7 +136,18 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 				json parseJSON = json::parse(packet.m_lpContent);
 				AssemblyComm assemblyComm = parseJSON.at(0);
 
-				sendResponse(tcpComm, packet, nullptr, StatusServer::OK_RESPONSE);
+				int idAssembly = assemblyComm.m_id_assembly;
+
+				if (Assemblies::getInstance().existAssembly(idAssembly))
+				{
+					Assemblies::getInstance().updateAssembly(m_lpDBAdapter, assemblyComm);
+					Plant::getInstance().updateRelation(m_lpDBAdapter, idAssembly, assemblyComm);
+				}
+
+				json j = json{ { "id", idAssembly } };
+				std::string data = j.dump();
+
+				sendResponse(tcpComm, packet, (char *)data.c_str(), StatusServer::OK_RESPONSE);
 			}
 			catch (const std::exception &e)
 			{

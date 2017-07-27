@@ -1,6 +1,8 @@
 #include "StockPlant.h"
 
 #include <map>
+#include <string>
+#include <sstream>
 
 
 StockPlant StockPlant::loadStockPlant(DBAdapter *lpDBAdapter)
@@ -74,6 +76,35 @@ void StockPlant::addStock(StockPlant & stock)
 	m_subStock.push_back(stock);
 }
 
+size_t StockPlant::getHash() const
+{
+	return m_hash;
+}
+
+void StockPlant::generateHash(std::vector<int> ids)
+{
+	std::hash<std::string> getHashStock;
+	std::stringstream ss;
+	ss.str("");
+
+	for (int id : ids)
+	{
+		ss << id << "-";
+	}
+
+	m_hash = getHashStock(ss.str());
+}
+
+int StockPlant::getAssemblyInstance() const
+{
+	return m_assembly_instance;
+}
+
+void StockPlant::setAssemblyInstance(int instance)
+{
+	m_assembly_instance = instance;
+}
+
 bool StockPlant::loadFromDB()
 {
 	bool ret = ObjectDB::loadFromDB();
@@ -110,12 +141,14 @@ bool StockPlant::saveToDB()
 void StockPlant::operator=(const Row& row)
 {
 	this->setID(row.get<int>("stock_id"));
-	this->m_assembly_id		= row.get<int>("assembly_id");
-	this->m_position_id		= row.get<int>("position_entity_id");
-	this->m_sn				= row.get<std::string>("serial_number");
-	this->m_canBeSelected	= row.get<bool>("canBeSelected");
-	this->m_canShowInfo		= row.get<bool>("canShowInfo");
-	this->m_enable			= row.get<bool>("enable");
+	this->m_assembly_id			= row.get<int>("assembly_id");
+	this->m_position_id			= row.get<int>("position_entity_id");
+	this->m_sn					= row.get<std::string>("serial_number");
+	this->m_canBeSelected		= row.get<bool>("canBeSelected");
+	this->m_canShowInfo			= row.get<bool>("canShowInfo");
+	this->m_enable				= row.get<bool>("enable");
+	this->m_hash				= row.get<size_t>("hash");
+	this->m_assembly_instance	= row.get<int>("assembly_instance");
 
 	this->m_position = loadPositionFromDB(this->m_position_id, getDBAdapter());
 }
@@ -175,43 +208,51 @@ Row StockPlant::getRow() const
 	fieldData->push_back(FieldData("canBeSelected", TypeData::DB_BOOL));
 	fieldData->push_back(FieldData("canShowInfo", TypeData::DB_BOOL));
 	fieldData->push_back(FieldData("enable", TypeData::DB_BOOL));
+	fieldData->push_back(FieldData("hash", TypeData::DB_LONG_LONG));
+	fieldData->push_back(FieldData("assembly_instance", TypeData::DB_INTEGER));
 
 	row.setFieldData(fieldData);
 
 	row.addRegisterPerValue<int>(this->getID());
 	row.addRegisterPerValue<int>(this->m_assembly_id);
 	row.addRegisterPerValue<int>(this->m_position_id);
-	row.addRegisterPerValue<std::string>(this->getSN());
-	row.addRegisterPerValue<bool>(this->getCanBeSelected());
-	row.addRegisterPerValue<bool>(this->getCanShowInfo());
-	row.addRegisterPerValue<bool>(this->isEnable());
+	row.addRegisterPerValue<std::string>(this->m_sn);
+	row.addRegisterPerValue<bool>(this->m_canBeSelected);
+	row.addRegisterPerValue<bool>(this->m_canShowInfo);
+	row.addRegisterPerValue<bool>(this->m_enable);
+	row.addRegisterPerValue<size_t>(this->m_hash);
+	row.addRegisterPerValue<int>(this->m_assembly_instance);
 
 	return row;
 }
 
 void to_json(json& j, const StockPlant& m) {
 	j = json{
-	{ "m_id",				m.getID() },
-	{ "m_assembly_id",		m.m_assembly_id },
-	{ "m_position_id",		m.m_position_id },
-	{ "m_position",			m.getPosition() },
-	{ "m_sn",				m.getSN() },
-	{ "m_canBeSelected",	m.getCanBeSelected() },
-	{ "m_canShowInfo",		m.getCanShowInfo() },
-	{ "m_enable",			m.isEnable() },
-	{ "m_subStock",			m.getSubStock() } };
+	{ "m_id",					m.getID() },
+	{ "m_assembly_id",			m.m_assembly_id },
+	{ "m_position_id",			m.m_position_id },
+	{ "m_position",				m.m_position },
+	{ "m_sn",					m.m_sn },
+	{ "m_canBeSelected",		m.m_canBeSelected },
+	{ "m_canShowInfo",			m.m_canShowInfo },
+	{ "m_enable",				m.m_enable },
+	{ "m_hash",					m.m_hash },
+	{ "m_assembly_instance",	m.m_assembly_instance },
+	{ "m_subStock",				m.getSubStock() } };
 }
 
 void from_json(const json& j, StockPlant& m) {
 	m.setID(j.at("m_id").get<int>());
-	m.m_assembly_id		= j.at("m_assembly_id").get<int>();
-	m.m_position_id		= j.at("m_position_id").get<int>();
-	m.m_position		= j.at("m_position");
-	m.m_sn				= j.at("m_sn").get<std::string>();
-	m.m_canBeSelected	= j.at("m_canBeSelected").get<bool>();
-	m.m_canShowInfo		= j.at("m_canShowInfo").get<bool>();
-	m.m_enable			= j.at("m_enable").get<bool>();
-	m.m_subStock		= j.at("m_subStock");
+	m.m_assembly_id			= j.at("m_assembly_id").get<int>();
+	m.m_position_id			= j.at("m_position_id").get<int>();
+	m.m_position			= j.at("m_position");
+	m.m_sn					= j.at("m_sn").get<std::string>();
+	m.m_canBeSelected		= j.at("m_canBeSelected").get<bool>();
+	m.m_canShowInfo			= j.at("m_canShowInfo").get<bool>();
+	m.m_enable				= j.at("m_enable").get<bool>();
+	m.m_hash				= j.at("m_hash").get<size_t>();
+	m.m_assembly_instance	= j.at("m_assembly_instance").get<int>();
+	m.m_subStock			= j.at("m_subStock");
 }
 
 const StockPlant& Plant::getPlant() const
@@ -308,22 +349,23 @@ void Plant::updatePlantFromDB(DBAdapter* lpDBAdapter)
 	// loadPlantFromDB(lpDBAdapter); // TODO: optimize
 }
 
-StockPlant Plant::newStock(DBAdapter* lpDBAdapter, int idAssembly, const Position& position)
+StockPlant Plant::newStock(DBAdapter* lpDBAdapter, int idAssembly, int instance_id, const Position& position)
 {
 	StockPlant stock;
 	stock.setDBAdapter(lpDBAdapter);
 	stock.setPosition(position);
 	stock.setAssemblyID(idAssembly);
+	stock.setAssemblyInstance(instance_id);
 
 	stock.saveToDB();
 
 	return stock;
 }
 
-StockPlant Plant::newStock(DBAdapter* lpDBAdapter, int idAssembly)
+StockPlant Plant::newStock(DBAdapter* lpDBAdapter, int idAssembly, int instance_id)
 {
 	Position pos;
-	return newStock(lpDBAdapter, idAssembly, pos);
+	return newStock(lpDBAdapter, idAssembly, instance_id, pos);
 }
 
 bool Plant::processRelation(DBAdapter* lpDBAdapter, int idAssembly, AssemblyComm& assemblyComm)
@@ -334,7 +376,7 @@ bool Plant::processRelation(DBAdapter* lpDBAdapter, int idAssembly, AssemblyComm
 
 	for (AssemblyRelation& assemblyRelation : assemblyComm.m_listAssemblyRelations)
 	{
-		StockPlant& stock = newStock(lpDBAdapter, idAssembly, assemblyRelation.m_position);
+		StockPlant& stock = newStock(lpDBAdapter, idAssembly, assemblyRelation.m_id_instance, assemblyRelation.m_position);
 
 		if (!m_plant.isValidID())
 		{
@@ -359,8 +401,28 @@ bool Plant::processRelation(DBAdapter* lpDBAdapter, int idAssembly, AssemblyComm
 	return true;
 }
 
+bool Plant::updateRelation(DBAdapter * lpDBAdapter, int idAssembly, AssemblyComm & assemblyComm)
+{
+	std::vector<int> path;
+	return updateRelation(lpDBAdapter, idAssembly, assemblyComm, path);
+}
+
+bool Plant::updateRelation(DBAdapter * lpDBAdapter, int idAssembly, AssemblyComm & assemblyComm, std::vector<int> path)
+{
+	return false;
+}
+
 int Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id)
 {
+	std::vector<int> path;
+	return insertStock(lpDBAdapter, root, stock, child_assembly_id, path);
+}
+
+int Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id, std::vector<int> path)
+{
+	path.push_back(root.getAssemblyID());
+	path.push_back(root.getAssemblyInstance());
+
 	if (root.getAssemblyID() == child_assembly_id)
 	{
 		stock.addStock(root);
@@ -371,7 +433,14 @@ int Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& sto
 			m_plant = stock;
 			setIDRootPlant(lpDBAdapter, stock.getID());
 		}
+		else
+		{
+
+		}
 		
+
+		changeHash(lpDBAdapter, root, path);
+
 		return root.getID();
 	}
 	else
@@ -380,11 +449,25 @@ int Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& sto
 		{
 			for (StockPlant s : root.getSubStock())
 			{
-				insertStock(lpDBAdapter, s, stock, child_assembly_id);
+				insertStock(lpDBAdapter, s, stock, child_assembly_id, path);
 			}
 		}
 		
 		return -1;
+	}
+}
+
+void Plant::changeHash(DBAdapter * lpDBAdapter, StockPlant & root, std::vector<int> path)
+{
+	path.push_back(root.getAssemblyID());
+	path.push_back(root.getAssemblyInstance());
+
+	root.generateHash(path);
+	root.saveToDB();
+
+	for (StockPlant s : root.getSubStock())
+	{
+		changeHash(lpDBAdapter, s, path);
 	}
 }
 

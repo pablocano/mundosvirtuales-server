@@ -265,6 +265,8 @@ CREATE TABLE stock (
   canShowInfo BOOL  DEFAULT false NOT NULL ,
   canBeSelected BOOL  DEFAULT false NOT NULL ,
   enable BOOL  DEFAULT true NOT NULL ,
+  hash BIGINT  DEFAULT 0 NOT NULL ,
+  assembly_instance INTEGER  DEFAULT 0 NOT NULL ,
   created_at TIMESTAMP  DEFAULT now() NOT NULL ,
   updated_at TIMESTAMP  DEFAULT now()    ,
 PRIMARY KEY(stock_id)    ,

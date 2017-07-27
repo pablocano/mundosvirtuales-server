@@ -173,6 +173,8 @@ public:
 
 	int createAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm);
 
+	int updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm);
+
 	void setAssemblies(json j);
 	
 	friend void to_json(json& j, const Assemblies& m);

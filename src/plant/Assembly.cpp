@@ -168,6 +168,11 @@ int Assemblies::createAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assem
 	return assembly.getID();
 }
 
+int Assemblies::updateAssembly(DBAdapter * lpDBAdapter, const AssemblyComm & assemblyComm)
+{
+	return 0;
+}
+
 void Assemblies::setAssemblies(json j)
 {
 	from_json(j, *this);
