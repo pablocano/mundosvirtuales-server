@@ -218,7 +218,7 @@ public:
 
 	const StockPlant& at(int id) const;
 
-	const StockPlant& Plant::at(const StockPlant & stock, int id) const;
+	const StockPlant& at(const StockPlant & stock, int id) const;
 
 	const StockPlant& at(std::string sn) const;
 

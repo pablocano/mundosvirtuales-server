@@ -40,7 +40,7 @@ public:
 	/// Gets Assembly ID.
 	/// </summary>
 	/// <returns>Returns id of assembly. </returns>
-	int InfoAssembly::getAssemblyID() const;
+	int getAssemblyID() const;
 
 	/// <summary>
 	/// 

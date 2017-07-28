@@ -40,5 +40,5 @@ public:
 	/// <param name="command"></param>
 	/// <param name="s"></param>
 	/// <returns></returns>
-	std::string ClientPlant::request(Command command, std::string s);
+	std::string request(Command command, std::string s);
 };
