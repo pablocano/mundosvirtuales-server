@@ -83,7 +83,7 @@ typedef STRUCT_PACKET _HeaderPacketComm
 	/// </summary>
 	/// <param name="header">Header for comparing.</param>
 	/// <returns>Returns true if all elements of header are equals, false otherwise.</returns>
-	bool _HeaderPacketComm::operator ==(const _HeaderPacketComm &header) const
+	bool operator ==(const _HeaderPacketComm &header) const
 	{
 		return (version == header.version) && (m_command == header.m_command) && (m_idResponse == header.m_idResponse) && (m_size == header.m_size);
 	}
@@ -201,7 +201,7 @@ typedef STRUCT_PACKET _PacketComm
 	/// </summary>
 	/// <param name="packet">Packet for comparing.</param>
 	/// <returns>Returns true if headers are equals or the idResponses are equals in both packets, this last condition is for doing to match the response packets. Returns false otherwise.</returns>
-	bool _PacketComm::operator ==(const _PacketComm &packet) const
+	bool operator==(const _PacketComm &packet) const
 	{
 		uint32_t _sizeContent = std::min<int>(sizeContent(), packet.sizeContent());
 		return ((m_header.m_command == packet.m_header.m_command) && (m_header.m_idResponse == packet.m_header.m_idResponse)) ||
