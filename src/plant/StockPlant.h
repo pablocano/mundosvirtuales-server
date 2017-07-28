@@ -11,6 +11,8 @@ using namespace db;
 
 class StockPlant;
 
+class Plant;
+
 /// <summary>
 /// Definition of a vector of stock.
 /// </summary>
@@ -115,6 +117,12 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
+	/// <param name="stock"></param>
+	void delStock(StockPlant& stock);
+
+	/// <summary>
+	/// 
+	/// </summary>
 	/// <returns></returns>
 	size_t getHash() const;
 
@@ -179,6 +187,8 @@ public:
 	friend void to_json(json& j, const StockPlant& m);
 
 	friend void from_json(const json& j, StockPlant& m);
+
+	friend class Plant;
 };
 
 

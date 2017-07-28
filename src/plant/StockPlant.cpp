@@ -76,6 +76,11 @@ void StockPlant::addStock(StockPlant & stock)
 	m_subStock.push_back(stock);
 }
 
+void StockPlant::delStock(StockPlant & stock)
+{
+	//m_subStock.
+}
+
 size_t StockPlant::getHash() const
 {
 	return m_hash;
@@ -415,29 +420,16 @@ bool Plant::updateRelation(DBAdapter * lpDBAdapter, int idAssembly, AssemblyComm
 int Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id)
 {
 	std::vector<int> path;
-	return insertStock(lpDBAdapter, root, stock, child_assembly_id, path);
-}
-
-int Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id, std::vector<int> path)
-{
-	path.push_back(root.getAssemblyID());
-	path.push_back(root.getAssemblyInstance());
-
-	if (root.getAssemblyID() == child_assembly_id)
+	if (root.getAssemblyID() == child_assembly_id && m_plant.getID() == root.getID())
 	{
 		stock.addStock(root);
 
-		if (m_plant.getID() == root.getID())
-		{
-			// Update root plant
-			m_plant = stock;
-			setIDRootPlant(lpDBAdapter, stock.getID());
-		}
-		else
-		{
+		// Update root plant
+		m_plant = stock;
+		setIDRootPlant(lpDBAdapter, stock.getID());
 
-		}
-		
+		path.push_back(stock.getAssemblyID());
+		path.push_back(stock.getAssemblyInstance());
 
 		changeHash(lpDBAdapter, root, path);
 
@@ -445,16 +437,40 @@ int Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& sto
 	}
 	else
 	{
-		if (root.getSubStock().size() > 0)
+		return insertStock(lpDBAdapter, root, stock, child_assembly_id, path);
+	}
+}
+
+int Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id, std::vector<int> path)
+{
+	if (root.m_subStock.size() > 0)
+	{
+		path.push_back(root.getAssemblyID());
+		path.push_back(root.getAssemblyInstance());
+
+		for (StockPlant& s : root.m_subStock)
 		{
-			for (StockPlant s : root.getSubStock())
+			if (s.getAssemblyID() == child_assembly_id)
+			{
+				stock.addStock(s);
+
+				path.push_back(stock.getAssemblyID());
+				path.push_back(stock.getAssemblyInstance());
+
+				stock.delStock(s);
+
+				changeHash(lpDBAdapter, s, path);
+
+				return s.getID();
+			}
+			else
 			{
 				insertStock(lpDBAdapter, s, stock, child_assembly_id, path);
 			}
 		}
-		
-		return -1;
 	}
+		
+	return -1;
 }
 
 void Plant::changeHash(DBAdapter * lpDBAdapter, StockPlant & root, std::vector<int> path)
