@@ -30,6 +30,16 @@ namespace db
 		/// <param name="row">Reference row.</param>
 		Row(const Row& row);
 
+		const std::shared_ptr<Fields> getFields() const
+		{
+			return m_lpFields;
+		}
+
+		const Registers& getRegisters() const
+		{
+			return m_registers;
+		}
+
 		/// <summary>
 		/// Operator equals.
 		/// </summary>
@@ -55,7 +65,7 @@ namespace db
 		T get(std::string field, T default = T()) const
 		{
 			int pos = find_field(field);
-			if (pos < 0)
+			if (pos < 0 || m_registers.size() <= 0)
 				return default;
 			else
 				return m_registers[pos].get<T>();
@@ -79,25 +89,6 @@ namespace db
 		/// <param name="fieldName">Field's name.</param>
 		/// <returns>Returns position of register.</returns>
 		int find_field(std::string fieldName) const;
-
-		/// <summary>
-		/// Gets all field names.
-		/// </summary>
-		/// <returns>Returns a string with all field names.</returns>
-		std::string getSQLFieldNames() const;
-		
-		/// <summary>
-		/// Gets all register of row.
-		/// </summary>
-		/// <returns>Returns a string with all register values.</returns>
-		std::string getSQLRegisterValues() const;
-
-		/// <summary>
-		/// Gets a string for using it in SQL update query.
-		/// </summary>
-		/// <returns>Returns a string for making an update query with this object.</returns>
-		std::string getSQLUpdateRegisterValues() const;
-
 
 		bool isEmpty() const;
 	};

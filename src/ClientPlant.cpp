@@ -68,3 +68,34 @@ bool ClientPlant::requestAssemblies(Assemblies& assemblies)
 
 	return assemblies.getDictAssemblies().size() > 0;
 }
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="command"></param>
+/// <param name="j"></param>
+/// <returns></returns>
+
+std::string ClientPlant::request(Command command, std::string s)
+{
+	if (m_tcpComm.connected())
+	{
+		HeaderPacketComm header;
+		PacketComm packetRequest;
+		packetRequest.m_header.m_command = command;
+		packetRequest.m_lpContent = (char *)s.c_str();
+
+		std::unique_ptr<char[]> packetTCP = packetRequest.packing();
+		m_tcpComm.send(packetTCP.get(), packetRequest.size());
+
+		PacketComm packetResponse = m_lpResponsePacket->get_response(packetRequest);
+
+		if ((packetResponse.m_header.m_idResponse == packetRequest.m_header.m_idResponse) && packetResponse.sizeContent() > 0)
+		{
+			return packetResponse.m_lpContent;
+		}
+
+	}
+
+	return ""; // Empty
+}

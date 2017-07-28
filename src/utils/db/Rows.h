@@ -42,6 +42,6 @@ namespace db
 
 		void addField(FieldData field);
 
-		std::shared_ptr<Fields> getFields();
+		std::shared_ptr<Fields> getFields() const;
 	};
 }

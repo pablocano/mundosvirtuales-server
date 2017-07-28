@@ -1,7 +1,6 @@
 #include "ResponsePacketServer.h"
 #include "../logger/Logger.h"
 #include "../AssemblyUtils.h"
-#include "../../plant/StockPlant.h"
 
 using json = nlohmann::json;
 
@@ -103,11 +102,19 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 			try
 			{
 				json parseJSON = json::parse(packet.m_lpContent);
-				std::string s(packet.m_lpContent);
-				AssemblyComm assemblyComm = parseJSON;
+				AssemblyComm assemblyComm = parseJSON.at(0);
 				
-				int idAssembly = Assemblies::getInstance().createAssembly(m_lpDBAdapter, assemblyComm);
-				Plant::getInstance().createStock(m_lpDBAdapter, idAssembly, assemblyComm);
+				int idAssembly = assemblyComm.m_id_assembly;
+
+				if (!Assemblies::getInstance().existAssembly(idAssembly))
+				{
+					idAssembly = Assemblies::getInstance().createAssembly(m_lpDBAdapter, assemblyComm);
+				}
+
+				if (idAssembly > 0)
+				{
+					Plant::getInstance().processRelation(m_lpDBAdapter, idAssembly, assemblyComm);
+				}
 				
 				json j = json{ { "id", idAssembly } };
 				std::string data = j.dump();
@@ -126,14 +133,21 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 		{
 			try
 			{
-				/*json parseJSON = json::parse(packet.m_lpContent);
-				int version = parseJSON.at("version").get<int>();
-				int assembly_id = parseJSON.at("id").get<int>();
+				json parseJSON = json::parse(packet.m_lpContent);
+				AssemblyComm assemblyComm = parseJSON.at(0);
 
-				json j = json{ { "version", version + 1 },{ "id", assembly_id } };
-				std::string data = j.dump();*/
+				int idAssembly = assemblyComm.m_id_assembly;
 
-				sendResponse(tcpComm, packet, nullptr, StatusServer::OK_RESPONSE);
+				if (Assemblies::getInstance().existAssembly(idAssembly))
+				{
+					Assemblies::getInstance().updateAssembly(m_lpDBAdapter, assemblyComm);
+					Plant::getInstance().updateRelation(m_lpDBAdapter, idAssembly, assemblyComm);
+				}
+
+				json j = json{ { "id", idAssembly } };
+				std::string data = j.dump();
+
+				sendResponse(tcpComm, packet, (char *)data.c_str(), StatusServer::OK_RESPONSE);
 			}
 			catch (const std::exception &e)
 			{

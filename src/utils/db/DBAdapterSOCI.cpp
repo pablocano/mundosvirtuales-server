@@ -4,6 +4,7 @@
 #include <cstring>
 #include <sstream>
 #include <ctime>
+#include <regex>
 
 #include "soci/soci.h"
 #include "soci/soci-config.h"
@@ -16,6 +17,14 @@ using namespace db;
 DBAdapterSOCI::DBAdapterSOCI(std::string _db_name, std::string _db_user, std::string _db_host, int _db_port, std::string _db_password, std::string _db_engine) :
 	DBAdapter(_db_name, _db_user, _db_host, _db_port, _db_password, _db_engine)
 {
+}
+
+void DBAdapterSOCI::onlyQuery(std::string query) const
+{
+	std::string connectString = get_str_connection();
+	soci::session sql(db_engine, connectString);
+
+	sql << query;
 }
 
 Rows DBAdapterSOCI::query(std::string query) const
@@ -98,7 +107,7 @@ Rows DBAdapterSOCI::query(std::string query) const
 			}
 
 			registerValue.setIndicator(indicator);
-			registerValue.setFieldData(&(*rows.getFields())[i]);
+			registerValue.setFieldData(rows.getFields()->at(i));
 			row.addRegister(registerValue);
 		}
 	}
@@ -129,15 +138,30 @@ std::vector<int> DBAdapterSOCI::insert(const std::string& table, const Rows & ro
 		std::string connectString = get_str_connection();
 		soci::session sql(db_engine, connectString);
 
+		std::vector<int> skip_pos;
+		int pos_primary_key = getPos(rows.getFields(), rows.getFields()->getPrimaryKey().getName());
+		skip_pos.push_back(pos_primary_key);
+
 		soci::transaction tr(sql);
 
 		for (auto row = rows.cbegin(); row != rows.cend(); ++row)
 		{
 			std::stringstream ss;
-			ss << "INSERT INTO " << table << row->getSQLFieldNames() << " VALUES" << row->getSQLRegisterValues() << " RETURNING " << table << "_id" << ";";
+			ss << "INSERT INTO " << table;
+			if (pos_primary_key > 0 && row->getRegisters().at(pos_primary_key).get<int>() <= 0)
+			{
+				ss << getSQLFieldNames(*row, skip_pos) << " VALUES" << getSQLRegisterValues(*row, skip_pos);
+			}
+			else
+			{
+				ss << getSQLFieldNames(*row) << " VALUES" << getSQLRegisterValues(*row);
+			}
+			
+			ss << " RETURNING " << table << "_id" << ";";
+			std::regex pattern(table + "\\.");
 			std::string query = ss.str();
 			int id;
-			sql << query, soci::into(id);
+			sql << std::regex_replace(query, pattern, ""), soci::into(id);
 			ids.push_back(id);
 		}
 
@@ -158,11 +182,27 @@ int DBAdapterSOCI::insert(const std::string& table, const Row & row)
 		std::string connectString = get_str_connection();
 		soci::session sql(db_engine, connectString);
 
+		std::vector<int> skip_pos;
+		int pos_primary_key = getPos(row.getFields(), row.getFields()->getPrimaryKey().getName());
+		skip_pos.push_back(pos_primary_key);
+
 		std::stringstream ss;
-		ss << "INSERT INTO " << table << row.getSQLFieldNames() << " VALUES" << row.getSQLRegisterValues() << " RETURNING " << table << "_id" << ";";
+		ss << "INSERT INTO " << table;
+		if (pos_primary_key >= 0 && row.getRegisters().at(pos_primary_key).get<int>() <= 0)
+		{
+			ss << getSQLFieldNames(row, skip_pos) << " VALUES" << getSQLRegisterValues(row, skip_pos);
+		}
+		else
+		{
+			ss << getSQLFieldNames(row) << " VALUES" << getSQLRegisterValues(row);
+		}
+
+		ss << " RETURNING " << table << "_id" << ";";
+		std::regex pattern(table + "\\.");
 		std::string query = ss.str();
 		int id;
-		sql << query, soci::into(id);
+		sql << std::regex_replace(query, pattern, ""), soci::into(id);
+
 		return id;
 	}
 	catch(const std::exception &e)
@@ -185,7 +225,7 @@ bool db::DBAdapterSOCI::update(const std::string & table, const Rows & rows, con
 		{
 			std::stringstream ss;
 			ss.str("");
-			ss << "update " << table << "set " << row->getSQLUpdateRegisterValues() << " where " << name_id << " = " << row->get<int>(name_id) << ";";
+			ss << "UPDATE " << table << "SET " << getSQLUpdateRegisterValues(*row) << " WHERE " << name_id << " = " << row->get<int>(name_id) << ";";
 		}
 
 		tr.commit();
@@ -207,7 +247,7 @@ bool db::DBAdapterSOCI::update(const std::string & table, const Row & row, const
 
 		std::stringstream ss;
 		ss.str("");
-		ss << "update " << table << "set " << row.getSQLUpdateRegisterValues() << " where " << where << ";";
+		ss << "UPDATE " << table << "SET " << getSQLUpdateRegisterValues(row) << " WHERE " << where << ";";
 
 		std::string query = ss.str();
 		sql << query;

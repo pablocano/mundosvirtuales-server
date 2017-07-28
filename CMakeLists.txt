@@ -55,6 +55,7 @@ set( UTILS_SRC
 	src/utils/administration/Roles.cpp
 	src/utils/administration/User.cpp
 	src/utils/communication/ResponsePacket.cpp
+	src/utils/db/ObjectDB.cpp
 	src/utils/network/TcpComm.cpp
 	src/utils/network/UdpComm.cpp
 	src/utils/network/ServerTCP.cpp

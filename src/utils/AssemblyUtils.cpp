@@ -33,5 +33,5 @@ void from_json(const json& j, AssemblyComm& m)
 	m.m_name					= j.at("m_name").get<std::string>();
 	m.m_id_assembly				= j.at("m_id_assembly").get<int>();
 	m.m_version					= j.at("m_version").get<int>();
-	m.m_listAssemblyRelations	= j.at("m_listAssemblyRelations").get<std::vector<AssemblyRelation>>();
+	m.m_listAssemblyRelations	= j.at("m_listAssemblyRelations").get<ListAssemblyRelations>();
 }

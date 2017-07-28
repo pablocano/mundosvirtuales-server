@@ -7,7 +7,7 @@ using json = nlohmann::json;
 
 struct AssemblyRelation
 {
-	int m_id_assembly;
+	int m_id_assembly; // TODO: change to m_assembly_id
 	Position m_position;
 	int m_id_instance;
 
@@ -29,6 +29,8 @@ struct AssemblyComm
 	ListAssemblyRelations m_listAssemblyRelations;
 
 	AssemblyComm() : m_part_number(), m_listAssemblyRelations(), m_id_assembly(), m_version() {}
+
+	bool isOnlyAssembly() { return m_listAssemblyRelations.size() <= 0; }
 };
 
 void to_json(json& j, const AssemblyComm& m);

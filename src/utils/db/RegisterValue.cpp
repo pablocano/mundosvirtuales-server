@@ -5,7 +5,7 @@
 
 using namespace db;
 
-RegisterValue::RegisterValue() : m_value(nullptr), m_size(0), m_indicator(IndicatorField::IS_OK), m_fieldData(nullptr) {}
+RegisterValue::RegisterValue() : m_value(nullptr), m_size(0), m_indicator(IndicatorField::IS_OK), m_fieldData() {}
 
 RegisterValue::RegisterValue(const RegisterValue & w)
 {
@@ -58,14 +58,14 @@ void RegisterValue::setIndicator(IndicatorField indicator)
 	m_indicator = indicator;
 }
 
-FieldData RegisterValue::getFieldData() 
+const FieldData& RegisterValue::getFieldData() 
 { 
 	return *m_fieldData;
 }
 
-void RegisterValue::setFieldData(FieldData * field) 
+void RegisterValue::setFieldData(const FieldData& field)
 { 
-	m_fieldData = field;
+	m_fieldData = &field;
 }
 
 std::string RegisterValue::getSQLValue() const
@@ -73,6 +73,9 @@ std::string RegisterValue::getSQLValue() const
 	std::string value;
 	switch (m_fieldData->getType())
 	{
+	case TypeData::DB_BOOL:
+		value = get<bool>() ? "TRUE" : "FALSE";
+		break;
 	case TypeData::DB_STRING:
 		value = "'" + get<std::string>() + "'";
 		break;

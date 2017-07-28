@@ -8,35 +8,18 @@ using json = nlohmann::json;
 class InfoAssembly : public ObjectDB
 {
 protected:
-	/// <summary>
-	/// The name of the machine
-	/// </summary>
-	std::string m_name;
 
-	/// <summary>
-	/// The descriptions of this assembly.
-	/// </summary>
-	std::string m_info;
-
-	/// <summary>
-	/// A short description of this assembly.
-	/// </summary>
-	std::string m_shortInfo;
+	std::string m_name; /* The name of the machine. */
+	std::string m_info; /* The descriptions of this assembly. */
+	std::string m_shortInfo; /* A short description of this assembly. */
+	int m_language_id; /* Id of default language. */
+	int m_assembly_id; /* Id of assembly. */
 
 public:
 	/// <summary>
 	/// Constructor.
 	/// </summary>
-	InfoAssembly() : ObjectDB(0, "assembly_translation", nullptr), m_name("NO NAME"), m_info(), m_shortInfo() {}
-
-	/// <summary>
-	/// Constructor.
-	/// </summary>
-	/// <param name="name">The name of the machine shown in the game.</param>
-	/// <param name="info">The description of this assembly.</param>
-	/// <param name="shortInfo">A little description about the assembly.</param>
-	InfoAssembly(std::string name, std::string info, std::string shortInfo) :
-		ObjectDB(0, "assembly_translation", nullptr), m_name(name), m_info(info), m_shortInfo(shortInfo) {}
+	InfoAssembly() : ObjectDB(0, "assembly_translation", nullptr), m_name("NO NAME"), m_info(), m_shortInfo(), m_language_id(1), m_assembly_id() {}
 
 	/// <summary>
 	/// Gets Name.
@@ -52,6 +35,18 @@ public:
 	/// Gets short information about this assembly.
 	/// </summary>
 	std::string getShortInfo() const;
+
+	/// <summary>
+	/// Gets Assembly ID.
+	/// </summary>
+	/// <returns>Returns id of assembly. </returns>
+	int InfoAssembly::getAssemblyID() const;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="id"></param>
+	void setAssemblyID(int id);
 
 	/// <summary>
 	/// Operator equals with Row.

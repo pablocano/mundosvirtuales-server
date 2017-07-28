@@ -17,6 +17,8 @@ namespace db
 	public:
 		DBAdapterSOCI(std::string _db_name, std::string _db_user, std::string _db_host = "", int _db_port = 5432, std::string _db_password = "", std::string _db_engine = "postgresql");
 
+		void onlyQuery(std::string query) const;
+
 		Rows query(std::string query) const;
 
 		int countQuery(std::string table, std::string where) const;

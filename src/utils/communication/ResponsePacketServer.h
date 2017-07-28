@@ -3,6 +3,9 @@
 #include "ResponsePacket.h"
 #include "../db/DBAdapter.h"
 #include "../../plant/Assembly.h"
+#include "../../plant/StockPlant.h"
+
+#include <map>
 
 using namespace db;
 

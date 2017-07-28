@@ -188,6 +188,8 @@ struct Position
 
 	Position() : m_pos(), m_rot() {}
 
+	Position(Vectorf3D pos, Vectorf3D rot) : m_pos(pos), m_rot(rot) {}
+
 	Position& operator=(const Position& position)
 	{
 		m_pos = position.m_pos, m_rot = position.m_rot;

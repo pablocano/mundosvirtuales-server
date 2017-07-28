@@ -21,7 +21,7 @@ Row& Row::operator=(const Row& row)
 
 void Row::addRegister(RegisterValue& registerValue)
 {
-	registerValue.setFieldData(&m_lpFields->at(m_registers.size()));
+	registerValue.setFieldData(m_lpFields->at(m_registers.size()));
 	m_registers.push_back(registerValue);
 }
 
@@ -37,54 +37,6 @@ int Row::find_field(std::string fieldName) const
 		return -1;
 	else
 		return (int)std::distance(m_lpFields->begin(), it);
-}
-
-std::string Row::getSQLFieldNames() const
-{
-	std::stringstream ss;
-	ss.str("");
-	ss << "(";
-	int pos = 0;
-	for (; pos < m_lpFields->size() - 1; ++pos)
-		ss << m_lpFields->at(pos).getName() << ", ";
-
-	if (pos == m_lpFields->size() - 1)
-		ss << m_lpFields->at(pos).getName();
-
-	ss << ")";
-
-	return ss.str();
-}
-
-std::string Row::getSQLRegisterValues() const
-{
-	std::stringstream ss;
-	ss.str("");
-	ss << "(";
-	int pos = 0;
-	for (; pos < m_registers.size() - 1; ++pos)
-		ss << m_registers.at(pos).getSQLValue() << ", ";
-
-	if (pos == m_registers.size() - 1)
-		ss << m_registers.at(pos).getSQLValue();
-
-	ss << ")";
-
-	return ss.str();
-}
-
-std::string Row::getSQLUpdateRegisterValues() const
-{
-	std::stringstream ss;
-	ss.str("");
-	int pos = 0;
-	for (; pos < m_registers.size() - 1; ++pos)
-		ss << m_lpFields->at(pos).getName() << " = " << m_registers.at(pos).getSQLValue() << ", ";
-
-	if (pos == m_registers.size() - 1)
-		ss << m_lpFields->at(pos).getName() << " = " << m_registers.at(pos).getSQLValue();
-
-	return ss.str();
 }
 
 bool db::Row::isEmpty() const

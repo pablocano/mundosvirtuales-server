@@ -79,7 +79,7 @@ void Rows::addField(FieldData field)
 	m_fields->push_back(field);
 }
 
-std::shared_ptr<Fields> Rows::getFields()
+std::shared_ptr<Fields> Rows::getFields() const
 { 
 	return m_fields;
 }
