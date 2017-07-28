@@ -170,7 +170,13 @@ int Assemblies::createAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assem
 
 int Assemblies::updateAssembly(DBAdapter * lpDBAdapter, const AssemblyComm & assemblyComm)
 {
-	return 0;
+	updateDictAssembliesFromDB(lpDBAdapter);
+
+	Assemblies::getInstance().getDictAssemblies()[assemblyComm.m_id_assembly] = assemblyComm; // Copy data
+
+	Assemblies::getInstance().getDictAssemblies()[assemblyComm.m_id_assembly].saveToDB(); // Save data
+
+	return Assemblies::getInstance().getDictAssemblies()[assemblyComm.m_id_assembly].getID();
 }
 
 void Assemblies::setAssemblies(json j)

@@ -111,18 +111,6 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <param name="stock"></param>
-	void addStock(StockPlant& stock);
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="stock"></param>
-	void delStock(StockPlant& stock);
-
-	/// <summary>
-	/// 
-	/// </summary>
 	/// <returns></returns>
 	size_t getHash() const;
 
@@ -130,7 +118,13 @@ public:
 	/// 
 	/// </summary>
 	/// <param name="ids"></param>
-	void generateHash(std::vector<int> ids);
+	void setHash(std::vector<int> ids);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="ids"></param>
+	static size_t generateHash(std::vector<int> ids);
 
 	/// <summary>
 	/// 
@@ -232,9 +226,9 @@ public:
 
 	void updatePlantFromDB(DBAdapter* lpDBAdapter);
 
-	StockPlant newStock(DBAdapter* lpDBAdapter, int idAssembly, int instance_id, const Position& position);
+	StockPlant newStock(DBAdapter* lpDBAdapter, int idAssembly, int instance_id, const Position& position, bool save = true);
 	
-	StockPlant newStock(DBAdapter* lpDBAdapter, int idAssembly, int instance_id);
+	StockPlant newStock(DBAdapter* lpDBAdapter, int idAssembly, int instance_id, bool save = true);
 
 	bool processRelation(DBAdapter* lpDBAdapter, int idAssembly, AssemblyComm& assemblyComm);
 
@@ -245,6 +239,10 @@ public:
 	int insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id);
 	
 	int insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id, std::vector<int> path);
+
+	void updateStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, AssemblyComm& assemblyComm);
+
+	void updateStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, AssemblyComm& assemblyComm, std::vector<int> path);
 
 	void changeHash(DBAdapter* lpDBAdapter, StockPlant& root, std::vector<int> path);
 
