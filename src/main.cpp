@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 
-static DBAdapterSOCI dataBase("test_proter", "postgres", "127.0.0.1", 5432, "test123");
+static DBAdapterSOCI dataBase("proter2", "postgres", "10.0.42.8", 5432, "test123");
 
 void observerLogDataBase(std::string type, std::chrono::system_clock::time_point date, std::string source, std::string message)
 {

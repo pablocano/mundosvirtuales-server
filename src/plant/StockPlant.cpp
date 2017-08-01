@@ -247,27 +247,54 @@ bool Plant::setIDRootPlant(DBAdapter * lpDBAdapter, int id)
 
 void Plant::loadPlantFromDB(DBAdapter* lpDBAdapter)
 {
+	//Set the DB adapter of the root
 	m_plant.setDBAdapter(lpDBAdapter);
+
+	// Get the id off the root
 	int idPlant = Plant::getIDRootPlant(lpDBAdapter);
 
+	// If the id is valid
 	if (idPlant > 0)
 	{
+		// Set the id to the root stock
 		m_plant.setID(idPlant);
+		
+		// Load the root from DB
 		m_plant.loadFromDB();
 	}
 
+	//Load all substocks recursively
+	m_plant.AddSubStocks(m_plant.getNodePath(""));
+}
+
+void StockPlant::AddSubStocks(const std::string & path)
+{
+	// Creation of the function that generates the hash
 	std::hash<std::string> generateHash;
 
-	// TODO: Pablo Cano: Cargar subStock de forma recursiva
-	// loadRelationFromDB(lpDBAdapter, assembly_id) retorna la lista de relaciones a partir de un id assembly
-	// stock es una instancia de StockPlant
-	// stock.setID(id) permite cambiar el id del objeto y stock.loadFromDB() cargarlo de la base de datos
-	// loadStockPerHashFromDB(hash) carga un stock de la base de datos a partir de un hash
-	// El formato del hash es una concatenacion de los nodos del recorrido del arbol, el recorrido actual se obtiene con la funcion
-	// getNodePath(path) donde path es el camino del padre.
-	// generateHash(path) es la funcion que devuelve el hash a partir del hash 
-	// stock.setHash(s) y stock.getHash() son el setter y getter del hash
-	// (PD: no pongo acentos :p para evitar problemas)
+	// Obtain all the relations of the assembly of the current stock
+	ListAssemblyRelations relations = Assemblies::loadRelationFromDB(getDBAdapter(), m_assembly_id);
+
+	// Iterate over all relations the assembly of this stock
+	for (const auto& relation : relations)
+	{
+		// Creation the possible child stock
+		StockPlant childStock;
+
+		// Load the stock from the DB by the path of the relation
+		if (childStock.loadStockPerHashFromDB(generateHash(relation.CreatePath(path))))
+		{
+			// If the stock is load correctly, load its substocks and then add it to the substocks
+			if (childStock.m_assembly_id > 0 && childStock.m_assembly_id == relation.m_id_assembly)
+			{
+				// Load its substocks
+				childStock.AddSubStocks(getNodePath(path));
+
+				// Add it to the substock list of the current stock
+				m_subStock.push_back(childStock);
+			}
+		}
+	}
 }
 
 void Plant::updatePlantFromDB(DBAdapter* lpDBAdapter)

@@ -12,6 +12,16 @@ struct AssemblyRelation
 	int m_id_instance;
 
 	AssemblyRelation() : m_id_assembly(), m_position() {}
+
+	/// <summary>
+	/// Create the path to this relation
+	/// </summary>
+	/// <param name="parentPath">The path to the parent</param>
+	/// <returns></returns>
+	std::string CreatePath(const std::string& parentPath) const
+	{
+		return parentPath + (parentPath.empty() ? "" : ",") + std::to_string(m_id_assembly) + ":" + std::to_string(m_id_instance);
+	}
 };
 
 void to_json(json& j, const AssemblyRelation& m);
