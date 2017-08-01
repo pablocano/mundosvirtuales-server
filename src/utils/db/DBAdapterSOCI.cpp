@@ -218,6 +218,8 @@ bool db::DBAdapterSOCI::update(const std::string & table, const Rows & rows, con
 	{
 		std::string connectString = get_str_connection();
 		soci::session sql(db_engine, connectString);
+		
+		std::regex pattern(table + "\\.");
 
 		soci::transaction tr(sql);
 
@@ -225,7 +227,10 @@ bool db::DBAdapterSOCI::update(const std::string & table, const Rows & rows, con
 		{
 			std::stringstream ss;
 			ss.str("");
-			ss << "UPDATE " << table << "SET " << getSQLUpdateRegisterValues(*row) << " WHERE " << name_id << " = " << row->get<int>(name_id) << ";";
+			ss << "UPDATE " << table << " SET " << getSQLUpdateRegisterValues(*row) << " WHERE " << name_id << " = " << row->get<int>(name_id) << ";";
+			
+			std::string query = ss.str();
+			sql << std::regex_replace(query, pattern, "");
 		}
 
 		tr.commit();
@@ -247,10 +252,12 @@ bool db::DBAdapterSOCI::update(const std::string & table, const Row & row, const
 
 		std::stringstream ss;
 		ss.str("");
-		ss << "UPDATE " << table << "SET " << getSQLUpdateRegisterValues(row) << " WHERE " << where << ";";
+		ss << "UPDATE " << table << " SET " << getSQLUpdateRegisterValues(row) << " WHERE " << where << ";";
 
+		std::regex pattern(table + "\\.");
 		std::string query = ss.str();
-		sql << query;
+		sql << std::regex_replace(query, pattern, "");
+
 		return true;
 	}
 	catch (const std::exception &e)

@@ -6,6 +6,7 @@
 #include "../utils/Position.h"
 #include "Assembly.h"
 
+
 using json = nlohmann::json;
 using namespace db;
 
@@ -26,33 +27,24 @@ typedef std::vector<int> IDStock;
 
 class StockPlant : public ObjectDB
 {
-public:
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="lpDBAdapter"></param>
-	/// <returns></returns>
-	static StockPlant loadStockPlant(DBAdapter* lpDBAdapter);
-
 protected:
 	
 	int m_assembly_id; /* Assembly Identifier. */
-	int m_position_id; /* Position Identifier. */
+	int m_instance; /* Instance assembly.  */
 	Position m_position; /* Position on plant. */
 	std::string m_sn; /* Serial number. */
 	bool m_canBeSelected; /* This flag is used to know if the stock can be selected. */
 	bool m_canShowInfo; /* This flag is used to know if the stock can be showed.  */
 	bool m_enable; /* This flag is used to know if the stock is enabled. */
 	size_t m_hash; /* Hash for identified stock (creation). */
-	int m_assembly_instance; /* Disambiguation for each assembly. */
+
 	SubStock m_subStock; /* All the sub-assemblies of this assembly */
 
 public:
 	/// <summary>
 	/// Constructor.
 	/// </summary>
-	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_position_id(), m_position(), m_sn("SN"), m_canBeSelected(false), m_canShowInfo(false), m_enable(false), m_hash(), m_assembly_instance() {}
+	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_instance(), m_position(), m_sn("SN"), m_canBeSelected(false), m_canShowInfo(false), m_enable(false), m_hash() {}
 
 	/// <summary>
 	/// Gets Assembly.
@@ -70,6 +62,18 @@ public:
 	/// </summary>
 	/// <param name="id"></param>
 	void setAssemblyID(int id);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	int getInstance() const;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="id"></param>
+	void setInstance(int id);
 
 	/// <summary>
 	/// Gets Serial Number.
@@ -118,59 +122,27 @@ public:
 	/// 
 	/// </summary>
 	/// <param name="ids"></param>
-	void setHash(std::vector<int> ids);
+	void setHash(std::string s);
 
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <param name="ids"></param>
-	static size_t generateHash(std::vector<int> ids);
-
-	/// <summary>
-	/// 
-	/// </summary>
+	/// <param name="hash"></param>
 	/// <returns></returns>
-	int getAssemblyInstance() const;
+	bool loadStockPerHashFromDB(size_t hash);
 
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <param name="instance"></param>
-	void setAssemblyInstance(int instance);
-
-	/// <summary>
-	/// 
-	/// </summary>
+	/// <param name="path"></param>
 	/// <returns></returns>
-	bool loadFromDB();
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <returns></returns>
-	bool saveToDB();
+	std::string getNodePath(std::string path);
 
 	/// <summary>
 	/// Operator equals with Row.
 	/// </summary>
 	/// <param name="row">Row reference.</param>
 	void operator=(const Row& row);
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="position_id"></param>
-	/// <param name="lpDBAdapter"></param>
-	/// <returns></returns>
-	static Position loadPositionFromDB(int position_id, DBAdapter* lpDBAdapter);
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="position"></param>
-	/// <param name="lpDBAdapter"></param>
-	/// <returns></returns>
-	int savePositionToDB(const Position& position, DBAdapter* lpDBAdapter);
 
 	/// <summary>
 	/// Gets a row.
@@ -226,27 +198,15 @@ public:
 
 	void updatePlantFromDB(DBAdapter* lpDBAdapter);
 
-	StockPlant newStock(DBAdapter* lpDBAdapter, int idAssembly, int instance_id, const Position& position, bool save = true);
-	
-	StockPlant newStock(DBAdapter* lpDBAdapter, int idAssembly, int instance_id, bool save = true);
+	StockPlant newStock(DBAdapter* lpDBAdapter, int idAssembly, const Position& position);
 
-	bool processRelation(DBAdapter* lpDBAdapter, int idAssembly, AssemblyComm& assemblyComm);
-
-	bool updateRelation(DBAdapter* lpDBAdapter, int idAssembly, AssemblyComm& assemblyComm);
-
-	bool updateRelation(DBAdapter* lpDBAdapter, int idAssembly, AssemblyComm& assemblyComm, std::vector<int> path);
+	bool processRelation(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm);
 
 	int insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id);
 	
-	int insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id, std::vector<int> path);
+	int insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id, std::string path);
 
-	void updateStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, AssemblyComm& assemblyComm);
-
-	void updateStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, AssemblyComm& assemblyComm, std::vector<int> path);
-
-	void changeHash(DBAdapter* lpDBAdapter, StockPlant& root, std::vector<int> path);
-
-	int saveRelationToDB(DBAdapter* lpDBAdapter, int parent_id, int child_id);
+	void changeHash(DBAdapter* lpDBAdapter, StockPlant& root, std::string path);
 
 	void setPlant(json j);
 

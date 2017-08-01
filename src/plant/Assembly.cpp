@@ -184,6 +184,70 @@ void Assemblies::setAssemblies(json j)
 	from_json(j, *this);
 }
 
+bool Assemblies::processRelation(DBAdapter * lpDBAdapter, AssemblyComm & assemblyComm)
+{
+	updateDictAssembliesFromDB(lpDBAdapter);
+
+	for (AssemblyRelation& assemblyRelation : assemblyComm.m_listAssemblyRelations)
+	{
+		saveRelationToDB(lpDBAdapter, assemblyComm.m_id_assembly, assemblyRelation.m_id_assembly, assemblyRelation.m_id_instance, assemblyRelation.m_position);
+	}
+
+	return true;
+}
+
+int Assemblies::saveRelationToDB(DBAdapter * lpDBAdapter, int parent_id, int child_id, int instance, Position & position)
+{
+	int position_id = savePositionToDB(lpDBAdapter, position);
+
+	if (position_id)
+	{
+		ObjectDB objDB(0, "assembly_relations", lpDBAdapter);
+
+		Row row;
+		std::shared_ptr<Fields> fieldData(new Fields());
+
+		fieldData->push_back(FieldData(objDB.getIDFieldName(), TypeData::DB_INTEGER, true));
+		fieldData->push_back(FieldData("parent_assembly_id", TypeData::DB_INTEGER));
+		fieldData->push_back(FieldData("child_assembly_id", TypeData::DB_INTEGER));
+		fieldData->push_back(FieldData("instance", TypeData::DB_INTEGER));
+		fieldData->push_back(FieldData("position_entity_id", TypeData::DB_INTEGER));
+
+		row.setFieldData(fieldData);
+
+		row.addRegisterPerValue<int>(objDB.getID());
+		row.addRegisterPerValue<int>(parent_id);
+		row.addRegisterPerValue<int>(child_id);
+		row.addRegisterPerValue<int>(instance);
+		row.addRegisterPerValue<int>(position_id);
+
+		if (objDB.saveToDB(row))
+			return objDB.getID();
+
+	}
+
+	return -1;
+}
+
+ListAssemblyRelations Assemblies::loadRelationFromDB(DBAdapter * lpDBAdapter, int assembly_id)
+{
+	ListAssemblyRelations listRelations;
+	Rows rows = lpDBAdapter->query("SELECT * FROM assembly_relations WHERE parent_assembly_id = " + std::to_string(assembly_id) + ";");
+
+	for (Row& row : rows)
+	{
+		AssemblyRelation assemblyRelation;
+
+		assemblyRelation.m_id_assembly = row.get<int>("child_assembly_id");
+		assemblyRelation.m_id_instance = row.get<int>("instance");
+		assemblyRelation.m_position = loadPositionFromDB(lpDBAdapter, row.get<int>("position_entity_id"));
+
+		listRelations.push_back(assemblyRelation);
+	}
+
+	return listRelations;
+}
+
 void to_json(json &j, const Assemblies &m)
 {
 	j = json{ { "m_dictAssemblies",	m.m_dictAssemblies } };

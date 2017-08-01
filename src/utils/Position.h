@@ -7,6 +7,7 @@
 #include <iostream>
 
 using json = nlohmann::json;
+using namespace db;
 
 template<typename T>
 struct Vector3D
@@ -196,6 +197,10 @@ struct Position
 		return *this;
 	}
 };
+
+Position loadPositionFromDB(DBAdapter* lpDBAdapter, int position_id);
+
+int savePositionToDB(DBAdapter* lpDBAdapter, const Position& position);
 
 void to_json(json& j, const Vectorf3D& m);
 
