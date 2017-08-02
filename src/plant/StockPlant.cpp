@@ -77,16 +77,18 @@ void StockPlant::setHash(std::string s)
 
 bool StockPlant::loadStockPerHashFromDB(size_t hash)
 {
-	int id = getDBAdapter()->query("SELECT stock_id FROM stock WHERE hash = " + std::to_string(hash)).front().get<int>("stock_id");
-	if (id > 0)
+	Rows rows = getDBAdapter()->query("SELECT stock_id FROM stock WHERE hash = " + std::to_string(hash));
+	if (!rows.isEmpty())
 	{
-		setID(id);
-		return loadFromDB();
+		int id = rows.front().get<int>("stock_id");
+		if (id > 0)
+		{
+			setID(id);
+			return loadFromDB();
+		}
 	}
-	else
-	{
-		return false;
-	}
+	
+	return false;
 }
 
 std::string StockPlant::getNodePath(std::string path)
@@ -285,6 +287,9 @@ void StockPlant::AddSubStocks(const std::string & path)
 	{
 		// Creation the possible child stock
 		StockPlant childStock;
+
+		// Set handler Database.
+		childStock.setDBAdapter(getDBAdapter());
 
 		// Load the stock from the DB by the path of the relation
 		if (childStock.loadStockPerHashFromDB(generateHash(relation.CreatePath(path))))
