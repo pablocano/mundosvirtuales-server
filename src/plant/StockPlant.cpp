@@ -307,6 +307,11 @@ void StockPlant::AddSubStocks(const std::string & path)
 	}
 }
 
+
+void StockPlant::UpdateStock(const std::string & path)
+{
+}
+
 void Plant::updatePlantFromDB(DBAdapter* lpDBAdapter)
 {
 	// loadPlantFromDB(lpDBAdapter); // TODO: optimize

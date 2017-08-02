@@ -164,6 +164,12 @@ public:
 	/// <param name="path">The current path in the tree</param>
 	void AddSubStocks(const std::string& path);
 
+	/// <summary>
+	/// Update the stock in the database
+	/// </summary>
+	/// <param name="path">The current path in the tree</param>
+	void UpdateStock(const std::string& path);
+
 	friend void to_json(json& j, const StockPlant& m);
 
 	friend void from_json(const json& j, StockPlant& m);
