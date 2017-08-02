@@ -127,6 +127,11 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
+	void deleteSubStock();
+
+	/// <summary>
+	/// 
+	/// </summary>
 	/// <param name="hash"></param>
 	/// <returns></returns>
 	bool loadStockPerHashFromDB(size_t hash);
@@ -137,6 +142,14 @@ public:
 	/// <param name="path"></param>
 	/// <returns></returns>
 	std::string getNodePath(std::string path);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="lpDBAdapter"></param>
+	/// <param name="assemblyComm"></param>
+	/// <returns></returns>
+	static StockPlant createStock(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm);
 
 	/// <summary>
 	/// 

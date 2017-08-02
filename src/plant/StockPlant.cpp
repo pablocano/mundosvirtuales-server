@@ -75,6 +75,17 @@ void StockPlant::setHash(std::string s)
 	m_hash = generateHash(s);
 }
 
+void StockPlant::deleteSubStock()
+{
+	for (StockPlant& s : m_subStock)
+	{
+		s.deleteSubStock();
+	}
+
+	deleteToDB();
+	m_subStock.clear();
+}
+
 bool StockPlant::loadStockPerHashFromDB(size_t hash)
 {
 	Rows rows = getDBAdapter()->query("SELECT stock_id FROM stock WHERE hash = " + std::to_string(hash));
@@ -94,6 +105,11 @@ bool StockPlant::loadStockPerHashFromDB(size_t hash)
 std::string StockPlant::getNodePath(std::string path)
 {
 	return path + (path.empty() ? "" : ",") + std::to_string(getAssemblyID()) + ":" + std::to_string(getInstance());
+}
+
+StockPlant StockPlant::createStock(DBAdapter * lpDBAdapter, AssemblyComm & assemblyComm)
+{
+	// TODO: complete soon
 }
 
 std::string StockPlant::getNodePath(std::string path, AssemblyRelation & assemblyRelation)

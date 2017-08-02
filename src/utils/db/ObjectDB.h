@@ -83,6 +83,8 @@ public:
 	/// <returns></returns>
 	bool saveToDB(Row& row);
 
+	void deleteToDB();
+
 	/// <summary>
 	/// 
 	/// </summary>

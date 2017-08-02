@@ -120,6 +120,13 @@ bool ObjectDB::saveToDB(Row & row)
 	return false;
 }
 
+void ObjectDB::deleteToDB()
+{
+	std::string query = "DELETE " + getFieldsSelect() + " FROM " + m_tableName + " WHERE " + getWhere() + ";";
+	m_lpDBAdapter->onlyQuery(query);
+	setID(0);
+}
+
 bool ObjectDB::saveToDB()
 {
 	Row row = getRow();
