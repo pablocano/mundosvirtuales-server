@@ -182,6 +182,15 @@ public:
 	int saveRelationToDB(DBAdapter* lpDBAdapter, int parent_id, int child_id, int instance, Position& position);
 
 	static ListAssemblyRelations loadRelationFromDB(DBAdapter* lpDBAdapter, int assembly_id);
+
+	/// <summary>
+	/// Evaluate if the start assembly is a parent of the end assembly
+	/// </summary>
+	/// <param name="lpDBAdapter">The adapter used to connect to the server</param>
+	/// <param name="id_assembly_start">The is of the start assembly</param>
+	/// <param name="id_assembly_end">The id of the end assembly</param>
+	/// <returns></returns>
+	static bool IsConnected(DBAdapter* lpDBAdapter, int id_assembly_start, int id_assembly_end);
 	
 	friend void to_json(json& j, const Assemblies& m);
 

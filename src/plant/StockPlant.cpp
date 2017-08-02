@@ -113,10 +113,13 @@ void StockPlant::createStock(DBAdapter* lpDBAdapter, AssemblyRelation& assemblyR
 	setDBAdapter(lpDBAdapter);
 
 	// Set the id of the stock
-	setID(assemblyRelation.m_id_assembly);
+	setAssemblyID(assemblyRelation.m_id_assembly);
 
 	// Set the instance of the stock
 	setInstance(assemblyRelation.m_id_instance);
+
+	// Save the current stock into the database
+	saveToDB();
 
 	// Obtain all the relations of the assembly of the current stock
 	ListAssemblyRelations relations = Assemblies::loadRelationFromDB(getDBAdapter(), m_assembly_id);
@@ -457,6 +460,7 @@ void Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, int idAssembly
 		m_plant.setHash(StockPlant::getNodePath(path, assemblyRelation));
 		m_plant.saveToDB();
 	}
+
 	else
 	{
 		insertStock(lpDBAdapter, root, idAssembly, assemblyRelation, path);

@@ -178,6 +178,39 @@ int Assemblies::updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assem
 	{
 		assemblies.getDictAssemblies()[assemblyComm.m_id_assembly] = assemblyComm; // Copy data
 		assemblies.getDictAssemblies()[assemblyComm.m_id_assembly].saveToDB(); // Save data
+
+		ListAssemblyRelations relations = Assemblies::loadRelationFromDB(lpDBAdapter, assemblyComm.m_id_assembly);
+
+		for (auto& commRelation : assemblyComm.m_listAssemblyRelations)
+		{
+			bool newRelation = true;
+			for (auto& relation : relations)
+			{
+				if (commRelation.m_id_assembly == relation.m_id_assembly && commRelation.m_id_instance == relation.m_id_instance)
+				{
+					//TODO Pablo Saavedra
+					//UpdateRelation(relation.id,commRelation.m_pos);
+					//relation.id = -1;
+					newRelation = false;
+					break;
+				}
+			}
+
+			if (newRelation)
+			{
+				//NewRelation(commRelation);
+			}
+		}
+
+		for (auto& relation : relations)
+		{
+			if (/*relation.id > 0*/)
+			{
+				//DeleteRelation(relation.id);
+			}
+		}
+
+
 		return assemblies.getDictAssemblies()[assemblyComm.m_id_assembly].getID();
 	}
 	else
@@ -253,6 +286,36 @@ ListAssemblyRelations Assemblies::loadRelationFromDB(DBAdapter * lpDBAdapter, in
 	}
 
 	return listRelations;
+}
+
+bool Assemblies::IsConnected(DBAdapter* lpDBAdapter, int id_assembly_start, int id_assembly_end)
+{
+	// Get all the assemblies that are related with the start assembly
+	ListAssemblyRelations relations = loadRelationFromDB(lpDBAdapter, id_assembly_start);
+
+	//Iterate over all relations
+	for (const auto& relation : relations)
+	{
+		// If the current relation is connected to the end assembly, the assemblies are conected
+		if (relation.m_id_assembly == id_assembly_end)
+		{
+			return true;
+		}
+	}
+
+	// Iterate over all relations
+	for (const auto& relation : relations)
+	{
+		// Evaluate if one the childs of the current assembly is connected to the end assembly
+		if (IsConnected(lpDBAdapter, relation.m_id_assembly, id_assembly_end))
+		{
+			return true;
+		}
+	}
+
+	// If there is no connection between the two assemblies, return false
+	return false;
+
 }
 
 void to_json(json &j, const Assemblies &m)
