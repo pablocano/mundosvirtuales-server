@@ -107,9 +107,32 @@ std::string StockPlant::getNodePath(std::string path)
 	return path + (path.empty() ? "" : ",") + std::to_string(getAssemblyID()) + ":" + std::to_string(getInstance());
 }
 
-StockPlant StockPlant::createStock(DBAdapter* lpDBAdapter, AssemblyRelation& assemblyRelation, const std::string& path)
+void StockPlant::createStock(DBAdapter* lpDBAdapter, AssemblyRelation& assemblyRelation, const std::string& path)
 {
-	// TODO: complete soon
+	// Initialize the sub stock adapter
+	setDBAdapter(lpDBAdapter);
+
+	// Set the id of the stock
+	setID(assemblyRelation.m_id_assembly);
+
+	// Set the instance of the stock
+	setInstance(assemblyRelation.m_id_instance);
+
+	// Obtain all the relations of the assembly of the current stock
+	ListAssemblyRelations relations = Assemblies::loadRelationFromDB(getDBAdapter(), m_assembly_id);
+
+	// Iterate over all the relations
+	for (auto& relation : relations)
+	{
+		// Create the substock
+		StockPlant childStock;
+
+		// Add the substock into the tree
+		childStock.createStock(lpDBAdapter, relation, getNodePath(path));
+
+		// Add the substock into the substocks
+		m_subStock.push_back(childStock);
+	}
 }
 
 std::string StockPlant::getNodePath(std::string path, AssemblyRelation & assemblyRelation)
@@ -391,7 +414,7 @@ void StockPlant::UpdateStock(const std::string & path, int caller_assembly_id)
 				// Creation the sub stock
 				StockPlant childStock;
 
-				// Add the new sub stock into the tree
+				// Add the substock into the tree
 				childStock.createStock(getDBAdapter(), relation, path);
 
 				// Add the child as a substock
