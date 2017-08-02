@@ -150,7 +150,7 @@ public:
 	/// <param name="assemblyComm"></param>
 	/// <param name="path"></param>
 	/// <returns></returns>
-	static StockPlant createStock(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm, const std::string& path);
+	static StockPlant createStock(DBAdapter* lpDBAdapter, AssemblyRelation& assemblyRelation, const std::string& path);
 
 	/// <summary>
 	/// 
