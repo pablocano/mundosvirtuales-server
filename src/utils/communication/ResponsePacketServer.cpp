@@ -109,13 +109,13 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 				if (!Assemblies::getInstance().existAssembly(idAssembly))
 				{
 					idAssembly = Assemblies::getInstance().createAssembly(m_lpDBAdapter, assemblyComm); // Update ID Assembly
-					Assemblies::getInstance().processRelation(m_lpDBAdapter, assemblyComm);
-					assemblyComm.m_id_assembly = idAssembly;
+					assemblyComm.m_id_assembly = idAssembly;					
 				}
 				
-				if(idAssembly > 0)
+				if(!assemblyComm.isOnlyAssembly() && idAssembly > 0)
 				{
 					Plant::getInstance().processRelation(m_lpDBAdapter, assemblyComm);
+					Assemblies::getInstance().processRelation(m_lpDBAdapter, assemblyComm);
 				}
 				
 				json j = json{ { "id", idAssembly } };
@@ -143,7 +143,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 				if (Assemblies::getInstance().existAssembly(idAssembly))
 				{
 					Assemblies::getInstance().updateAssembly(m_lpDBAdapter, assemblyComm);
-					// Plant::getInstance().updateRelation(m_lpDBAdapter, idAssembly, assemblyComm);
+					Plant::getInstance().updatePlant(m_lpDBAdapter, assemblyComm);
 				}
 				else
 				{

@@ -39,7 +39,7 @@ void test_server()
 
 bool test_get_assemblies(ClientPlant& client)
 {
-	LOGGER_LOG("Test Server", "start test GET_ASSEMBLIES");
+	LOGGER_LOG("Test Server", "GET_ASSEMBLIES");
 
 	static Assemblies &assemblies = Assemblies::getInstance();
 	static Plant &plant = Plant::getInstance();
@@ -53,53 +53,30 @@ bool test_get_assemblies(ClientPlant& client)
 	return false;
 }
 
-void test_new_assembly1(ClientPlant& client)
+AssemblyComm newAssemblyComm(std::string pn, std::string name, int version = 1)
 {
-	LOGGER_LOG("Test Server", "NEW_ASSEMBLY 1");
-
-	static Assemblies &assemblies = Assemblies::getInstance();
-	static Plant &plant = Plant::getInstance();
-
 	AssemblyComm assemblyComm;
 
-	assemblyComm.m_part_number = "PN_TEST_1";
-	assemblyComm.m_version = 1;
-	assemblyComm.m_name = "/Game/Models/Test1";
+	assemblyComm.m_part_number = pn;
+	assemblyComm.m_version = version;
+	assemblyComm.m_name = "/Game/Models/" + name;
 
-	json j_new_assembly = json({ assemblyComm });
-
-	std::string s = client.request(Command::NEW_ASSEMBLY, j_new_assembly.dump());
-
-	LOGGER_LOG("Test Server", s);
+	return assemblyComm;
 }
 
-void test_new_assembly2(ClientPlant& client)
+void test_new_assembly(ClientPlant& client, AssemblyComm& assemblyComm)
 {
-	LOGGER_LOG("Test Server", "NEW_ASSEMBLY 2");
+	LOGGER_LOG("Test Server", "NEW_ASSEMBLY");
 
 	static Assemblies &assemblies = Assemblies::getInstance();
 	static Plant &plant = Plant::getInstance();
 
-	AssemblyComm assemblyComm;
-
-	assemblyComm.m_part_number = "PN_TEST_2";
-	assemblyComm.m_version = 1;
-	assemblyComm.m_name = "/Game/Models/Test2";
-
-	AssemblyRelation assemblyRelation;
-
-	assemblyRelation.m_id_assembly = 1;
-	assemblyRelation.m_id_instance = 1;
-	assemblyRelation.m_position.m_pos.x = 100;
-	assemblyRelation.m_position.m_rot.y = 100;
-
-	assemblyComm.m_listAssemblyRelations.push_back(assemblyRelation);
-
-	json j_new_assembly = json({ assemblyComm });
+	json j_new_assembly = json(assemblyComm);
 
 	std::string s = client.request(Command::NEW_ASSEMBLY, j_new_assembly.dump());
+	json j = json::parse(s.c_str());
 
-	LOGGER_LOG("Test Server", s);
+	assemblyComm.m_id_assembly = j.at("id").get<int>();
 }
 
 void test_concurrency()
@@ -121,10 +98,28 @@ int main()
 
 	client.start();
 
-	test_new_assembly1(client);
+	int N = 5;
+	std::vector<AssemblyComm> listAssemblyComm;
 
-	test_new_assembly2(client);
-	//test_server();
+	for (int i = 0; i < N; ++i)
+	{
+		AssemblyComm a = newAssemblyComm("PN_" + std::to_string(i), "NAME_" + std::to_string(i));
+		test_new_assembly(client, a);
+		if (a.m_id_assembly > 0)
+			listAssemblyComm.push_back(a);
+	}
+
+	for (int i = 1; i < (int)listAssemblyComm.size(); ++i)
+	{
+		AssemblyRelation r;
+		r.m_id_assembly = listAssemblyComm.at(i).m_id_assembly;
+		r.m_id_instance = 1;
+		r.m_position.m_pos.x = 10 * i;
+		listAssemblyComm.at(1).m_listAssemblyRelations.push_back(r);
+	}
+
+	if (listAssemblyComm.size() > 1)
+		test_new_assembly(client, listAssemblyComm.at(1));
 
 	LOGGER_LOG("Test Server", "Press enter to finish");
 	std::getchar();

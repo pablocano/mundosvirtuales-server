@@ -139,6 +139,14 @@ public:
 	std::string getNodePath(std::string path);
 
 	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="path"></param>
+	/// <param name="assemblyRelation"></param>
+	/// <returns></returns>
+	static std::string getNodePath(std::string path, AssemblyRelation& assemblyRelation);
+
+	/// <summary>
 	/// Operator equals with Row.
 	/// </summary>
 	/// <param name="row">Row reference.</param>
@@ -198,13 +206,13 @@ public:
 
 	void updatePlantFromDB(DBAdapter* lpDBAdapter);
 
-	StockPlant newStock(DBAdapter* lpDBAdapter, int idAssembly, const Position& position);
-
 	bool processRelation(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm);
 
-	int insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id);
+	bool updatePlant(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm);
+
+	void insertStock(DBAdapter* lpDBAdapter, StockPlant& root, int idAssembly, AssemblyRelation& assemblyRelation);
 	
-	int insertStock(DBAdapter* lpDBAdapter, StockPlant& root, StockPlant& stock, int child_assembly_id, std::string path);
+	void insertStock(DBAdapter* lpDBAdapter, StockPlant& root, int idAssembly, AssemblyRelation& assemblyRelation, std::string path);
 
 	void changeHash(DBAdapter* lpDBAdapter, StockPlant& root, std::string path);
 

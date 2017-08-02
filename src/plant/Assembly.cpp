@@ -168,15 +168,22 @@ int Assemblies::createAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assem
 	return assembly.getID();
 }
 
-int Assemblies::updateAssembly(DBAdapter * lpDBAdapter, const AssemblyComm & assemblyComm)
+int Assemblies::updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm)
 {
 	updateDictAssembliesFromDB(lpDBAdapter);
 
-	Assemblies::getInstance().getDictAssemblies()[assemblyComm.m_id_assembly] = assemblyComm; // Copy data
+	Assemblies& assemblies = Assemblies::getInstance();
 
-	Assemblies::getInstance().getDictAssemblies()[assemblyComm.m_id_assembly].saveToDB(); // Save data
-
-	return Assemblies::getInstance().getDictAssemblies()[assemblyComm.m_id_assembly].getID();
+	if (assemblies.existAssembly(assemblyComm.m_id_assembly))
+	{
+		assemblies.getDictAssemblies()[assemblyComm.m_id_assembly] = assemblyComm; // Copy data
+		assemblies.getDictAssemblies()[assemblyComm.m_id_assembly].saveToDB(); // Save data
+		return assemblies.getDictAssemblies()[assemblyComm.m_id_assembly].getID();
+	}
+	else
+	{
+		return -1;
+	}
 }
 
 void Assemblies::setAssemblies(json j)
