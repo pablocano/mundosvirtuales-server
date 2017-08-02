@@ -38,8 +38,6 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 	case Command::GET_PLANT: // OK
 		LOGGER_LOG("ResponsePacketServerPlant", "GET_PLANT");
 		{
-			Plant::getInstance().updatePlantFromDB(m_lpDBAdapter);
-
 			json j = json{ { "plant", Plant::getInstance() } };
 			std::string data = j.dump();
 
@@ -115,7 +113,11 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 				if(!assemblyComm.isOnlyAssembly() && idAssembly > 0)
 				{
 					Assemblies::getInstance().processRelation(m_lpDBAdapter, assemblyComm);
-					Plant::getInstance().processRelation(m_lpDBAdapter, assemblyComm);
+				}
+
+				if (idAssembly > 0)
+				{
+					Plant::getInstance().UpdateTree(m_lpDBAdapter, assemblyComm);
 				}
 				
 				json j = json{ { "id", idAssembly } };
@@ -143,7 +145,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 				if (Assemblies::getInstance().existAssembly(idAssembly))
 				{
 					Assemblies::getInstance().updateAssembly(m_lpDBAdapter, assemblyComm);
-					Plant::getInstance().updatePlant(m_lpDBAdapter, assemblyComm);
+					Plant::getInstance().UpdateTree(m_lpDBAdapter, assemblyComm);
 				}
 				else
 				{

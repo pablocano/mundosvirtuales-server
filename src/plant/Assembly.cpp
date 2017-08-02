@@ -204,7 +204,7 @@ int Assemblies::updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assem
 
 		for (auto& relation : relations)
 		{
-			if (/*relation.id > 0*/)
+			if (/*relation.id > 0*/1)
 			{
 				//DeleteRelation(relation.id);
 			}
