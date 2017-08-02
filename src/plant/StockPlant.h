@@ -182,7 +182,8 @@ public:
 	/// Update the stock in the database
 	/// </summary>
 	/// <param name="path">The current path in the tree</param>
-	void UpdateStock(const std::string& path);
+	/// <param name="caller_assembly_id">The id of the assembly which start this update</param>
+	void UpdateStock(const std::string& path, int caller_assembly_id);
 
 	friend void to_json(json& j, const StockPlant& m);
 

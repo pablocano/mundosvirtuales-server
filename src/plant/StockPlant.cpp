@@ -324,8 +324,82 @@ void StockPlant::AddSubStocks(const std::string & path)
 }
 
 
-void StockPlant::UpdateStock(const std::string & path)
+void StockPlant::UpdateStock(const std::string & path, int caller_assembly_id)
 {
+	// Verify if the current assembly must be updated
+	if (m_assembly_id != caller_assembly_id)
+	{
+		// Call the update function for each substock
+		for (auto& substock : m_subStock)
+		{
+			substock.UpdateStock(getNodePath(path), caller_assembly_id);
+		}
+	}
+	else
+	{
+		// Obtain all the relations of the assembly of the current stock
+		ListAssemblyRelations relations = Assemblies::loadRelationFromDB(getDBAdapter(), m_assembly_id);
+
+		// Iterate over all the substocks
+		for (auto& substock = m_subStock.begin(); substock != m_subStock.end();)
+		{
+			// Delete every substock that is not present in the relations
+			bool deleteSubStock = true;
+
+			// Iterate over the relations
+			for (auto& relation : relations)
+			{
+				// If the relation is the same as the substock, update it
+				if (substock->m_assembly_id == relation.m_id_assembly && substock->m_instance == relation.m_id_instance)
+				{
+					// Update substock
+					substock->UpdateStock(getNodePath(path), caller_assembly_id);
+
+					// Mark the relation as used
+					relation.m_id_assembly = -1;
+
+					// Do not delete this substock
+					deleteSubStock = false;
+
+					// Stop searching in the relations
+					break;
+				}
+			}
+
+			// If this substock is not present in the relations, delete it
+			if (deleteSubStock)
+			{
+				// Remove the substock from the tree
+				substock->deleteSubStock();
+
+				// Remove the sub stock from the sub stocks and update the iteator to the next substock
+				substock = m_subStock.erase(substock);
+			}
+			else
+			{
+				// Update the iterator to the next substock
+				substock++;
+			}
+		}
+
+		// Create a new substock for each not used relation
+		for (auto& relation : relations)
+		{
+			// Verify that the relation was not used before
+			if (relation.m_id_assembly > 0)
+			{
+				// Creation the sub stock
+				StockPlant childStock;
+
+				// Add the new sub stock into the tree
+				childStock.createStock(getDBAdapter(), relation, path);
+
+				// Add the child as a substock
+				m_subStock.push_back(childStock);
+			}
+		}
+	}
+
 }
 
 void Plant::updatePlantFromDB(DBAdapter* lpDBAdapter)
