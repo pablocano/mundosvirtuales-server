@@ -339,21 +339,6 @@ void Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, int idAssembly
 		m_plant.setHash(StockPlant::getNodePath(path, assemblyRelation));
 		m_plant.saveToDB();
 	}
-	//else if (root.getAssemblyID() == assemblyRelation.m_id_assembly && m_plant.getID() == root.getID())
-	//{
-	//	if(root.isValidID())
-	//		stock.m_subStock.push_back(root);
-
-	//	// Update root plant
-	//	m_plant = stock;
-	//	setIDRootPlant(lpDBAdapter, stock.getID());
-
-	//	// Update Hash
-	//	path.push_back(stock.getAssemblyID());
-	//	changeHash(lpDBAdapter, m_plant, path);
-
-	//	return root.getID();
-	//}
 	else
 	{
 		insertStock(lpDBAdapter, root, idAssembly, assemblyRelation, path);
@@ -364,32 +349,9 @@ void Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, int idAssembly
 {
 	if (root.m_subStock.size() > 0)
 	{
-		std::string pathRoot = root.getNodePath(path);
-
-		for (auto it = root.m_subStock.begin(); it != root.m_subStock.end() ; ++it)
-		{
-			if (it->getAssemblyID() == assemblyRelation.m_id_assembly)
-			{
-				// Create New Stock
-				StockPlant stock;
-				stock.setDBAdapter(lpDBAdapter);
-				stock.setAssemblyID(idAssembly);
-				stock.setHash(StockPlant::getNodePath(path, assemblyRelation));
-				stock.saveToDB();
-
-				// Insert new stock
-				StockPlant s = *it;
-				stock.m_subStock.push_back(s);
-				root.m_subStock.erase(it);
-
-				// Update Hash
-				changeHash(lpDBAdapter, stock.m_subStock.back(), pathRoot);
-			}
-			else
-			{
-				insertStock(lpDBAdapter, *it, idAssembly, assemblyRelation, pathRoot);
-			}
-		}
+		// TODO: Pablo Cano
+		// setIDRootPlant(lpDBAdapter, id) modifica el id del root del arbol
+		// changeHash(lpDBAdapter, root, root.getNodePath(path)) actualiza todos los hash del arbol desde el nodo root 
 	}
 }
 
