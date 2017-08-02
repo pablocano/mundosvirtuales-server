@@ -107,7 +107,7 @@ std::string StockPlant::getNodePath(std::string path)
 	return path + (path.empty() ? "" : ",") + std::to_string(getAssemblyID()) + ":" + std::to_string(getInstance());
 }
 
-StockPlant StockPlant::createStock(DBAdapter * lpDBAdapter, AssemblyComm & assemblyComm)
+StockPlant StockPlant::createStock(DBAdapter * lpDBAdapter, AssemblyComm & assemblyComm, const std::string& path)
 {
 	// TODO: complete soon
 }
