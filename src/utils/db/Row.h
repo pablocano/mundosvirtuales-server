@@ -9,7 +9,7 @@
 namespace db
 {
 	/// <summary>
-	/// Abstraction table row. 
+	/// Abstraction table row.
 	/// </summary>
 	class Row
 	{

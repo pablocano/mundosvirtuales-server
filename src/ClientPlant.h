@@ -6,9 +6,8 @@
 #include "utils/network/ClientTCP.h"
 #include "plant/StockPlant.h"
 
-
 /// <summary>
-/// Class allows sending requests and responding packets to the server.  
+/// Class allows sending requests and responding packets to the server.
 /// </summary>
 class ClientPlant : public ClientTCP
 {
@@ -28,14 +27,14 @@ public:
 	bool requestPlant(Plant& plant);
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="assemblies"></param>
 	/// <returns></returns>
 	bool requestAssemblies(Assemblies& assemblies);
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="command"></param>
 	/// <param name="s"></param>

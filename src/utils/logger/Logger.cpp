@@ -13,7 +13,7 @@ Logger::Logger() : m_mutex(), m_listObs(), m_prompt()
 std::string Logger::getStringDate(std::chrono::system_clock::time_point date)
 {
 	char buf[100] = { 0 };
-	
+
 	std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(date.time_since_epoch());
 	std::chrono::seconds s = std::chrono::duration_cast<std::chrono::seconds>(ms);
 	std::time_t t = s.count();
@@ -71,5 +71,3 @@ void Logger::setPrompt(std::string prompt)
 {
 	m_prompt = prompt;
 }
-
-

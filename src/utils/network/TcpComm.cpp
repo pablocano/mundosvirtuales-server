@@ -125,7 +125,7 @@ SocketClientTcp::SocketClientTcp(int socketClient) :
 		int addrlen = sizeof(sockaddr_in);
 #endif
 		getpeername(m_socket, (sockaddr*)&m_address, &addrlen);
-		
+
 		if (m_isNonBlock)
 			NON_BLOCK(m_socket); // switch socket to nonblocking
 	}
@@ -153,7 +153,7 @@ bool SocketClientTcp::checkConnection()
 		if (connected())
 		{
 			m_bWasConnected = true;
-			
+
 			if (m_isNonBlock)
 				NON_BLOCK(m_socket); // switch socket to nonblocking
 #ifdef MACOSX

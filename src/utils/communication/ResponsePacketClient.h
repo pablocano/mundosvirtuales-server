@@ -3,7 +3,7 @@
 #include "ResponsePacket.h"
 
 /// <summary>
-/// Process incoming packets for client. 
+/// Process incoming packets for client.
 /// </summary>
 class ResponsePacketClientPlant : public ResponsePacket
 {

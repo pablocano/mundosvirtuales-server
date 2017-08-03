@@ -4,22 +4,22 @@ using namespace db;
 
 FieldData::FieldData(std::string name, TypeData type, bool isPrimaryKey) : m_name(name), m_type(type), m_isPrimaryKey(isPrimaryKey) {}
 
-std::string FieldData::getName() const 
-{ 
+std::string FieldData::getName() const
+{
 	return m_name;
 }
 
-void FieldData::setName(std::string name) 
-{ 
+void FieldData::setName(std::string name)
+{
 	m_name = name;
 }
 
-TypeData FieldData::getType() const 
+TypeData FieldData::getType() const
 {
 	return m_type;
 }
 
-void FieldData::setType(TypeData type) 
+void FieldData::setType(TypeData type)
 {
 	m_type = type;
 }
@@ -91,7 +91,7 @@ const FieldData & Fields::operator[](std::size_t pos) const
 
 int Fields::size() const
 {
-	return (int) m_fields.size();
+	return (int)m_fields.size();
 }
 
 const FieldData & Fields::getPrimaryKey()

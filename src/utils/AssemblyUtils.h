@@ -14,7 +14,7 @@ struct AssemblyRelation : public ObjectDB
 	Position m_position;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	AssemblyRelation() : ObjectDB(0, "assembly_relations", nullptr), m_parent_assembly_id(), m_child_assembly_id(), m_instance(), m_position() {}
 
@@ -26,13 +26,13 @@ struct AssemblyRelation : public ObjectDB
 	std::string CreatePath(const std::string& parentPath) const;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="lpDBAdapter"></param>
 	void setDBAdapter(DBAdapter* lpDBAdapter);
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <returns></returns>
 	bool saveToDB();
@@ -60,11 +60,12 @@ struct AssemblyComm
 {
 	std::string m_part_number;
 	std::string m_name;
+	std::string m_filename;
 	int m_id_assembly;
 	int m_version;
 	ListAssemblyRelations m_listAssemblyRelations;
 
-	AssemblyComm() : m_part_number(), m_listAssemblyRelations(), m_id_assembly(), m_version() {}
+	AssemblyComm() : m_part_number(), m_name(), m_filename(), m_id_assembly(), m_version(), m_listAssemblyRelations() {}
 
 	bool isOnlyAssembly() { return m_listAssemblyRelations.size() <= 0; }
 };

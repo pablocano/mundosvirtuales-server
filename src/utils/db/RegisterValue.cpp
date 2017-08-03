@@ -48,23 +48,23 @@ RegisterValue::~RegisterValue()
 		free(m_value);
 }
 
-IndicatorField db::RegisterValue::getIndicator() const 
+IndicatorField db::RegisterValue::getIndicator() const
 {
 	return m_indicator;
 }
 
-void RegisterValue::setIndicator(IndicatorField indicator) 
-{ 
+void RegisterValue::setIndicator(IndicatorField indicator)
+{
 	m_indicator = indicator;
 }
 
-const FieldData& RegisterValue::getFieldData() 
-{ 
+const FieldData& RegisterValue::getFieldData()
+{
 	return *m_fieldData;
 }
 
 void RegisterValue::setFieldData(const FieldData& field)
-{ 
+{
 	m_fieldData = &field;
 }
 

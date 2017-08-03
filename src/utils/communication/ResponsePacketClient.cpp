@@ -19,7 +19,7 @@ ResponsePacketClientPlant::~ResponsePacketClientPlant()
 std::unique_ptr<PacketComm> ResponsePacketClientPlant::process_packet(PacketComm packet, SocketClientTcp& tcpComm)
 {
 	std::unique_ptr<PacketComm> responsePacket = nullptr;
-	
+
 	LOGGER_LOG("Response Packet Client", tcpComm.getInfo() + ":");
 	switch (packet.m_header.m_command)
 	{

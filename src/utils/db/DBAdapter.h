@@ -55,7 +55,7 @@ namespace db
 		{
 			std::shared_ptr<Fields> lpFields = row.getFields();
 			std::stringstream ss;
-			int n = (int) lpFields->size();
+			int n = (int)lpFields->size();
 
 			ss.str("");
 			ss << "(";
@@ -65,7 +65,7 @@ namespace db
 				if (std::find(skip_pos.begin(), skip_pos.end(), pos) == skip_pos.end())
 				{
 					ss << lpFields->at(pos).getName();
-					
+
 					if (pos < n - 1)
 						ss << ", ";
 				}
@@ -80,7 +80,7 @@ namespace db
 		{
 			std::shared_ptr<Fields> lpFields = row.getFields();
 			std::stringstream ss;
-			int n = (int) lpFields->size();
+			int n = (int)lpFields->size();
 
 			ss.str("");
 			ss << "(";
@@ -102,11 +102,11 @@ namespace db
 		{
 			const Registers& registers = row.getRegisters();
 			std::stringstream ss;
-			int n = (int) registers.size();
+			int n = (int)registers.size();
 
 			ss.str("");
 			ss << "(";
-			
+
 			for (int pos = 0; pos < n; ++pos)
 			{
 				if (std::find(skip_pos.begin(), skip_pos.end(), pos) == skip_pos.end())
@@ -127,7 +127,7 @@ namespace db
 		{
 			const Registers& registers = row.getRegisters();
 			std::stringstream ss;
-			int n = (int) registers.size();
+			int n = (int)registers.size();
 
 			ss.str("");
 			ss << "(";
@@ -150,14 +150,14 @@ namespace db
 			std::shared_ptr<Fields> lpFields = row.getFields();
 			const Registers& registers = row.getRegisters();
 			std::stringstream ss;
-			int n = (int) registers.size();
+			int n = (int)registers.size();
 
 			ss.str("");
 
 			for (int pos = 0; pos < n; ++pos)
 			{
 				ss << lpFields->at(pos).getName() << " = " << registers.at(pos).getSQLValue();
-				
+
 				if (pos < n - 1)
 					ss << ", ";
 			}
@@ -168,7 +168,7 @@ namespace db
 		static int getPos(std::shared_ptr<Fields> lpFields, std::string s)
 		{
 			int pos = (int)std::distance(lpFields->begin(), std::find(lpFields->begin(), lpFields->end(), s));
-			return (pos < (int) lpFields->size() ? pos : -1);
+			return (pos < (int)lpFields->size() ? pos : -1);
 		}
 	};
 }

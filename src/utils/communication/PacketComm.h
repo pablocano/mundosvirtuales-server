@@ -21,15 +21,15 @@
 #define KEY_CRYPT { 56324394, 73576, 12030122, 56 } /* Private key for encrypted. */
 
 #ifdef WIN32
-	#define STRUCT_PACKET struct
-	#pragma pack(push)
-	#pragma pack(1)
+#define STRUCT_PACKET struct
+#pragma pack(push)
+#pragma pack(1)
 #else
-	#define STRUCT_PACKET struct __attribute__((packed))
+#define STRUCT_PACKET struct __attribute__((packed))
 #endif
 
 /// <summary>
-/// Enum that contain different commands.  
+/// Enum that contain different commands.
 /// </summary>
 typedef enum _Command
 {
@@ -148,7 +148,7 @@ typedef STRUCT_PACKET _PacketComm
 	}
 
 	/// <summary>
-	/// Packing Communication Packet. 
+	/// Packing Communication Packet.
 	/// </summary>
 	/// <returns>Returns smart pointer with data Packet (header + payload).</returns>
 	std::unique_ptr<char[]> packing()
@@ -210,5 +210,5 @@ typedef STRUCT_PACKET _PacketComm
 } PacketComm;
 
 #ifdef WIN32
-	#pragma pack(pop)
+#pragma pack(pop)
 #endif

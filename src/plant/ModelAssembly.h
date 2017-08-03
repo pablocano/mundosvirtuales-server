@@ -23,13 +23,13 @@ public:
 	ModelAssembly() : ObjectDB(0, "model", nullptr), m_path_model(), m_material(), m_color(), m_animated(false), m_version(-1) {}
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <returns></returns>
 	std::string getPathModel() const;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="path"></param>
 	void setPathModel(std::string path)
@@ -38,25 +38,25 @@ public:
 	}
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <returns></returns>
 	std::string getMaterial() const;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <returns></returns>
 	std::string getColor() const;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <returns></returns>
 	bool isAnimated() const;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <returns></returns>
 	int getVersion() const;

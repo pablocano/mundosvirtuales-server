@@ -17,7 +17,7 @@ protected:
 	std::shared_ptr<void> m_value; /* Current value sensor. */
 
 public:
-	
+
 	/// <summary>
 	/// Constructor.
 	/// </summary>
@@ -30,7 +30,7 @@ public:
 	Sensor& operator =(Sensor const&) = delete;
 
 	/// <summary>
-	/// Update current value of sensor, also notifies all observers. 
+	/// Update current value of sensor, also notifies all observers.
 	/// </summary>
 	/// <param name="value">Value sensor.</param>
 	void updateSensor(std::shared_ptr<void> value)

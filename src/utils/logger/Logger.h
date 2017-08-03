@@ -25,7 +25,7 @@ protected:
 	void consoleLogger(std::string type, std::chrono::system_clock::time_point date, std::string source, std::string message);
 
 private:
-	
+
 	Logger();
 
 	Logger(Logger const& copy) = delete;

@@ -53,7 +53,6 @@ UdpComm::~UdpComm()
 	delete (struct sockaddr_in*)m_target;
 }
 
-
 bool UdpComm::resolve(const char* addrStr, int port, struct sockaddr_in* addr)
 {
 	memset(addr, 0, sizeof(struct sockaddr_in));
@@ -67,7 +66,6 @@ bool UdpComm::resolve(const char* addrStr, int port, struct sockaddr_in* addr)
 	return true;
 }
 
-
 bool UdpComm::setTarget(const char* addrStr, int port)
 {
 	struct sockaddr_in* addr = (struct sockaddr_in*)m_target;
@@ -75,7 +73,6 @@ bool UdpComm::setTarget(const char* addrStr, int port)
 		return false;
 	return true;
 }
-
 
 bool UdpComm::setBlocking(bool block)
 {
@@ -101,7 +98,6 @@ bool UdpComm::setBlocking(bool block)
 #endif
 }
 
-
 bool UdpComm::setTTL(const char ttl)
 {
 	int r = setsockopt(m_sock, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(unsigned char));
@@ -112,7 +108,6 @@ bool UdpComm::setTTL(const char ttl)
 	}
 	return true;
 }
-
 
 bool UdpComm::setLoopback(bool yesno)
 {
@@ -125,7 +120,6 @@ bool UdpComm::setLoopback(bool yesno)
 	}
 	return true;
 }
-
 
 bool UdpComm::joinMulticast(const char* addrStr)
 {
@@ -200,7 +194,6 @@ bool UdpComm::joinMulticast(const char* addrStr)
 	return false;
 }
 
-
 bool UdpComm::setBroadcast(bool enable)
 {
 	int yes = enable ? 1 : 0;
@@ -241,7 +234,6 @@ bool UdpComm::setRcvBufSize(unsigned int rcvbuf)
 	LOGGER_ERROR("Response Packet Client", "multicast-socket: could not get sockopt SO_RCVBUF");
 	return false;
 }
-
 
 bool UdpComm::bind(const char* addr_str, int port)
 {
@@ -339,7 +331,7 @@ int UdpComm::readLocal(char* data, int len)
 #else
 		return result;
 #endif
-}
+	}
 }
 
 bool UdpComm::write(const char* data, const int len)
@@ -366,9 +358,9 @@ unsigned short UdpComm::getHost() {
 				std::string addr = inet_ntoa(((struct sockaddr_in *) ifa->ifa_addr)->sin_addr);
 				std::string host = addr.substr(addr.rfind(".") + 1);
 				return (unsigned short)atoi(host.c_str());
-}
+			}
+		}
 	}
-  }
 #endif
 	return 255;
 }

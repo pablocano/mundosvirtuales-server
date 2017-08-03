@@ -28,9 +28,9 @@ void Rows::setFields()
 	}
 }
 
-void Rows::push_back(Row & row) 
-{ 
-	m_rows.push_back(row); 
+void Rows::push_back(Row & row)
+{
+	m_rows.push_back(row);
 	m_rows.back().setFieldData(m_fields);
 }
 
@@ -39,23 +39,23 @@ Row& Rows::front()
 	return m_rows.front();
 }
 
-Row& Rows::back() 
-{ 
+Row& Rows::back()
+{
 	return m_rows.back();
 }
 
-std::vector<Row>::iterator Rows::begin() 
-{ 
+std::vector<Row>::iterator Rows::begin()
+{
 	return m_rows.begin();
 }
 
-std::vector<Row>::iterator Rows::end() 
-{ 
+std::vector<Row>::iterator Rows::end()
+{
 	return m_rows.end();
 }
 
-std::vector<Row>::const_iterator Rows::cbegin() const 
-{ 
+std::vector<Row>::const_iterator Rows::cbegin() const
+{
 	return m_rows.cbegin();
 }
 
@@ -66,7 +66,7 @@ std::vector<Row>::const_iterator Rows::cend() const
 
 int Rows::size() const
 {
-	return (int) m_rows.size();
+	return (int)m_rows.size();
 }
 
 bool db::Rows::isEmpty() const
@@ -80,6 +80,6 @@ void Rows::addField(FieldData field)
 }
 
 std::shared_ptr<Fields> Rows::getFields() const
-{ 
+{
 	return m_fields;
 }

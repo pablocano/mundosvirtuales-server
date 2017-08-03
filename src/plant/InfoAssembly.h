@@ -22,9 +22,16 @@ public:
 	InfoAssembly() : ObjectDB(0, "assembly_translation", nullptr), m_name("NO NAME"), m_info(), m_shortInfo(), m_language_id(1), m_assembly_id() {}
 
 	/// <summary>
-	/// Gets Name.
+	/// Gets assembly name.
 	/// </summary>
+	/// <returns>Returns a string with assembly name.</returns>
 	std::string getName() const;
+
+	/// <summary>
+	/// Sets assembly name.
+	/// </summary>
+	/// <param name="name">Assembly name.</param>
+	void setName(std::string name);
 
 	/// <summary>
 	/// Gets information about this assembly.
@@ -43,7 +50,7 @@ public:
 	int getAssemblyID() const;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="id"></param>
 	void setAssemblyID(int id);

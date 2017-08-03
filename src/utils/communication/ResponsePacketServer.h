@@ -10,7 +10,7 @@
 using namespace db;
 
 /// <summary>
-/// Process incoming packets, if it is necessary, this class makes a query to database for response some packets.   
+/// Process incoming packets, if it is necessary, this class makes a query to database for response some packets.
 /// </summary>
 class ResponsePacketServerPlant : public ResponsePacket
 {
@@ -28,7 +28,7 @@ public:
 	/// <param name="_db_password">Password user database.</param>
 	/// <param name="_db_engine">Engine database (default: PostgreSQL).</param>
 	ResponsePacketServerPlant(DBAdapter* lpDBAdapter);
-	
+
 	/// <summary>
 	/// Destructor.
 	/// </summary>

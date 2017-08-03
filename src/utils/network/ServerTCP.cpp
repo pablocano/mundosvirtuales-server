@@ -2,7 +2,7 @@
 #include "../logger/Logger.h"
 
 ServerTCP::ServerTCP(DBAdapter* lpDBAdapter) :
-	m_lpServerPlant( new ResponsePacketServerPlant(lpDBAdapter))
+	m_lpServerPlant(new ResponsePacketServerPlant(lpDBAdapter))
 {
 	LOGGER_LOG("Server TCP", "Create Server");
 }

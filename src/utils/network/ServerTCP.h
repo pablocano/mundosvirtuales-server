@@ -36,7 +36,7 @@ public:
 	/// <param name="_db_password">Password user database.</param>
 	/// <param name="_db_engine">Engine database (default: PostgreSQL).</param>
 	ServerTCP(DBAdapter* lpDBAdapter);
-	
+
 	/// <summary>
 	/// Destructor.
 	/// </summary>

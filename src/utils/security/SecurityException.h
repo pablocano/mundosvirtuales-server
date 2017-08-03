@@ -4,5 +4,4 @@
 
 class SecurityException : public Exception
 {
-	
 };

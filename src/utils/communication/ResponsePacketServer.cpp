@@ -28,7 +28,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 		LOGGER_LOG("ResponsePacketServerPlant", "GET_ASSEMBLIES");
 		{
 			Assemblies::getInstance().updateDictAssembliesFromDB(m_lpDBAdapter);
-			
+
 			json j = json{ {"assemblies", Assemblies::getInstance() } };
 			std::string data = j.dump();
 
@@ -71,7 +71,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 				json parseJSON = json::parse(packet.m_lpContent);
 				int version = parseJSON.at("version").get<int>();
 				int assembly_id = parseJSON.at("id").get<int>();
-				
+
 				std::string data;
 				if (Assemblies::getInstance().existAssembly(assembly_id))
 				{
@@ -84,8 +84,8 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 					json j = json{ { "version", -1 },{ "id", assembly_id } };
 					data = j.dump();
 				}
-					
-				sendResponse(tcpComm, packet, (char *) data.c_str(), StatusServer::OK_RESPONSE);
+
+				sendResponse(tcpComm, packet, (char *)data.c_str(), StatusServer::OK_RESPONSE);
 			}
 			catch (const std::exception &e)
 			{
@@ -101,16 +101,16 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 			{
 				json parseJSON = json::parse(packet.m_lpContent);
 				AssemblyComm assemblyComm = parseJSON;
-				
+
 				int idAssembly = assemblyComm.m_id_assembly;
 
 				if (!Assemblies::getInstance().existAssembly(idAssembly))
 				{
 					idAssembly = Assemblies::getInstance().createAssembly(m_lpDBAdapter, assemblyComm); // Update ID Assembly
-					assemblyComm.m_id_assembly = idAssembly;					
+					assemblyComm.m_id_assembly = idAssembly;
 				}
-				
-				if(!assemblyComm.isOnlyAssembly() && idAssembly > 0)
+
+				if (!assemblyComm.isOnlyAssembly() && idAssembly > 0)
 				{
 					Assemblies::getInstance().processRelation(m_lpDBAdapter, assemblyComm);
 				}
@@ -119,7 +119,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 				{
 					Plant::getInstance().UpdateTree(m_lpDBAdapter, assemblyComm);
 				}
-				
+
 				json j = json{ { "id", idAssembly } };
 				std::string data = j.dump();
 

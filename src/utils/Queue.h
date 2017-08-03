@@ -3,7 +3,7 @@
 #include <list>
 #include <thread>
 #include <mutex>
-#include <condition_variable> 
+#include <condition_variable>
 
 /// <summary>
 /// Queue class with concurrency support.
@@ -16,7 +16,7 @@ protected:
 	std::condition_variable m_condv; /* Condition for synchronized access to queue. */
 
 public:
-	
+
 	/// <summary>
 	/// Constructor
 	/// </summary>
@@ -35,7 +35,7 @@ public:
 	T remove();
 
 	/// <summary>
-	/// Look for an item in queue and remove it. 
+	/// Look for an item in queue and remove it.
 	/// </summary>
 	/// <param name="item">Item to search in queue.</param>
 	/// <returns>If item is found, this function returns pointer with item, nullptr otherwise.</returns>
@@ -100,5 +100,5 @@ template<typename T>
 int Queue<T>::size()
 {
 	std::unique_lock<std::mutex> lock(m_mutex);
-	return (int) m_queue.size();
+	return (int)m_queue.size();
 }

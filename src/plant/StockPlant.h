@@ -6,7 +6,6 @@
 #include "../utils/Position.h"
 #include "Assembly.h"
 
-
 using json = nlohmann::json;
 using namespace db;
 
@@ -24,14 +23,12 @@ typedef std::vector<StockPlant> SubStock;
 /// </summary>
 typedef std::vector<int> IDStock;
 
-
 class StockPlant : public ObjectDB
 {
 protected:
-	
+
 	int m_assembly_id; /* Assembly Identifier. */
 	int m_instance; /* Instance assembly.  */
-	Position m_position; /* Position on plant. */
 	std::string m_sn; /* Serial number. */
 	bool m_canBeSelected; /* This flag is used to know if the stock can be selected. */
 	bool m_canShowInfo; /* This flag is used to know if the stock can be showed.  */
@@ -44,7 +41,7 @@ public:
 	/// <summary>
 	/// Constructor.
 	/// </summary>
-	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_instance(1), m_position(), m_sn("SN"), m_canBeSelected(false), m_canShowInfo(false), m_enable(false), m_hash() {}
+	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_instance(1), m_sn("SN"), m_canBeSelected(false), m_canShowInfo(false), m_enable(false), m_hash() {}
 
 	/// <summary>
 	/// Gets Assembly.
@@ -52,25 +49,25 @@ public:
 	const Assembly& getAssembly() const;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <returns></returns>
 	int getAssemblyID() const;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="id"></param>
 	void setAssemblyID(int id);
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <returns></returns>
 	int getInstance() const;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="id"></param>
 	void setInstance(int id);
@@ -96,55 +93,44 @@ public:
 	bool getCanShowInfo() const;
 
 	/// <summary>
-	/// Gets position.
-	/// </summary>
-	Position getPosition() const;
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="position"></param>
-	void setPosition(const Position& position);
-
-	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <returns></returns>
 	const SubStock& getSubStock() const;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <returns></returns>
 	size_t getHash() const;
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="ids"></param>
 	void setHash(std::string s);
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	void deleteSubStock();
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="hash"></param>
 	/// <returns></returns>
 	bool loadStockPerHashFromDB(size_t hash);
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="path"></param>
 	/// <returns></returns>
 	std::string getNodePath(std::string path);
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="lpDBAdapter"></param>
 	/// <param name="assemblyComm"></param>
@@ -152,7 +138,7 @@ public:
 	void createStock(DBAdapter* lpDBAdapter, AssemblyRelation& assemblyRelation, const std::string& path);
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <param name="path"></param>
 	/// <param name="assemblyRelation"></param>
@@ -190,7 +176,6 @@ public:
 
 	friend class Plant;
 };
-
 
 void to_json(json& j, const StockPlant& m);
 
@@ -240,7 +225,6 @@ public:
 
 	friend void from_json(const json& j, Plant& m);
 };
-
 
 void to_json(json& j, const Plant& m);
 

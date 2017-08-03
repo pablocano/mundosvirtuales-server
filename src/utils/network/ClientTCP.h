@@ -21,15 +21,15 @@ public:
 	/// <summary>
 	/// Constructor.
 	/// IMPORTANT:
-	///		By default the thread NOT detach of parent thread. 
+	///		By default the thread NOT detach of parent thread.
 	/// </summary>
 	/// <param name="ip">IP or DNS of remote host.</param>
 	/// <param name="port">Port of remote host.</param>
 	/// <param name="m_lpResponsePacket">Pointer to class responding to messages (packet).</param>
 	/// <param name="closeClientFn">Callback function when the communication finishes.</param>
 	/// <param name="isDetach">Whether this flag is true the thread detaches of parent thread.</param>
-	ClientTCP(const char* ip, int port, std::shared_ptr<ResponsePacket> m_lpResponsePacket, std::function<void(std::shared_ptr<ClientTCP>)> closeClientFn = nullptr, bool isDetach=false);
-	
+	ClientTCP(const char* ip, int port, std::shared_ptr<ResponsePacket> m_lpResponsePacket, std::function<void(std::shared_ptr<ClientTCP>)> closeClientFn = nullptr, bool isDetach = false);
+
 	/// <summary>
 	/// Constructor.
 	/// IMPORTANT:
@@ -39,8 +39,8 @@ public:
 	/// <param name="m_lpResponsePacket">Pointer to class responding to messages (packet).</param>
 	/// <param name="closeClientFn">Callback function when the communication finishes.</param>
 	/// <param name="isDetach">Whether this flag is true the thread detaches of parent thread.</param>
-	ClientTCP(int socket, std::shared_ptr<ResponsePacket> m_lpResponsePacket, std::function<void(std::shared_ptr<ClientTCP>)> closeClientFn = nullptr, bool isDetach=true);
-	
+	ClientTCP(int socket, std::shared_ptr<ResponsePacket> m_lpResponsePacket, std::function<void(std::shared_ptr<ClientTCP>)> closeClientFn = nullptr, bool isDetach = true);
+
 	/// <summary>
 	/// Destructor.
 	/// </summary>

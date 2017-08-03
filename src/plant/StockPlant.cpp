@@ -49,16 +49,6 @@ bool StockPlant::getCanShowInfo() const
 	return m_canShowInfo;
 }
 
-Position StockPlant::getPosition() const
-{
-	return m_position;
-}
-
-void StockPlant::setPosition(const Position & position)
-{
-	m_position = position;
-}
-
 const SubStock& StockPlant::getSubStock() const
 {
 	return m_subStock;
@@ -98,7 +88,7 @@ bool StockPlant::loadStockPerHashFromDB(size_t hash)
 			return loadFromDB();
 		}
 	}
-	
+
 	return false;
 }
 
@@ -149,13 +139,13 @@ std::string StockPlant::getNodePath(std::string path, AssemblyRelation & assembl
 void StockPlant::operator=(const Row& row)
 {
 	this->setID(row.get<int>("stock_id"));
-	this->m_assembly_id			= row.get<int>("assembly_id");
-	this->m_instance			= row.get<int>("instance");
-	this->m_sn					= row.get<std::string>("serial_number");
-	this->m_canBeSelected		= row.get<bool>("canBeSelected");
-	this->m_canShowInfo			= row.get<bool>("canShowInfo");
-	this->m_enable				= row.get<bool>("enable");
-	this->m_hash				= row.get<size_t>("hash");
+	this->m_assembly_id = row.get<int>("assembly_id");
+	this->m_instance = row.get<int>("instance");
+	this->m_sn = row.get<std::string>("serial_number");
+	this->m_canBeSelected = row.get<bool>("canBeSelected");
+	this->m_canShowInfo = row.get<bool>("canShowInfo");
+	this->m_enable = row.get<bool>("enable");
+	this->m_hash = row.get<size_t>("hash");
 }
 
 Row StockPlant::getRow() const
@@ -191,7 +181,6 @@ void to_json(json& j, const StockPlant& m) {
 	{ "m_id",					m.getID() },
 	{ "m_assembly_id",			m.m_assembly_id },
 	{ "m_instance",				m.m_instance },
-	{ "m_position",				m.m_position },
 	{ "m_sn",					m.m_sn },
 	{ "m_canBeSelected",		m.m_canBeSelected },
 	{ "m_canShowInfo",			m.m_canShowInfo },
@@ -204,7 +193,6 @@ void from_json(const json& j, StockPlant& m) {
 	m.setID(j.at("m_id").get<int>());
 	m.m_assembly_id			= j.at("m_assembly_id").get<int>();
 	m.m_instance			= j.at("m_instance").get<int>();
-	m.m_position			= j.at("m_position").get<Position>();
 	m.m_sn					= j.at("m_sn").get<std::string>();
 	m.m_canBeSelected		= j.at("m_canBeSelected").get<bool>();
 	m.m_canShowInfo			= j.at("m_canShowInfo").get<bool>();
@@ -310,7 +298,7 @@ void Plant::loadPlantFromDB(DBAdapter* lpDBAdapter)
 	{
 		// Set the id to the root stock
 		m_plant.setID(idPlant);
-		
+
 		// Load the root from DB
 		m_plant.loadFromDB();
 	}
@@ -351,7 +339,6 @@ void StockPlant::AddSubStocks(const std::string & path)
 		}
 	}
 }
-
 
 void StockPlant::UpdateStock(const std::string & path, int caller_assembly_id)
 {
@@ -428,7 +415,6 @@ void StockPlant::UpdateStock(const std::string & path, int caller_assembly_id)
 			}
 		}
 	}
-
 }
 
 void Plant::UpdateTree(DBAdapter* lpDBAdapter, const AssemblyComm & assemblyComm)
@@ -453,7 +439,6 @@ void Plant::UpdateTree(DBAdapter* lpDBAdapter, const AssemblyComm & assemblyComm
 
 	// Update the stock tree using the new assembly
 	m_plant.UpdateStock(m_plant.getNodePath(""), assemblyComm.m_id_assembly);
-
 }
 
 void Plant::changeHash(DBAdapter* lpDBAdapter, StockPlant& root, std::string path)

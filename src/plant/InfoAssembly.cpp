@@ -1,17 +1,22 @@
 #include "InfoAssembly.h"
 
-std::string InfoAssembly::getName() const 
-{ 
+std::string InfoAssembly::getName() const
+{
 	return m_name;
 }
 
-std::string InfoAssembly::getInfo() const 
-{ 
+void InfoAssembly::setName(std::string name)
+{
+	m_name = name;
+}
+
+std::string InfoAssembly::getInfo() const
+{
 	return m_info;
 }
 
 std::string InfoAssembly::getShortInfo() const
-{ 
+{
 	return m_shortInfo;
 }
 
@@ -28,9 +33,9 @@ void InfoAssembly::setAssemblyID(int id)
 void InfoAssembly::operator=(const Row& row)
 {
 	ObjectDB::operator=(row);
-	this->m_name		= row.get<std::string>("name");
-	this->m_info		= row.get<std::string>("info");
-	this->m_shortInfo	= row.get<std::string>("shortinfo");
+	this->m_name = row.get<std::string>("name");
+	this->m_info = row.get<std::string>("info");
+	this->m_shortInfo = row.get<std::string>("shortinfo");
 	this->m_language_id = row.get<int>("language_id");
 	this->m_assembly_id = row.get<int>("assembly_id");
 }
@@ -60,7 +65,7 @@ Row InfoAssembly::getRow() const
 }
 
 void to_json(json& j, const InfoAssembly& m) {
-	j = json{ 
+	j = json{
 		{ "m_id",			m.getID() },
 		{ "m_name",			m.m_name },
 		{ "m_info",			m.m_info },
@@ -71,9 +76,9 @@ void to_json(json& j, const InfoAssembly& m) {
 
 void from_json(const json& j, InfoAssembly& m) {
 	m.setID(j.at("m_id").get<int>());
-	m.m_name		= j.at("m_name").get<std::string>();
-	m.m_info		= j.at("m_info").get<std::string>();
-	m.m_shortInfo	= j.at("m_shortInfo").get<std::string>();
-	m.m_language_id	= j.at("m_language_id").get<int>();
+	m.m_name = j.at("m_name").get<std::string>();
+	m.m_info = j.at("m_info").get<std::string>();
+	m.m_shortInfo = j.at("m_shortInfo").get<std::string>();
+	m.m_language_id = j.at("m_language_id").get<int>();
 	m.m_assembly_id = j.at("m_assembly_id").get<int>();
 }

@@ -73,7 +73,7 @@ Rows DBAdapterSOCI::query(std::string query) const
 	for (auto it = soci_rows.begin(); it != soci_rows.end(); ++it)
 	{
 		rows.push_back(Row()); // New row
-		Row& row = rows.back(); // Get last added row 
+		Row& row = rows.back(); // Get last added row
 
 		for (std::size_t i = 0; i < it->size(); ++i)
 		{
@@ -156,7 +156,7 @@ std::vector<int> DBAdapterSOCI::insert(const std::string& table, const Rows & ro
 			{
 				ss << getSQLFieldNames(*row) << " VALUES" << getSQLRegisterValues(*row);
 			}
-			
+
 			ss << " RETURNING " << table << "_id" << ";";
 			std::regex pattern(table + "\\.");
 			std::string query = ss.str();
@@ -205,7 +205,7 @@ int DBAdapterSOCI::insert(const std::string& table, const Row & row)
 
 		return id;
 	}
-	catch(const std::exception &e)
+	catch (const std::exception &e)
 	{
 		LOGGER_ERROR("DBAdapterSOCI", e.what());
 		return -1;
@@ -218,7 +218,7 @@ bool db::DBAdapterSOCI::update(const std::string & table, const Rows & rows, con
 	{
 		std::string connectString = get_str_connection();
 		soci::session sql(db_engine, connectString);
-		
+
 		std::regex pattern(table + "\\.");
 
 		soci::transaction tr(sql);
@@ -228,7 +228,7 @@ bool db::DBAdapterSOCI::update(const std::string & table, const Rows & rows, con
 			std::stringstream ss;
 			ss.str("");
 			ss << "UPDATE " << table << " SET " << getSQLUpdateRegisterValues(*row) << " WHERE " << name_id << " = " << row->get<int>(name_id) << ";";
-			
+
 			std::string query = ss.str();
 			sql << std::regex_replace(query, pattern, "");
 		}

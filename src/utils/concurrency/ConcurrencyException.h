@@ -4,5 +4,4 @@
 
 class ConcurrencyException : public Exception
 {
-	
 };

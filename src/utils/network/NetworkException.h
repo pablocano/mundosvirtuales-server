@@ -4,5 +4,4 @@
 
 class NetworkException : public Exception
 {
-	
 };

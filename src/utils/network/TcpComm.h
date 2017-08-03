@@ -17,9 +17,9 @@
 #endif
 
 #ifdef WIN32
-	#define CLOSE(socket) closesocket(socket)
+#define CLOSE(socket) closesocket(socket)
 #else
-	#define CLOSE(socket) close(socket)
+#define CLOSE(socket) close(socket)
 #endif
 
 /// <summary>
@@ -62,13 +62,12 @@ public:
 	/// </summary>
 	/// <returns>Returns handle socket.</returns>
 	int getSocket() { return m_socket; }
-	
+
 	/// <summary>
 	/// The function return whether the connection was successful.
 	/// </summary>
 	/// <returns>Returns true if the connection was established, false otherwise.</returns>
 	bool connected() const { return m_socket > 0; }
-
 };
 
 /// <summary>
@@ -109,7 +108,6 @@ protected:
 	/// <returns>Returns true if listening client was successful, false otherwise.</returns>
 	bool listenSocket();
 };
-
 
 /// <summary>
 /// The class implements a tcp connection with socket.

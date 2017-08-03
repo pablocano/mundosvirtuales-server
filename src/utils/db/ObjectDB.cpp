@@ -35,7 +35,7 @@ std::string ObjectDB::getTableName() const
 }
 
 /// <summary>
-/// 
+///
 /// </summary>
 /// <returns></returns>
 
@@ -88,7 +88,7 @@ bool ObjectDB::loadFromDB(int id)
 }
 
 /// <summary>
-/// 
+///
 /// </summary>
 /// <param name="row"></param>
 /// <returns></returns>
@@ -134,7 +134,7 @@ bool ObjectDB::saveToDB()
 }
 
 /// <summary>
-/// 
+///
 /// </summary>
 /// <returns></returns>
 
@@ -144,7 +144,7 @@ std::string ObjectDB::getIDFieldName() const
 }
 
 /// <summary>
-/// 
+///
 /// </summary>
 /// <returns></returns>
 
@@ -154,7 +154,7 @@ std::string ObjectDB::getWhere() const
 }
 
 /// <summary>
-/// 
+///
 /// </summary>
 /// <returns></returns>
 
@@ -164,7 +164,7 @@ std::string ObjectDB::getFieldsSelect() const
 }
 
 /// <summary>
-/// 
+///
 /// </summary>
 /// <returns></returns>
 

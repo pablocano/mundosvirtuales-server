@@ -1,5 +1,5 @@
 #include "Position.h"
-#include "serialization/json.h" 
+#include "serialization/json.h"
 
 using json = nlohmann::json;
 

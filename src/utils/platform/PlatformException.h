@@ -4,5 +4,4 @@
 
 class PlatformException : public Exception
 {
-	
 };

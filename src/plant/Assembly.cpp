@@ -2,11 +2,6 @@
 #include "../utils/db/Rows.h"
 #include "../utils/logger/Logger.h"
 
-
-Assembly::Assembly() : ObjectDB(0, "assembly", nullptr)
-{
-}
-
 std::string Assembly::getPN() const
 {
 	return m_pn;
@@ -22,27 +17,41 @@ const ModelAssembly& Assembly::getModel() const
 	return m_modelAssembly;
 }
 
+const ListAssemblyRelations & Assembly::getRelations() const
+{
+	return m_assemblyRelations;
+}
+
 void Assembly::setID(int id)
 {
 	ObjectDB::setID(id);
-	m_infoAssembly.setAssemblyID(id);
+	m_infoAssembly.setAssemblyID(id); // Set Foreing key (assembly table).
 }
 
 void Assembly::setID(const Row & row)
 {
 	ObjectDB::setID(row);
-	m_infoAssembly.setAssemblyID(getID());
+	m_infoAssembly.setAssemblyID(getID()); // Set Foreing key (assembly table).
 }
 
 bool Assembly::loadFromDB()
 {
+	// Load information translated 
 	int id = getDBAdapter()->query("SELECT assembly_translation_id as id FROM assembly_translation WHERE ((assembly_id = " + std::to_string(getID()) + ") AND (language_id = 1));").front().get<int>("id"); // TODO: language id fixed
 	m_infoAssembly.setID(id);
 
-	return ObjectDB::loadFromDB() && m_infoAssembly.loadFromDB() && m_modelAssembly.loadFromDB();
+	// Load Assembly, Information and Model.
+	if (ObjectDB::loadFromDB() && m_infoAssembly.loadFromDB() && m_modelAssembly.loadFromDB())
+	{
+		// Load relations
+		m_assemblyRelations = Assemblies::loadRelationFromDB(getDBAdapter(), getID());
+		return true;
+	}
+
+	return false;
 }
 
-void Assembly::setDBAdapter(DBAdapter * lpDBAdapter)
+void Assembly::setDBAdapter(DBAdapter* lpDBAdapter)
 {
 	ObjectDB::setDBAdapter(lpDBAdapter);
 	m_infoAssembly.setDBAdapter(lpDBAdapter);
@@ -62,9 +71,12 @@ void Assembly::operator=(const Row& row)
 void Assembly::operator=(const AssemblyComm& assemblyComm)
 {
 	this->m_pn = assemblyComm.m_part_number;
+
 	this->m_infoAssembly.setDBAdapter(getDBAdapter());
+	this->m_infoAssembly.setName(assemblyComm.m_name);
+
 	this->m_modelAssembly.setDBAdapter(getDBAdapter());
-	this->m_modelAssembly.setPathModel(assemblyComm.m_name);
+	this->m_modelAssembly.setPathModel(assemblyComm.m_filename);
 	this->m_modelAssembly.setVersion(assemblyComm.m_version);
 }
 
@@ -98,18 +110,20 @@ bool Assembly::saveToDB()
 }
 
 void to_json(json& j, const Assembly& m) {
-	j = json{ 
+	j = json{
 		{"m_id",				m.getID() },
-		{"m_pn",				m.getPN() },
-		{"m_infoAssembly",		m.getInfo()},
-		{"m_modelAssembly",		m.getModel() } };
+		{"m_pn",				m.m_pn },
+		{"m_infoAssembly",		m.m_infoAssembly },
+		{"m_modelAssembly",		m.m_modelAssembly },
+		{"m_assemblyRelations",	m.m_assemblyRelations }};
 }
 
 void from_json(const json& j, Assembly& m) {
 	m.setID(j.at("m_id").get<int>());
-	m.m_pn				= j.at("m_pn");
-	m.m_infoAssembly	= j.at("m_infoAssembly");
-	m.m_modelAssembly	= j.at("m_modelAssembly");
+	m.m_pn = j.at("m_pn");
+	m.m_infoAssembly = j.at("m_infoAssembly");
+	m.m_modelAssembly = j.at("m_modelAssembly");
+	m.m_assemblyRelations = j.at("m_asssemblyRelations");
 }
 
 DictAssemblies& Assemblies::getDictAssemblies()
@@ -144,7 +158,6 @@ void Assemblies::loadDictAssembliesFromDB(DBAdapter *lpDBAdapter)
 	{
 		LOGGER_ERROR("Assemblies", e.what());
 	}
-
 }
 
 void Assemblies::updateDictAssembliesFromDB(DBAdapter *lpDBAdapter)
@@ -159,7 +172,7 @@ int Assemblies::createAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assem
 	Assembly assembly;
 	assembly.setDBAdapter(lpDBAdapter);
 	assembly = assemblyComm;
-	
+
 	if (assembly.saveToDB() && assembly.getID() > 0)
 	{
 		Assemblies::getInstance().getDictAssemblies()[assembly.getID()] = assembly;
@@ -202,14 +215,14 @@ void Assemblies::updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& asse
 
 				newRelation.setDBAdapter(lpDBAdapter);
 				newRelation.m_parent_assembly_id = assemblyComm.m_id_assembly;
-				
+
 				newRelation.saveToDB();
 			}
 		}
 
 		for (auto& relation : relations)
 		{
-			if(relation.isValidID())
+			if (relation.isValidID())
 				relation.deleteToDB();
 		}
 	}
@@ -219,7 +232,7 @@ bool Assemblies::processRelation(DBAdapter* lpDBAdapter, AssemblyComm & assembly
 {
 	updateDictAssembliesFromDB(lpDBAdapter);
 
-	for (auto it = assemblyComm.m_listAssemblyRelations.begin(); it != assemblyComm.m_listAssemblyRelations.end() ; ++it)
+	for (auto it = assemblyComm.m_listAssemblyRelations.begin(); it != assemblyComm.m_listAssemblyRelations.end(); ++it)
 	{
 		it->m_parent_assembly_id = assemblyComm.m_id_assembly;
 		it->setDBAdapter(lpDBAdapter);
@@ -288,7 +301,6 @@ bool Assemblies::IsConnected(DBAdapter* lpDBAdapter, int id_assembly_start, int 
 
 	// If there is no connection between the two assemblies, return false
 	return false;
-
 }
 
 void to_json(json &j, const Assemblies &m)

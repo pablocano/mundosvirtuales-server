@@ -4,5 +4,4 @@
 
 class CommunicationException : public Exception
 {
-	
 };

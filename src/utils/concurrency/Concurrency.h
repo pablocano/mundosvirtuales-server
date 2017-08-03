@@ -23,7 +23,7 @@ protected:
 	typedef std::chrono::duration<float, std::milli> Duration;
 
 	/// <summary>
-	/// Thread Function. 
+	/// Thread Function.
 	/// </summary>
 	void run()
 	{
@@ -35,7 +35,7 @@ protected:
 				break; // Break if principal task was over or timeout occurs.
 			SystemCall::sleep(m_nSleep);
 		}
-		
+
 		if (m_postTask)
 			m_postTask();
 	}
@@ -49,7 +49,7 @@ public:
 	/// <param name="nTimeout">Timeout for principal task. If this argument is zero, then timeout doesn't use.</param>
 	/// <param name="nSleep">Interval of time waiting between trials principal task.</param>
 	Concurrency(std::function<bool()> _main, std::function<void()> _post = nullptr, unsigned int nTimeout = 0, unsigned int nSleep = 10) :
-		m_mainTask(_main), m_postTask(_post), m_thread(), m_nTimeout(nTimeout), m_nSleep(nSleep) 
+		m_mainTask(_main), m_postTask(_post), m_thread(), m_nTimeout(nTimeout), m_nSleep(nSleep)
 	{
 		m_thread = std::thread(&Concurrency::run, this);
 		m_thread.detach();

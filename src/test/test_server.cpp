@@ -8,7 +8,6 @@
 #include <iostream>
 #include <sstream>
 
-
 void test_server()
 {
 	static ClientPlant client("localhost");
@@ -19,8 +18,8 @@ void test_server()
 
 	static Assemblies &assemblies = Assemblies::getInstance();
 	static Plant &plant = Plant::getInstance();
-	
-	static Concurrency con([]() -> bool { 
+
+	static Concurrency con([]() -> bool {
 		if (client.requestAssemblies(assemblies))
 		{
 			return client.requestPlant(plant);
@@ -31,7 +30,7 @@ void test_server()
 		[]() { LOGGER_LOG("Response Packet Client", "Plant:"); for (StockPlant machine : plant.getPlant().getSubStock()) LOGGER_LOG("Test Server", machine.getAssembly().getInfo().getName()); }, 100);
 
 	LOGGER_LOG("Test Server", "Post concurrency");
-	
+
 	SystemCall::sleep(3000);
 
 	LOGGER_LOG("Test Server", "Pre sleep");
@@ -123,6 +122,6 @@ int main()
 
 	LOGGER_LOG("Test Server", "Press enter to finish");
 	std::getchar();
-	
+
 	return 0;
 }

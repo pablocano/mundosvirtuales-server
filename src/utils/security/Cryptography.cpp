@@ -1,7 +1,7 @@
 #include "Cryptography.h"
-  #include <stdint.h>
-  #define DELTA 0x9e3779b9
-  #define MX (((z>>5^y<<2) + (y>>3^z<<4)) ^ ((sum^y) + (key[(p&3)^e] ^ z)))
+#include <stdint.h>
+#define DELTA 0x9e3779b9
+#define MX (((z>>5^y<<2) + (y>>3^z<<4)) ^ ((sum^y) + (key[(p&3)^e] ^ z)))
 
 void Cryptography::encrypt(uint32_t *v, unsigned n, uint32_t const key[4])
 {
@@ -13,7 +13,7 @@ void Cryptography::encrypt(uint32_t *v, unsigned n, uint32_t const key[4])
 	do {
 		sum += DELTA;
 		e = (sum >> 2) & 3;
-		for (p = 0; p<n - 1; p++) {
+		for (p = 0; p < n - 1; p++) {
 			y = v[p + 1];
 			z = v[p] += MX;
 		}
@@ -31,7 +31,7 @@ void Cryptography::decrypt(uint32_t *v, unsigned n, uint32_t const key[4])
 	y = v[0];
 	do {
 		e = (sum >> 2) & 3;
-		for (p = n - 1; p>0; p--) {
+		for (p = n - 1; p > 0; p--) {
 			z = v[p - 1];
 			y = v[p] -= MX;
 		}

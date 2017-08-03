@@ -8,7 +8,6 @@ using json = nlohmann::json;
 
 bool ClientPlant::requestPlant(Plant& plant)
 {
-
 	if (m_tcpComm.connected())
 	{
 		HeaderPacketComm header;
@@ -32,8 +31,7 @@ bool ClientPlant::requestPlant(Plant& plant)
 				LOGGER_ERROR("Response Packet Client", e.what());
 			}
 		}
-			
-	}	
+	}
 
 	return plant.getPlant().isEnable();
 }
@@ -63,14 +61,13 @@ bool ClientPlant::requestAssemblies(Assemblies& assemblies)
 				LOGGER_ERROR("Response Packet Client", e.what());
 			}
 		}
-
 	}
 
 	return assemblies.getDictAssemblies().size() > 0;
 }
 
 /// <summary>
-/// 
+///
 /// </summary>
 /// <param name="command"></param>
 /// <param name="j"></param>
@@ -94,7 +91,6 @@ std::string ClientPlant::request(Command command, std::string s)
 		{
 			return packetResponse.m_lpContent;
 		}
-
 	}
 
 	return ""; // Empty

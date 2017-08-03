@@ -1,41 +1,38 @@
 #include "ModelAssembly.h"
 
-
-
-std::string ModelAssembly::getPathModel() const 
-{ 
-	return m_path_model; 
+std::string ModelAssembly::getPathModel() const
+{
+	return m_path_model;
 }
 
-std::string ModelAssembly::getMaterial() const 
-{ 
+std::string ModelAssembly::getMaterial() const
+{
 	return m_material;
 }
 
-std::string ModelAssembly::getColor() const 
-{ 
+std::string ModelAssembly::getColor() const
+{
 	return m_color;
 }
 
-bool ModelAssembly::isAnimated() const 
-{ 
+bool ModelAssembly::isAnimated() const
+{
 	return m_animated;
 }
 
-int ModelAssembly::getVersion() const 
-{ 
+int ModelAssembly::getVersion() const
+{
 	return m_version;
 }
 
 void ModelAssembly::operator=(const Row& row)
 {
-	
 	ObjectDB::operator=(row);
-	this->m_path_model	= row.get<std::string>("path_model");
-	this->m_material	= row.get<std::string>("material");
-	this->m_color		= row.get<std::string>("color");
-	this->m_animated	= row.get<bool>("animated");
-	this->m_version		= row.get<int>("version");
+	this->m_path_model = row.get<std::string>("path_model");
+	this->m_material = row.get<std::string>("material");
+	this->m_color = row.get<std::string>("color");
+	this->m_animated = row.get<bool>("animated");
+	this->m_version = row.get<int>("version");
 }
 
 Row ModelAssembly::getRow() const
@@ -63,7 +60,7 @@ Row ModelAssembly::getRow() const
 }
 
 void to_json(json& j, const ModelAssembly& m) {
-	j = json{ 
+	j = json{
 		{ "m_path_model",	m.m_path_model },
 		{ "m_material",		m.m_material },
 		{ "m_color",		m.m_color },
@@ -72,9 +69,9 @@ void to_json(json& j, const ModelAssembly& m) {
 }
 
 void from_json(const json& j, ModelAssembly& m) {
-	m.m_path_model	= j.at("m_path_model").get<std::string>();
-	m.m_material	= j.at("m_material").get<std::string>();
-	m.m_color		= j.at("m_color").get<std::string>();
-	m.m_animated	= j.at("m_animated").get<bool>();
-	m.m_version		= j.at("m_version").get<int>();
+	m.m_path_model = j.at("m_path_model").get<std::string>();
+	m.m_material = j.at("m_material").get<std::string>();
+	m.m_color = j.at("m_color").get<std::string>();
+	m.m_animated = j.at("m_animated").get<bool>();
+	m.m_version = j.at("m_version").get<int>();
 }

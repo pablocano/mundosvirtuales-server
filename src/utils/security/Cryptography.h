@@ -8,7 +8,7 @@
 class Cryptography
 {
 public:
-	
+
 	/// <summary>
 	/// Encrypt the content
 	/// </summary>

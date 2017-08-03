@@ -4,5 +4,4 @@
 
 class SensorException : public Exception
 {
-	
 };
