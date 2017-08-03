@@ -30,12 +30,6 @@ public:
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <param name="row"></param>
-	ObjectDB(const Row& row);
-
-	/// <summary>
-	/// 
-	/// </summary>
 	/// <returns></returns>
 	int getID() const;
 

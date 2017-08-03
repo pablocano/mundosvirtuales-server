@@ -15,7 +15,7 @@
 #define MENOR_NUM_VERSION_PACKET	0x0  /* Define menor number of version. */
 #define VERSION_PACKET (((MAYOR_NUM_VERSION_PACKET) << 4) | (MENOR_NUM_VERSION_PACKET))  /* Define version of communication packet. */
 
-#define MAX_ERROR_COMM 5 /* Define max number of error supported before it closed communication. */
+#define MAX_ERROR_COMM 3 /* Define max number of error supported before it closed communication. */
 
 #define COMM_ENCRYPTED /* If is defined, the packets are encrypted. */
 #define KEY_CRYPT { 56324394, 73576, 12030122, 56 } /* Private key for encrypted. */

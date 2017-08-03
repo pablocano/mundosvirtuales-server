@@ -27,62 +27,70 @@ void ClientTCP::run()
 	{
 		HeaderPacketComm header;
 
-		// Validate
-		if (m_tcpComm.receive((char *)&header, SIZE_HEADER_PACKET))
+		try
 		{
-			if (header.version == VERSION_PACKET)
+			// Validate
+			if (m_tcpComm.receive((char *)&header, SIZE_HEADER_PACKET))
 			{
-				if (header.m_size >= 0)
+				if (header.version == VERSION_PACKET)
 				{
-					char* contentEncrypted = nullptr;
-
-					if (header.m_size)
+					if (header.m_size >= 0)
 					{
-						contentEncrypted = (char *)std::realloc(lpBuffer, header.m_size);
-						lpBuffer = contentEncrypted;
-					}
+						char* contentEncrypted = nullptr;
 
-					if (header.m_size == 0 || m_tcpComm.receive(contentEncrypted, header.m_size, 0))
-					{
-						PacketComm packet = PacketComm::unpacking(header, contentEncrypted);
-						std::unique_ptr<PacketComm> packetResponse = m_lpResponsePacket->process_packet(packet, m_tcpComm);
-						if (packetResponse.get())
+						if (header.m_size)
 						{
-							std::unique_ptr<char[]> packetTCP = packetResponse->packing();
-							m_tcpComm.send(packetTCP.get(), packetResponse->size());
+							contentEncrypted = (char *)std::realloc(lpBuffer, header.m_size);
+							lpBuffer = contentEncrypted;
+						}
+
+						if (header.m_size == 0 || m_tcpComm.receive(contentEncrypted, header.m_size, 0))
+						{
+							PacketComm packet = PacketComm::unpacking(header, contentEncrypted);
+							std::unique_ptr<PacketComm> packetResponse = m_lpResponsePacket->process_packet(packet, m_tcpComm);
+							if (packetResponse.get())
+							{
+								std::unique_ptr<char[]> packetTCP = packetResponse->packing();
+								m_tcpComm.send(packetTCP.get(), packetResponse->size());
+							}
+						}
+						else
+						{
+							LOGGER_ERROR("Client TCP", "Error received Content of Packet");
+							count_error++;
 						}
 					}
 					else
 					{
-						LOGGER_ERROR("Client TCP", "Error received Content of Packet");
+						LOGGER_ERROR("Client TCP", "Error received Header of Packet");
 						count_error++;
 					}
 				}
 				else
 				{
-					LOGGER_ERROR("Client TCP", "Error received Header of Packet");
+					LOGGER_ERROR("Client TCP", "Error Version Packet");
 					count_error++;
+
+					PacketComm packet;
+					packet.m_header.m_command = Command::NONE;
+					packet.m_header.m_statusComm = StatusServer::WRONG_VERSION;
+					packet.m_lpContent = nullptr;
+
+					std::unique_ptr<char[]> packetTCP = packet.packing();
+					m_tcpComm.send(packetTCP.get(), packet.size());
 				}
 			}
 			else
 			{
-				LOGGER_ERROR("Client TCP", "Error Version Packet");
 				count_error++;
-
-				PacketComm packet;
-				packet.m_header.m_command = Command::NONE;
-				packet.m_header.m_statusComm = StatusServer::WRONG_VERSION;
-				packet.m_lpContent = nullptr;
-
-				std::unique_ptr<char[]> packetTCP = packet.packing();
-				m_tcpComm.send(packetTCP.get(), packet.size());
 			}
 		}
-		else
+		catch (const std::exception& e)
 		{
+			LOGGER_ERROR("ClientTCP", e.what());
 			count_error++;
 		}
-
+		
 		if (count_error >= MAX_ERROR_COMM)
 			m_stop = true;
 	}

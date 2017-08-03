@@ -173,7 +173,7 @@ public:
 
 	int createAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm);
 
-	int updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm);
+	void updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm);
 
 	bool processRelation(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm);
 

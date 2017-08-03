@@ -1,10 +1,5 @@
 #include "ObjectDB.h"
 
-ObjectDB::ObjectDB(const Row & row)
-{
-	*this = row;
-}
-
 int ObjectDB::getID() const
 {
 	return m_id;
@@ -127,7 +122,7 @@ bool ObjectDB::saveToDB(Row & row)
 
 void ObjectDB::deleteToDB()
 {
-	std::string query = "DELETE " + getFieldsSelect() + " FROM " + m_tableName + " WHERE " + getWhere() + ";";
+	std::string query = "DELETE FROM " + m_tableName + " WHERE " + getWhere() + ";";
 	m_lpDBAdapter->onlyQuery(query);
 	setID(0);
 }

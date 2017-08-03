@@ -13,9 +13,10 @@ struct AssemblyRelation : public ObjectDB
 	int m_instance;
 	Position m_position;
 
+	/// <summary>
+	/// 
+	/// </summary>
 	AssemblyRelation() : ObjectDB(0, "assembly_relations", nullptr), m_parent_assembly_id(), m_child_assembly_id(), m_instance(), m_position() {}
-
-	AssemblyRelation(const Row& row) : ObjectDB(row) {}
 
 	/// <summary>
 	/// Create the path to this relation

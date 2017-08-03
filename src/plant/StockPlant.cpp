@@ -434,7 +434,8 @@ void StockPlant::UpdateStock(const std::string & path, int caller_assembly_id)
 void Plant::UpdateTree(DBAdapter* lpDBAdapter, const AssemblyComm & assemblyComm)
 {
 	// If the root in not valid or if the new assembly is the new root, set as root
-	if (!m_plant.isValidID() || Assemblies::IsConnected(lpDBAdapter, assemblyComm.m_id_assembly, m_plant.m_assembly_id))
+	bool f = Assemblies::IsConnected(lpDBAdapter, assemblyComm.m_id_assembly, m_plant.m_assembly_id);
+	if (!m_plant.isValidID() || f)
 	{
 		// Set the new assembly as root
 		m_plant.setAssemblyID(assemblyComm.m_id_assembly);
@@ -447,6 +448,7 @@ void Plant::UpdateTree(DBAdapter* lpDBAdapter, const AssemblyComm & assemblyComm
 
 		// Save the root into the database
 		m_plant.saveToDB();
+		Plant::setIDRootPlant(lpDBAdapter, m_plant.getID());
 	}
 
 	// Update the stock tree using the new assembly

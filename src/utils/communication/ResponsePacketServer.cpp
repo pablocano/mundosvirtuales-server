@@ -169,8 +169,5 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 		LOGGER_LOG("ResponsePacketServerPlant", "NONE");
 	}
 
-	if (packet.sizeContent() > 0)
-		LOGGER_LOG("ResponsePacketServerPlant", packet.m_lpContent);
-
 	return responsePacket;
 }

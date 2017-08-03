@@ -168,7 +168,7 @@ int Assemblies::createAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assem
 	return assembly.getID();
 }
 
-int Assemblies::updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm)
+void Assemblies::updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm)
 {
 	updateDictAssembliesFromDB(lpDBAdapter);
 
@@ -209,15 +209,9 @@ int Assemblies::updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assem
 
 		for (auto& relation : relations)
 		{
-			relation.deleteToDB();
+			if(relation.isValidID())
+				relation.deleteToDB();
 		}
-
-
-		return assemblies.getDictAssemblies()[assemblyComm.m_id_assembly].getID();
-	}
-	else
-	{
-		return -1;
 	}
 }
 
@@ -256,8 +250,10 @@ ListAssemblyRelations Assemblies::loadRelationFromDB(DBAdapter * lpDBAdapter, in
 
 	for (Row& row : rows)
 	{
-		AssemblyRelation assemblyRelation(row);
+		AssemblyRelation assemblyRelation;
+		assemblyRelation.m_parent_assembly_id = assembly_id;
 		assemblyRelation.setDBAdapter(lpDBAdapter);
+		assemblyRelation = row;
 
 		listRelations.push_back(assemblyRelation);
 	}
