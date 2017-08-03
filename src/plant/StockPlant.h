@@ -44,7 +44,7 @@ public:
 	/// <summary>
 	/// Constructor.
 	/// </summary>
-	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_instance(), m_position(), m_sn("SN"), m_canBeSelected(false), m_canShowInfo(false), m_enable(false), m_hash() {}
+	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_instance(1), m_position(), m_sn("SN"), m_canBeSelected(false), m_canShowInfo(false), m_enable(false), m_hash() {}
 
 	/// <summary>
 	/// Gets Assembly.
@@ -230,13 +230,11 @@ public:
 
 	void loadPlantFromDB(DBAdapter* lpDBAdapter);
 
-	void updatePlantFromDB(DBAdapter* lpDBAdapter);
-
-	bool updatePlant(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm);
-
 	void changeHash(DBAdapter* lpDBAdapter, StockPlant& root, std::string path);
 
 	void setPlant(json j);
+
+	void UpdateTree(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm);
 
 	friend void to_json(json& j, const Plant& m);
 
