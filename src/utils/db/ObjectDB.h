@@ -20,11 +20,18 @@ private:
 public:
 
 	/// <summary>
-	/// 
+	/// Constructor.
 	/// </summary>
 	/// <param name="id"></param>
 	/// <param name="tableName"></param>
+	/// <param name="lpDBAdapter"></param>
 	ObjectDB(int id, const std::string tableName, DBAdapter* lpDBAdapter) : m_id(id), m_tableName(tableName), m_lpDBAdapter(lpDBAdapter) {}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="row"></param>
+	ObjectDB(const Row& row);
 
 	/// <summary>
 	/// 
@@ -83,6 +90,9 @@ public:
 	/// <returns></returns>
 	bool saveToDB(Row& row);
 
+	/// <summary>
+	/// 
+	/// </summary>
 	void deleteToDB();
 
 	/// <summary>

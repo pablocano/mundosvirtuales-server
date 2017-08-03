@@ -1,27 +1,52 @@
 #pragma once
 
 #include "serialization/json.h"
+#include "db/ObjectDB.h"
 #include "Position.h"
 
 using json = nlohmann::json;
 
-struct AssemblyRelation
+struct AssemblyRelation : public ObjectDB
 {
-	int m_id_assembly; // TODO: change to m_assembly_id
+	int m_parent_assembly_id;
+	int m_child_assembly_id;
+	int m_instance;
 	Position m_position;
-	int m_id_instance;
 
-	AssemblyRelation() : m_id_assembly(), m_position() {}
+	AssemblyRelation() : ObjectDB(0, "assembly_relations", nullptr), m_parent_assembly_id(), m_child_assembly_id(), m_instance(), m_position() {}
+
+	AssemblyRelation(const Row& row) : ObjectDB(row) {}
 
 	/// <summary>
 	/// Create the path to this relation
 	/// </summary>
-	/// <param name="parentPath">The path to the parent</param>
+	/// <param name="parentPath">The path to the parent.</param>
 	/// <returns></returns>
-	std::string CreatePath(const std::string& parentPath) const
-	{
-		return parentPath + (parentPath.empty() ? "" : ",") + std::to_string(m_id_assembly) + ":" + std::to_string(m_id_instance);
-	}
+	std::string CreatePath(const std::string& parentPath) const;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="lpDBAdapter"></param>
+	void setDBAdapter(DBAdapter* lpDBAdapter);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	bool saveToDB();
+
+	/// <summary>
+	/// Gets a row.
+	/// </summary>
+	/// <returns>Returns a row constructed from this object's data.</returns>
+	Row getRow() const;
+
+	/// <summary>
+	/// Operator equals with Row.
+	/// </summary>
+	/// <param name="row">Row reference.</param>
+	void operator=(const Row& row);
 };
 
 void to_json(json& j, const AssemblyRelation& m);

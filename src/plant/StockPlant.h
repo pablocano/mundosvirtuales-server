@@ -232,13 +232,7 @@ public:
 
 	void updatePlantFromDB(DBAdapter* lpDBAdapter);
 
-	bool processRelation(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm);
-
 	bool updatePlant(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm);
-
-	void insertStock(DBAdapter* lpDBAdapter, StockPlant& root, int idAssembly, AssemblyRelation& assemblyRelation);
-	
-	void insertStock(DBAdapter* lpDBAdapter, StockPlant& root, int idAssembly, AssemblyRelation& assemblyRelation, std::string path);
 
 	void changeHash(DBAdapter* lpDBAdapter, StockPlant& root, std::string path);
 

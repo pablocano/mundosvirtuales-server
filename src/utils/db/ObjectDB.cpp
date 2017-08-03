@@ -1,5 +1,10 @@
 #include "ObjectDB.h"
 
+ObjectDB::ObjectDB(const Row & row)
+{
+	*this = row;
+}
+
 int ObjectDB::getID() const
 {
 	return m_id;

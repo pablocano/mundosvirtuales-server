@@ -186,11 +186,11 @@ int Assemblies::updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assem
 			bool newRelation = true;
 			for (auto& relation : relations)
 			{
-				if (commRelation.m_id_assembly == relation.m_id_assembly && commRelation.m_id_instance == relation.m_id_instance)
+				if (commRelation.m_child_assembly_id == relation.m_child_assembly_id && commRelation.m_instance == relation.m_instance)
 				{
-					//TODO Pablo Saavedra
-					//UpdateRelation(relation.id,commRelation.m_pos);
-					//relation.id = -1;
+					relation.m_position = commRelation.m_position;
+					relation.m_position.saveToDB();
+					relation.setID(-1);
 					newRelation = false;
 					break;
 				}
@@ -198,16 +198,18 @@ int Assemblies::updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assem
 
 			if (newRelation)
 			{
-				//NewRelation(commRelation);
+				AssemblyRelation newRelation = commRelation;
+
+				newRelation.setDBAdapter(lpDBAdapter);
+				newRelation.m_parent_assembly_id = assemblyComm.m_id_assembly;
+				
+				newRelation.saveToDB();
 			}
 		}
 
 		for (auto& relation : relations)
 		{
-			if (/*relation.id > 0*/)
-			{
-				//DeleteRelation(relation.id);
-			}
+			relation.deleteToDB();
 		}
 
 
@@ -219,54 +221,32 @@ int Assemblies::updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assem
 	}
 }
 
-void Assemblies::setAssemblies(json j)
-{
-	from_json(j, *this);
-}
-
-bool Assemblies::processRelation(DBAdapter * lpDBAdapter, AssemblyComm & assemblyComm)
+bool Assemblies::processRelation(DBAdapter* lpDBAdapter, AssemblyComm & assemblyComm)
 {
 	updateDictAssembliesFromDB(lpDBAdapter);
 
-	for (AssemblyRelation& assemblyRelation : assemblyComm.m_listAssemblyRelations)
+	for (auto it = assemblyComm.m_listAssemblyRelations.begin(); it != assemblyComm.m_listAssemblyRelations.end() ; ++it)
 	{
-		saveRelationToDB(lpDBAdapter, assemblyComm.m_id_assembly, assemblyRelation.m_id_assembly, assemblyRelation.m_id_instance, assemblyRelation.m_position);
+		it->m_parent_assembly_id = assemblyComm.m_id_assembly;
+		it->setDBAdapter(lpDBAdapter);
+		if (!it->saveToDB())
+		{
+			// Rollover
+			for (auto it2 = assemblyComm.m_listAssemblyRelations.begin(); it2 != it; ++it2)
+			{
+				it2->deleteToDB();
+			}
+
+			return false;
+		}
 	}
 
 	return true;
 }
 
-int Assemblies::saveRelationToDB(DBAdapter * lpDBAdapter, int parent_id, int child_id, int instance, Position & position)
+void Assemblies::setAssemblies(json j)
 {
-	int position_id = savePositionToDB(lpDBAdapter, position);
-
-	if (position_id)
-	{
-		ObjectDB objDB(0, "assembly_relations", lpDBAdapter);
-
-		Row row;
-		std::shared_ptr<Fields> fieldData(new Fields());
-
-		fieldData->push_back(FieldData(objDB.getIDFieldName(), TypeData::DB_INTEGER, true));
-		fieldData->push_back(FieldData("parent_assembly_id", TypeData::DB_INTEGER));
-		fieldData->push_back(FieldData("child_assembly_id", TypeData::DB_INTEGER));
-		fieldData->push_back(FieldData("instance", TypeData::DB_INTEGER));
-		fieldData->push_back(FieldData("position_entity_id", TypeData::DB_INTEGER));
-
-		row.setFieldData(fieldData);
-
-		row.addRegisterPerValue<int>(objDB.getID());
-		row.addRegisterPerValue<int>(parent_id);
-		row.addRegisterPerValue<int>(child_id);
-		row.addRegisterPerValue<int>(instance);
-		row.addRegisterPerValue<int>(position_id);
-
-		if (objDB.saveToDB(row))
-			return objDB.getID();
-
-	}
-
-	return -1;
+	from_json(j, *this);
 }
 
 ListAssemblyRelations Assemblies::loadRelationFromDB(DBAdapter * lpDBAdapter, int assembly_id)
@@ -276,11 +256,8 @@ ListAssemblyRelations Assemblies::loadRelationFromDB(DBAdapter * lpDBAdapter, in
 
 	for (Row& row : rows)
 	{
-		AssemblyRelation assemblyRelation;
-
-		assemblyRelation.m_id_assembly = row.get<int>("child_assembly_id");
-		assemblyRelation.m_id_instance = row.get<int>("instance");
-		assemblyRelation.m_position = loadPositionFromDB(lpDBAdapter, row.get<int>("position_entity_id"));
+		AssemblyRelation assemblyRelation(row);
+		assemblyRelation.setDBAdapter(lpDBAdapter);
 
 		listRelations.push_back(assemblyRelation);
 	}
@@ -297,7 +274,7 @@ bool Assemblies::IsConnected(DBAdapter* lpDBAdapter, int id_assembly_start, int 
 	for (const auto& relation : relations)
 	{
 		// If the current relation is connected to the end assembly, the assemblies are conected
-		if (relation.m_id_assembly == id_assembly_end)
+		if (relation.m_child_assembly_id == id_assembly_end)
 		{
 			return true;
 		}
@@ -307,7 +284,7 @@ bool Assemblies::IsConnected(DBAdapter* lpDBAdapter, int id_assembly_start, int 
 	for (const auto& relation : relations)
 	{
 		// Evaluate if one the childs of the current assembly is connected to the end assembly
-		if (IsConnected(lpDBAdapter, relation.m_id_assembly, id_assembly_end))
+		if (IsConnected(lpDBAdapter, relation.m_child_assembly_id, id_assembly_end))
 		{
 			return true;
 		}

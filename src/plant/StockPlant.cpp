@@ -113,10 +113,10 @@ void StockPlant::createStock(DBAdapter* lpDBAdapter, AssemblyRelation& assemblyR
 	setDBAdapter(lpDBAdapter);
 
 	// Set the id of the stock
-	setAssemblyID(assemblyRelation.m_id_assembly);
+	setAssemblyID(assemblyRelation.m_child_assembly_id);
 
 	// Set the instance of the stock
-	setInstance(assemblyRelation.m_id_instance);
+	setInstance(assemblyRelation.m_instance);
 
 	// Save the current stock into the database
 	saveToDB();
@@ -140,7 +140,7 @@ void StockPlant::createStock(DBAdapter* lpDBAdapter, AssemblyRelation& assemblyR
 
 std::string StockPlant::getNodePath(std::string path, AssemblyRelation & assemblyRelation)
 {
-	return path + (path.empty() ? "" : ",") + std::to_string(assemblyRelation.m_id_assembly) + ":" + std::to_string(assemblyRelation.m_id_instance);
+	return path + (path.empty() ? "" : ",") + std::to_string(assemblyRelation.m_child_assembly_id) + ":" + std::to_string(assemblyRelation.m_instance);
 }
 
 void StockPlant::operator=(const Row& row)
@@ -201,7 +201,7 @@ void from_json(const json& j, StockPlant& m) {
 	m.setID(j.at("m_id").get<int>());
 	m.m_assembly_id			= j.at("m_assembly_id").get<int>();
 	m.m_instance			= j.at("m_instance").get<int>();
-	m.m_position			= j.at("m_position");
+	m.m_position			= j.at("m_position").get<Position>();
 	m.m_sn					= j.at("m_sn").get<std::string>();
 	m.m_canBeSelected		= j.at("m_canBeSelected").get<bool>();
 	m.m_canShowInfo			= j.at("m_canShowInfo").get<bool>();
@@ -337,7 +337,7 @@ void StockPlant::AddSubStocks(const std::string & path)
 		if (childStock.loadStockPerHashFromDB(generateHash(relation.CreatePath(path))))
 		{
 			// If the stock is load correctly, load its substocks and then add it to the substocks
-			if (childStock.m_assembly_id > 0 && childStock.m_assembly_id == relation.m_id_assembly)
+			if (childStock.m_assembly_id > 0 && childStock.m_assembly_id == relation.m_child_assembly_id)
 			{
 				// Load its substocks
 				childStock.AddSubStocks(getNodePath(path));
@@ -376,13 +376,13 @@ void StockPlant::UpdateStock(const std::string & path, int caller_assembly_id)
 			for (auto& relation : relations)
 			{
 				// If the relation is the same as the substock, update it
-				if (substock->m_assembly_id == relation.m_id_assembly && substock->m_instance == relation.m_id_instance)
+				if (substock->m_assembly_id == relation.m_child_assembly_id && substock->m_instance == relation.m_instance)
 				{
 					// Update substock
 					substock->UpdateStock(getNodePath(path), caller_assembly_id);
 
 					// Mark the relation as used
-					relation.m_id_assembly = -1;
+					relation.m_child_assembly_id = -1;
 
 					// Do not delete this substock
 					deleteSubStock = false;
@@ -412,7 +412,7 @@ void StockPlant::UpdateStock(const std::string & path, int caller_assembly_id)
 		for (auto& relation : relations)
 		{
 			// Verify that the relation was not used before
-			if (relation.m_id_assembly > 0)
+			if (relation.m_child_assembly_id > 0)
 			{
 				// Creation the sub stock
 				StockPlant childStock;
@@ -433,48 +433,9 @@ void Plant::updatePlantFromDB(DBAdapter* lpDBAdapter)
 	// loadPlantFromDB(lpDBAdapter); // TODO: optimize
 }
 
-bool Plant::processRelation(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm)
-{
-	updatePlantFromDB(lpDBAdapter);
-
-	for (AssemblyRelation& assemblyRelation : assemblyComm.m_listAssemblyRelations)
-	{
-		insertStock(lpDBAdapter, m_plant, assemblyComm.m_id_assembly, assemblyRelation);
-	}
-
-	return true;
-}
-
 bool Plant::updatePlant(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm)
 {
 	return false;
-}
-
-void Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, int idAssembly, AssemblyRelation& assemblyRelation)
-{
-	std::string path;
-	if (!m_plant.isValidID())
-	{
-		m_plant.setDBAdapter(lpDBAdapter);
-		m_plant.setAssemblyID(idAssembly);
-		m_plant.setHash(StockPlant::getNodePath(path, assemblyRelation));
-		m_plant.saveToDB();
-	}
-
-	else
-	{
-		insertStock(lpDBAdapter, root, idAssembly, assemblyRelation, path);
-	}
-}
-
-void Plant::insertStock(DBAdapter* lpDBAdapter, StockPlant& root, int idAssembly, AssemblyRelation& assemblyRelation, std::string path)
-{
-	if (root.m_subStock.size() > 0)
-	{
-		// TODO: Pablo Cano
-		// setIDRootPlant(lpDBAdapter, id) modifica el id del root del arbol
-		// changeHash(lpDBAdapter, root, root.getNodePath(path)) actualiza todos los hash del arbol desde el nodo root 
-	}
 }
 
 void Plant::changeHash(DBAdapter* lpDBAdapter, StockPlant& root, std::string path)

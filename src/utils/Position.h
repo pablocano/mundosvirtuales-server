@@ -182,25 +182,33 @@ std::ostream& operator<<(std::ostream& os, const Quaternion<T>& q)
 typedef Quaternion<float>  Quatf;
 typedef Quaternion<double> QuatD;
 
-struct Position
+struct Position : public ObjectDB
 {
 	Vectorf3D m_pos;
 	Vectorf3D m_rot;
 
-	Position() : m_pos(), m_rot() {}
+	Position() : ObjectDB(0, "position_entity", nullptr), m_pos(), m_rot() {}
 
-	Position(Vectorf3D pos, Vectorf3D rot) : m_pos(pos), m_rot(rot) {}
+	Position(Vectorf3D pos, Vectorf3D rot) : ObjectDB(0, "position_entity", nullptr), m_pos(pos), m_rot(rot) {}
 
 	Position& operator=(const Position& position)
 	{
 		m_pos = position.m_pos, m_rot = position.m_rot;
 		return *this;
 	}
+
+	/// <summary>
+	/// Gets a row.
+	/// </summary>
+	/// <returns>Returns a row constructed from this object's data.</returns>
+	Row getRow() const;
+
+	/// <summary>
+	/// Operator equals with Row.
+	/// </summary>
+	/// <param name="row">Row reference.</param>
+	void operator=(const Row& row);
 };
-
-Position loadPositionFromDB(DBAdapter* lpDBAdapter, int position_id);
-
-int savePositionToDB(DBAdapter* lpDBAdapter, const Position& position);
 
 void to_json(json& j, const Vectorf3D& m);
 

@@ -112,9 +112,9 @@ int main()
 	for (int i = 1; i < (int)listAssemblyComm.size(); ++i)
 	{
 		AssemblyRelation r;
-		r.m_id_assembly = listAssemblyComm.at(i).m_id_assembly;
-		r.m_id_instance = 1;
-		r.m_position.m_pos.x = 10 * i;
+		r.m_child_assembly_id = listAssemblyComm.at(i).m_id_assembly;
+		r.m_instance = 1;
+		r.m_position.m_pos.x = 10.0f * i;
 		listAssemblyComm.at(1).m_listAssemblyRelations.push_back(r);
 	}
 

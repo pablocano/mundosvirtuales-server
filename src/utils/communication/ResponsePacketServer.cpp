@@ -115,7 +115,7 @@ std::unique_ptr<PacketComm> ResponsePacketServerPlant::process_packet(PacketComm
 				if(!assemblyComm.isOnlyAssembly() && idAssembly > 0)
 				{
 					Assemblies::getInstance().processRelation(m_lpDBAdapter, assemblyComm);
-					Plant::getInstance().processRelation(m_lpDBAdapter, assemblyComm);
+					Plant::getInstance().updatePlant(m_lpDBAdapter, assemblyComm);
 				}
 				
 				json j = json{ { "id", idAssembly } };

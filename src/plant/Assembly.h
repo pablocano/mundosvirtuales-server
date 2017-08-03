@@ -175,11 +175,9 @@ public:
 
 	int updateAssembly(DBAdapter* lpDBAdapter, const AssemblyComm& assemblyComm);
 
-	void setAssemblies(json j);
-
 	bool processRelation(DBAdapter* lpDBAdapter, AssemblyComm& assemblyComm);
 
-	int saveRelationToDB(DBAdapter* lpDBAdapter, int parent_id, int child_id, int instance, Position& position);
+	void setAssemblies(json j);
 
 	static ListAssemblyRelations loadRelationFromDB(DBAdapter* lpDBAdapter, int assembly_id);
 
