@@ -37,11 +37,20 @@ void Assembly::setID(const Row & row)
 bool Assembly::loadFromDB()
 {
 	// Load information translated 
-	int id = getDBAdapter()->query("SELECT assembly_translation_id as id FROM assembly_translation WHERE ((assembly_id = " + std::to_string(getID()) + ") AND (language_id = 1));").front().get<int>("id"); // TODO: language id fixed
-	m_infoAssembly.setID(id);
+	if (ObjectDB::loadFromDB())
+	{
+		Rows rows = getDBAdapter()->query("SELECT assembly_translation_id as id FROM assembly_translation WHERE ((assembly_id = " + std::to_string(getID()) + ") AND (language_id = 1));");
+		if (!rows.isEmpty())
+		{
+			int id = rows.front().get<int>("id"); // TODO: language id fixed
+			m_infoAssembly.setID(id);
+			m_infoAssembly.loadFromDB();
+		}
 
-	// Load Assembly, Information and Model.
-	return ObjectDB::loadFromDB() && m_infoAssembly.loadFromDB() && m_modelAssembly.loadFromDB();
+		return m_modelAssembly.loadFromDB();
+	}
+
+	return  false;
 }
 
 void Assembly::setDBAdapter(DBAdapter* lpDBAdapter)
