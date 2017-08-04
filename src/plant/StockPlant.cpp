@@ -69,11 +69,26 @@ size_t StockPlant::getHash() const
 	return m_hash;
 }
 
+std::string StockPlant::getstrHash() const
+{
+	return m_strHash;
+}
+
 void StockPlant::setHash(std::string s)
 {
 	std::hash<std::string> generateHash;
 	m_strHash = s;
 	m_hash = generateHash(s);
+}
+
+StateStock StockPlant::getState() const
+{
+	return m_state;
+}
+
+void StockPlant::setState(StateStock state)
+{
+	m_state = state;
 }
 
 void StockPlant::deleteSubStock()
@@ -158,14 +173,15 @@ std::string StockPlant::getNodePath(std::string path, AssemblyRelation & assembl
 void StockPlant::operator=(const Row& row)
 {
 	this->setID(row.get<int>("stock_id"));
-	this->m_assembly_id = row.get<int>("assembly_id");
-	this->m_instance = row.get<int>("instance");
-	this->m_sn = row.get<std::string>("serial_number");
-	this->m_canBeSelected = row.get<bool>("canBeSelected");
-	this->m_canShowInfo = row.get<bool>("canShowInfo");
-	this->m_enable = row.get<bool>("enable");
+	this->m_assembly_id		= row.get<int>("assembly_id");
+	this->m_instance		= row.get<int>("instance");
+	this->m_sn				= row.get<std::string>("serial_number");
+	this->m_canBeSelected	= row.get<bool>("canBeSelected");
+	this->m_canShowInfo		= row.get<bool>("canShowInfo");
+	this->m_enable			= row.get<bool>("enable");
 	this->m_hash = row.get<size_t>("hash");
 	this->m_strHash = row.get<std::string>("strHash");
+	this->m_state = row.get<std::string>("state");
 }
 
 Row StockPlant::getRow() const
@@ -182,6 +198,7 @@ Row StockPlant::getRow() const
 	fieldData->push_back(FieldData("enable", TypeData::DB_BOOL));
 	fieldData->push_back(FieldData("hash", TypeData::DB_LONG_LONG));
 	fieldData->push_back(FieldData("strHash", TypeData::DB_STRING));
+	fieldData->push_back(FieldData("status", TypeData::DB_INTEGER));
 
 	row.setFieldData(fieldData);
 
@@ -194,6 +211,7 @@ Row StockPlant::getRow() const
 	row.addRegisterPerValue<bool>(this->m_enable);
 	row.addRegisterPerValue<size_t>(this->m_hash);
 	row.addRegisterPerValue<std::string>(this->m_strHash);
+	row.addRegisterPerValue<std::string>(this->m_status);
 
 	return row;
 }
@@ -210,6 +228,7 @@ void to_json(json& j, const StockPlant& m) {
 	{ "m_enable",				m.m_enable },
 	{ "m_hash",					m.m_hash },
 	{ "m_strHash",				m.m_strHash },
+	{ "m_status",				m.m_status },
 	{ "m_subStock",				m.getSubStock() } };
 }
 
@@ -224,6 +243,7 @@ void from_json(const json& j, StockPlant& m) {
 	m.m_enable = j.at("m_enable").get<bool>();
 	m.m_hash = j.at("m_hash").get<size_t>();
 	m.m_strHash = j.at("m_strHash").get<std::string>();
+	m.m_status = j.at("m_status").get<int>();
 	m.m_subStock = j.at("m_subStock").get<SubStock>();
 }
 

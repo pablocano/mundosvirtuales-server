@@ -13,6 +13,15 @@ class StockPlant;
 
 class Plant;
 
+enum StateStock
+{
+	INSTALLED,				// Installed
+	CONSTRUCTION,			// In construction
+	WAREHOUSE,				// In warehouse
+	PROCESS_OF_PURCHASE,	// In process of purchase
+	NEED_BUY				// Is need to buy
+};
+
 /// <summary>
 /// Definition of a vector of stock.
 /// </summary>
@@ -36,6 +45,7 @@ protected:
 	bool m_enable; /* This flag is used to know if the stock is enabled. */
 	size_t m_hash; /* Hash for identified stock (creation). */
 	std::string m_strHash; /* Path. */
+	StateStock m_state; /* State of stock. */
 
 	SubStock m_subStock; /* All the sub-assemblies of this assembly */
 
@@ -118,10 +128,28 @@ public:
 	size_t getHash() const;
 
 	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	std::string getstrHash() const;
+
+	/// <summary>
 	///
 	/// </summary>
 	/// <param name="ids"></param>
 	void setHash(std::string s);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
+	StateStock getState() const;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="state"></param>
+	void setState(StateStock state);
 
 	/// <summary>
 	///
