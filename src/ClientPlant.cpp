@@ -6,74 +6,47 @@
 
 using json = nlohmann::json;
 
-bool ClientPlant::requestPlant(Plant& plant)
+bool ClientPlant::requestPlant()
 {
-	if (m_tcpComm.connected())
+	try
 	{
-		HeaderPacketComm header;
-		PacketComm packetRequest;
-		packetRequest.m_header.m_command = Command::GET_PLANT;
-
-		std::unique_ptr<char[]> packetTCP = packetRequest.packing();
-		m_tcpComm.send(packetTCP.get(), packetRequest.size());
-
-		PacketComm packetResponse = m_lpResponsePacket->get_response(packetRequest);
-
-		if ((packetResponse.m_header.m_idResponse == packetRequest.m_header.m_idResponse) && packetResponse.sizeContent() > 0)
+		if (requestAssemblies())
 		{
-			try
-			{
-				json parseJSON = json::parse(packetResponse.m_lpContent);
-				plant.setPlant(parseJSON.at("plant"));
-			}
-			catch (std::exception e)
-			{
-				LOGGER_ERROR("Response Packet Client", e.what());
-			}
+			std::string response = request(Command::GET_PLANT);
+			json parseJSON = json::parse(response.c_str());
+			Plant::getInstance().setPlant(parseJSON.at("plant"));
+
+			return !response.empty();
 		}
 	}
-
-	return plant.getPlant().isEnable();
-}
-
-bool ClientPlant::requestAssemblies(Assemblies& assemblies)
-{
-	if (m_tcpComm.connected())
+	catch (std::exception e)
 	{
-		HeaderPacketComm header;
-		PacketComm packetRequest;
-		packetRequest.m_header.m_command = Command::GET_ASSEMBLIES;
-
-		std::unique_ptr<char[]> packetTCP = packetRequest.packing();
-		m_tcpComm.send(packetTCP.get(), packetRequest.size());
-
-		PacketComm packetResponse = m_lpResponsePacket->get_response(packetRequest);
-
-		if ((packetResponse.m_header.m_idResponse == packetRequest.m_header.m_idResponse) && packetResponse.sizeContent() > 0)
-		{
-			try
-			{
-				json parseJSON = json::parse(packetResponse.m_lpContent);
-				assemblies.setAssemblies(parseJSON.at("assemblies"));
-			}
-			catch (std::exception e)
-			{
-				LOGGER_ERROR("Response Packet Client", e.what());
-			}
-		}
+		LOGGER_ERROR("Response Packet Client", e.what());
 	}
 
-	return assemblies.getDictAssemblies().size() > 0;
+	return false;
 }
 
-/// <summary>
-///
-/// </summary>
-/// <param name="command"></param>
-/// <param name="j"></param>
-/// <returns></returns>
+bool ClientPlant::requestAssemblies()
+{
+	if (!isLoadedAssemblies())
+	{
+		std::string response = request(Command::GET_ASSEMBLIES);
+		json parseJSON = json::parse(response.c_str());
+		Assemblies::getInstance().setAssemblies(parseJSON.at("assemblies"));
+		
+		m_enableAssembly = !response.empty();
+	}
 
-std::string ClientPlant::request(Command command, std::string s)
+	return m_enableAssembly;
+}
+
+bool ClientPlant::isLoadedAssemblies() const
+{
+	return m_enableAssembly;
+}
+
+std::string ClientPlant::request(Command command, std::string s, int timeout)
 {
 	if (m_tcpComm.connected())
 	{
@@ -84,6 +57,8 @@ std::string ClientPlant::request(Command command, std::string s)
 
 		std::unique_ptr<char[]> packetTCP = packetRequest.packing();
 		m_tcpComm.send(packetTCP.get(), packetRequest.size());
+
+		SystemCall::sleep(timeout);
 
 		PacketComm packetResponse = m_lpResponsePacket->get_response(packetRequest);
 

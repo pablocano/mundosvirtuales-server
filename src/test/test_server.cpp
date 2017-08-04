@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <functional>
 
 void test_server()
 {
@@ -16,18 +17,8 @@ void test_server()
 
 	client.start();
 
-	static Assemblies &assemblies = Assemblies::getInstance();
-	static Plant &plant = Plant::getInstance();
-
-	static Concurrency con([]() -> bool {
-		if (client.requestAssemblies(assemblies))
-		{
-			return client.requestPlant(plant);
-		}
-		else
-			return false;
-	},
-		[]() { LOGGER_LOG("Response Packet Client", "Plant:"); for (StockPlant machine : plant.getPlant().getSubStock()) LOGGER_LOG("Test Server", machine.getAssembly().getInfo().getName()); }, 100);
+	static Concurrency con(std::bind(&ClientPlant::requestPlant, &client),
+		[]() { LOGGER_LOG("Response Packet Client", "Plant:"); for (StockPlant machine : Plant::getInstance().getPlant().getSubStock()) LOGGER_LOG("Test Server", machine.getAssembly().getInfo().getName()); }, 100);
 
 	LOGGER_LOG("Test Server", "Post concurrency");
 
@@ -40,16 +31,7 @@ bool test_get_assemblies(ClientPlant& client)
 {
 	LOGGER_LOG("Test Server", "GET_ASSEMBLIES");
 
-	static Assemblies &assemblies = Assemblies::getInstance();
-	static Plant &plant = Plant::getInstance();
-
-	if (client.requestAssemblies(assemblies))
-	{
-		if (client.requestPlant(plant))
-			return true;
-	}
-
-	return false;
+	return client.requestPlant();
 }
 
 AssemblyComm newAssemblyComm(std::string pn, std::string name, int version = 1)
@@ -92,7 +74,9 @@ void test_concurrency()
 
 int main()
 {
-	ClientPlant client("localhost");
+	test_server();
+
+	/*ClientPlant client("localhost");
 	LOGGER_LOG("Test Server", "Starting Client");
 
 	client.start();
@@ -118,7 +102,7 @@ int main()
 	}
 
 	if (listAssemblyComm.size() > 1)
-		test_new_assembly(client, listAssemblyComm.at(1));
+		test_new_assembly(client, listAssemblyComm.at(1));*/
 
 	LOGGER_LOG("Test Server", "Press enter to finish");
 	std::getchar();

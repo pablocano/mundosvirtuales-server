@@ -176,12 +176,12 @@ void StockPlant::operator=(const Row& row)
 	this->m_assembly_id		= row.get<int>("assembly_id");
 	this->m_instance		= row.get<int>("instance");
 	this->m_sn				= row.get<std::string>("serial_number");
-	this->m_canBeSelected	= row.get<bool>("canBeSelected");
-	this->m_canShowInfo		= row.get<bool>("canShowInfo");
+	this->m_canBeSelected	= row.get<bool>("canbeselected");
+	this->m_canShowInfo		= row.get<bool>("canshowinfo");
 	this->m_enable			= row.get<bool>("enable");
-	this->m_hash = row.get<size_t>("hash");
-	this->m_strHash = row.get<std::string>("strHash");
-	this->m_state = (int) row.get<int>("state");
+	this->m_hash			= row.get<size_t>("hash");
+	this->m_strHash			= row.get<std::string>("strhash");
+	this->m_state			= row.get<int>("state");
 }
 
 Row StockPlant::getRow() const
@@ -193,12 +193,12 @@ Row StockPlant::getRow() const
 	fieldData->push_back(FieldData("assembly_id", TypeData::DB_INTEGER));
 	fieldData->push_back(FieldData("instance", TypeData::DB_INTEGER));
 	fieldData->push_back(FieldData("serial_number", TypeData::DB_STRING));
-	fieldData->push_back(FieldData("canBeSelected", TypeData::DB_BOOL));
-	fieldData->push_back(FieldData("canShowInfo", TypeData::DB_BOOL));
+	fieldData->push_back(FieldData("canbeselected", TypeData::DB_BOOL));
+	fieldData->push_back(FieldData("canshowinfo", TypeData::DB_BOOL));
 	fieldData->push_back(FieldData("enable", TypeData::DB_BOOL));
 	fieldData->push_back(FieldData("hash", TypeData::DB_LONG_LONG));
-	fieldData->push_back(FieldData("strHash", TypeData::DB_STRING));
-	fieldData->push_back(FieldData("status", TypeData::DB_INTEGER));
+	fieldData->push_back(FieldData("strhash", TypeData::DB_STRING));
+	fieldData->push_back(FieldData("state", TypeData::DB_INTEGER));
 
 	row.setFieldData(fieldData);
 
