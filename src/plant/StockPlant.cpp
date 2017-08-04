@@ -87,9 +87,14 @@ void StockPlant::deleteSubStock()
 	m_subStock.clear();
 }
 
-bool StockPlant::loadStockPerHashFromDB(size_t hash)
+bool StockPlant::loadStockPerHashFromDB(std::string path)
 {
-	Rows rows = getDBAdapter()->query("SELECT stock_id FROM stock WHERE hash = " + std::to_string(hash));
+	// Creation of the function that generates the hash
+	std::hash<std::string> generateHash;
+
+	size_t hash = generateHash(path);
+
+	Rows rows = getDBAdapter()->query("SELECT stock_id FROM stock WHERE hash = " + std::to_string((long long) hash));
 	if (!rows.isEmpty())
 	{
 		int id = rows.front().get<int>("stock_id");
@@ -160,7 +165,7 @@ void StockPlant::operator=(const Row& row)
 	this->m_canShowInfo = row.get<bool>("canShowInfo");
 	this->m_enable = row.get<bool>("enable");
 	this->m_hash = row.get<size_t>("hash");
-	this->m_strHash = row.get<std::string>("hash");
+	this->m_strHash = row.get<std::string>("strHash");
 }
 
 Row StockPlant::getRow() const
@@ -330,9 +335,6 @@ void Plant::loadPlantFromDB(DBAdapter* lpDBAdapter)
 
 void StockPlant::AddSubStocks(const std::string & path)
 {
-	// Creation of the function that generates the hash
-	std::hash<std::string> generateHash;
-
 	// Obtain all the relations of the assembly of the current stock
 	ListAssemblyRelations relations = Assemblies::loadRelationFromDB(getDBAdapter(), m_assembly_id);
 
@@ -346,7 +348,7 @@ void StockPlant::AddSubStocks(const std::string & path)
 		childStock.setDBAdapter(getDBAdapter());
 
 		// Load the stock from the DB by the path of the relation
-		if (childStock.loadStockPerHashFromDB(generateHash(relation.CreatePath(getNodePath(path)))))
+		if (childStock.loadStockPerHashFromDB(relation.CreatePath(getNodePath(path))))
 		{
 			// If the stock is load correctly, load its substocks and then add it to the substocks
 			if (childStock.m_assembly_id > 0 && childStock.m_assembly_id == relation.m_child_assembly_id)

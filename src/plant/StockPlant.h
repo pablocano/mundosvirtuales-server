@@ -133,7 +133,7 @@ public:
 	/// </summary>
 	/// <param name="hash"></param>
 	/// <returns></returns>
-	bool loadStockPerHashFromDB(size_t hash);
+	bool loadStockPerHashFromDB(std::string path);
 
 	/// <summary>
 	///
