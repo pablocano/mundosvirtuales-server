@@ -45,7 +45,7 @@ protected:
 	bool m_enable; /* This flag is used to know if the stock is enabled. */
 	size_t m_hash; /* Hash for identified stock (creation). */
 	std::string m_strHash; /* Path. */
-	StateStock m_state; /* State of stock. */
+	int m_state; /* State of stock. */
 
 	SubStock m_subStock; /* All the sub-assemblies of this assembly */
 

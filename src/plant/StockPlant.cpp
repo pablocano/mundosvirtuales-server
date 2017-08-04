@@ -83,7 +83,7 @@ void StockPlant::setHash(std::string s)
 
 StateStock StockPlant::getState() const
 {
-	return m_state;
+	return (StateStock) m_state;
 }
 
 void StockPlant::setState(StateStock state)
@@ -181,7 +181,7 @@ void StockPlant::operator=(const Row& row)
 	this->m_enable			= row.get<bool>("enable");
 	this->m_hash = row.get<size_t>("hash");
 	this->m_strHash = row.get<std::string>("strHash");
-	this->m_state = row.get<std::string>("state");
+	this->m_state = (int) row.get<int>("state");
 }
 
 Row StockPlant::getRow() const
@@ -211,7 +211,7 @@ Row StockPlant::getRow() const
 	row.addRegisterPerValue<bool>(this->m_enable);
 	row.addRegisterPerValue<size_t>(this->m_hash);
 	row.addRegisterPerValue<std::string>(this->m_strHash);
-	row.addRegisterPerValue<std::string>(this->m_status);
+	row.addRegisterPerValue<int>(this->m_state);
 
 	return row;
 }
@@ -228,7 +228,7 @@ void to_json(json& j, const StockPlant& m) {
 	{ "m_enable",				m.m_enable },
 	{ "m_hash",					m.m_hash },
 	{ "m_strHash",				m.m_strHash },
-	{ "m_status",				m.m_status },
+	{ "m_status",				m.m_state },
 	{ "m_subStock",				m.getSubStock() } };
 }
 
@@ -243,7 +243,7 @@ void from_json(const json& j, StockPlant& m) {
 	m.m_enable = j.at("m_enable").get<bool>();
 	m.m_hash = j.at("m_hash").get<size_t>();
 	m.m_strHash = j.at("m_strHash").get<std::string>();
-	m.m_status = j.at("m_status").get<int>();
+	m.m_state = j.at("m_status").get<int>();
 	m.m_subStock = j.at("m_subStock").get<SubStock>();
 }
 
