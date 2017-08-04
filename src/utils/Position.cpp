@@ -32,8 +32,8 @@ Row Position::getRow() const
 void Position::operator=(const Row& row)
 {
 	ObjectDB::operator=(row);
-	this->m_pos = Vectorf3D(row.get<float>("pos_x"), row.get<float>("pos_y"), row.get<float>("pos_z"));
-	this->m_rot = Vectorf3D(row.get<float>("rot_roll"), row.get<float>("rot_pitch"), row.get<float>("rot_yaw"));
+	this->m_pos = Vectorf3D(row.get<double>("pos_x"), row.get<double>("pos_y"), row.get<double>("pos_z"));
+	this->m_rot = Vectorf3D(row.get<double>("rot_roll"), row.get<double>("rot_pitch"), row.get<double>("rot_yaw"));
 }
 
 void to_json(json& j, const Vectorf3D& m)
@@ -43,9 +43,9 @@ void to_json(json& j, const Vectorf3D& m)
 
 void from_json(const json& j, Vectorf3D& m)
 {
-	m.x = j.at("x").get<float>();
-	m.y = j.at("y").get<float>();
-	m.z = j.at("z").get<float>();
+	m.x = j.at("x").get<double>();
+	m.y = j.at("y").get<double>();
+	m.z = j.at("z").get<double>();
 }
 
 void to_json(json& j, const Position& m)
