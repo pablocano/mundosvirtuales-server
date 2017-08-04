@@ -24,13 +24,11 @@ protected:
 	ModelAssembly m_modelAssembly; /* Information about model. */
 	std::string m_pn; /* Part number. */
 
-	ListAssemblyRelations m_assemblyRelations; /* List of assembly relations. */
-
 public:
 	/// <summary>
 	/// Default constructor
 	/// </summary>
-	Assembly() : ObjectDB(0, "assembly", nullptr), m_infoAssembly(), m_modelAssembly(), m_pn(), m_assemblyRelations() {}
+	Assembly() : ObjectDB(0, "assembly", nullptr), m_infoAssembly(), m_modelAssembly(), m_pn() {}
 
 	/// <summary>
 	/// Constructor object from row.

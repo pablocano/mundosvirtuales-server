@@ -29,11 +29,13 @@ protected:
 
 	int m_assembly_id; /* Assembly Identifier. */
 	int m_instance; /* Instance assembly.  */
+	Position m_position; /* Position on plant. */
 	std::string m_sn; /* Serial number. */
 	bool m_canBeSelected; /* This flag is used to know if the stock can be selected. */
 	bool m_canShowInfo; /* This flag is used to know if the stock can be showed.  */
 	bool m_enable; /* This flag is used to know if the stock is enabled. */
 	size_t m_hash; /* Hash for identified stock (creation). */
+	std::string m_strHash; /* Path. */
 
 	SubStock m_subStock; /* All the sub-assemblies of this assembly */
 
@@ -41,7 +43,7 @@ public:
 	/// <summary>
 	/// Constructor.
 	/// </summary>
-	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_instance(1), m_sn("SN"), m_canBeSelected(false), m_canShowInfo(false), m_enable(false), m_hash() {}
+	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_instance(1), m_position(), m_sn("SN"), m_canBeSelected(false), m_canShowInfo(false), m_enable(false), m_hash(), m_strHash() {}
 
 	/// <summary>
 	/// Gets Assembly.
@@ -91,6 +93,17 @@ public:
 	/// Gets true if this object can show informartion.
 	/// </summary>
 	bool getCanShowInfo() const;
+
+	/// <summary>
+	/// Gets position.
+	/// </summary>
+	Position getPosition() const;
+
+	/// <summary>
+	///
+	/// </summary>
+	/// <param name="position"></param>
+	void setPosition(const Position& position);
 
 	/// <summary>
 	///

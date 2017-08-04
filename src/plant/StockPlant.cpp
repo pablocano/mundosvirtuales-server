@@ -49,6 +49,16 @@ bool StockPlant::getCanShowInfo() const
 	return m_canShowInfo;
 }
 
+Position StockPlant::getPosition() const
+{
+	return m_position;
+}
+
+void StockPlant::setPosition(const Position & position)
+{
+	m_position = position;
+}
+
 const SubStock& StockPlant::getSubStock() const
 {
 	return m_subStock;
@@ -62,6 +72,7 @@ size_t StockPlant::getHash() const
 void StockPlant::setHash(std::string s)
 {
 	std::hash<std::string> generateHash;
+	m_strHash = s;
 	m_hash = generateHash(s);
 }
 
@@ -111,6 +122,9 @@ void StockPlant::createStock(DBAdapter* lpDBAdapter, AssemblyRelation& assemblyR
 	// Set the hash of the stock
 	setHash(getNodePath(path));
 
+	// Set position
+	setPosition(assemblyRelation.m_position);
+
 	// Save the current stock into the database
 	saveToDB();
 
@@ -146,6 +160,7 @@ void StockPlant::operator=(const Row& row)
 	this->m_canShowInfo = row.get<bool>("canShowInfo");
 	this->m_enable = row.get<bool>("enable");
 	this->m_hash = row.get<size_t>("hash");
+	this->m_strHash = row.get<std::string>("hash");
 }
 
 Row StockPlant::getRow() const
@@ -161,6 +176,7 @@ Row StockPlant::getRow() const
 	fieldData->push_back(FieldData("canShowInfo", TypeData::DB_BOOL));
 	fieldData->push_back(FieldData("enable", TypeData::DB_BOOL));
 	fieldData->push_back(FieldData("hash", TypeData::DB_LONG_LONG));
+	fieldData->push_back(FieldData("strHash", TypeData::DB_STRING));
 
 	row.setFieldData(fieldData);
 
@@ -172,6 +188,7 @@ Row StockPlant::getRow() const
 	row.addRegisterPerValue<bool>(this->m_canShowInfo);
 	row.addRegisterPerValue<bool>(this->m_enable);
 	row.addRegisterPerValue<size_t>(this->m_hash);
+	row.addRegisterPerValue<std::string>(this->m_strHash);
 
 	return row;
 }
@@ -181,24 +198,28 @@ void to_json(json& j, const StockPlant& m) {
 	{ "m_id",					m.getID() },
 	{ "m_assembly_id",			m.m_assembly_id },
 	{ "m_instance",				m.m_instance },
+	{ "m_position",				m.m_position },
 	{ "m_sn",					m.m_sn },
 	{ "m_canBeSelected",		m.m_canBeSelected },
 	{ "m_canShowInfo",			m.m_canShowInfo },
 	{ "m_enable",				m.m_enable },
 	{ "m_hash",					m.m_hash },
+	{ "m_strHash",				m.m_strHash },
 	{ "m_subStock",				m.getSubStock() } };
 }
 
 void from_json(const json& j, StockPlant& m) {
 	m.setID(j.at("m_id").get<int>());
-	m.m_assembly_id			= j.at("m_assembly_id").get<int>();
-	m.m_instance			= j.at("m_instance").get<int>();
-	m.m_sn					= j.at("m_sn").get<std::string>();
-	m.m_canBeSelected		= j.at("m_canBeSelected").get<bool>();
-	m.m_canShowInfo			= j.at("m_canShowInfo").get<bool>();
-	m.m_enable				= j.at("m_enable").get<bool>();
-	m.m_hash				= j.at("m_hash").get<size_t>();
-	m.m_subStock			= j.at("m_subStock").get<SubStock>();
+	m.m_assembly_id = j.at("m_assembly_id").get<int>();
+	m.m_instance = j.at("m_instance").get<int>();
+	m.m_position = j.at("m_position").get<Position>();
+	m.m_sn = j.at("m_sn").get<std::string>();
+	m.m_canBeSelected = j.at("m_canBeSelected").get<bool>();
+	m.m_canShowInfo = j.at("m_canShowInfo").get<bool>();
+	m.m_enable = j.at("m_enable").get<bool>();
+	m.m_hash = j.at("m_hash").get<size_t>();
+	m.m_strHash = j.at("m_strHash").get<std::string>();
+	m.m_subStock = j.at("m_subStock").get<SubStock>();
 }
 
 const StockPlant& Plant::getPlant() const
@@ -304,7 +325,7 @@ void Plant::loadPlantFromDB(DBAdapter* lpDBAdapter)
 	}
 
 	//Load all substocks recursively
-	m_plant.AddSubStocks(m_plant.getNodePath(""));
+	m_plant.AddSubStocks("");
 }
 
 void StockPlant::AddSubStocks(const std::string & path)
@@ -325,13 +346,16 @@ void StockPlant::AddSubStocks(const std::string & path)
 		childStock.setDBAdapter(getDBAdapter());
 
 		// Load the stock from the DB by the path of the relation
-		if (childStock.loadStockPerHashFromDB(generateHash(relation.CreatePath(path))))
+		if (childStock.loadStockPerHashFromDB(generateHash(relation.CreatePath(getNodePath(path)))))
 		{
 			// If the stock is load correctly, load its substocks and then add it to the substocks
 			if (childStock.m_assembly_id > 0 && childStock.m_assembly_id == relation.m_child_assembly_id)
 			{
 				// Load its substocks
 				childStock.AddSubStocks(getNodePath(path));
+
+				// Set position
+				childStock.setPosition(relation.m_position);
 
 				// Add it to the substock list of the current stock
 				m_subStock.push_back(childStock);
@@ -438,7 +462,7 @@ void Plant::UpdateTree(DBAdapter* lpDBAdapter, const AssemblyComm & assemblyComm
 	}
 
 	// Update the stock tree using the new assembly
-	m_plant.UpdateStock(m_plant.getNodePath(""), assemblyComm.m_id_assembly);
+	m_plant.UpdateStock("", assemblyComm.m_id_assembly);
 }
 
 void Plant::changeHash(DBAdapter* lpDBAdapter, StockPlant& root, std::string path)

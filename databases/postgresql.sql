@@ -265,6 +265,7 @@ CREATE TABLE stock (
   canBeSelected BOOL  DEFAULT false NOT NULL ,
   enable BOOL  DEFAULT true NOT NULL ,
   hash BIGINT  DEFAULT 0 NOT NULL ,
+  strHash TEXT  DEFAULT '0' NOT NULL  ,
   instance INTEGER  DEFAULT 1  ,
   created_at TIMESTAMP  DEFAULT now() NOT NULL ,
   updated_at TIMESTAMP  DEFAULT now()    ,
@@ -540,7 +541,7 @@ CREATE TABLE assembly_relations (
   position_entity_id INTEGER   NOT NULL ,
   child_assembly_id INTEGER   NOT NULL ,
   parent_assembly_id INTEGER   NOT NULL ,
-  instance INTEGER  DEFAULT 1    ,
+  instance INTEGER  DEFAULT 1 NOT NULL   ,
 PRIMARY KEY(assembly_relations_id)      ,
   FOREIGN KEY(parent_assembly_id)
     REFERENCES assembly(assembly_id)

@@ -19,7 +19,7 @@ const ModelAssembly& Assembly::getModel() const
 
 const ListAssemblyRelations & Assembly::getRelations() const
 {
-	return m_assemblyRelations;
+	return Assemblies::loadRelationFromDB(getDBAdapter(), getID());
 }
 
 void Assembly::setID(int id)
@@ -41,14 +41,7 @@ bool Assembly::loadFromDB()
 	m_infoAssembly.setID(id);
 
 	// Load Assembly, Information and Model.
-	if (ObjectDB::loadFromDB() && m_infoAssembly.loadFromDB() && m_modelAssembly.loadFromDB())
-	{
-		// Load relations
-		m_assemblyRelations = Assemblies::loadRelationFromDB(getDBAdapter(), getID());
-		return true;
-	}
-
-	return false;
+	return ObjectDB::loadFromDB() && m_infoAssembly.loadFromDB() && m_modelAssembly.loadFromDB();
 }
 
 void Assembly::setDBAdapter(DBAdapter* lpDBAdapter)
@@ -114,8 +107,7 @@ void to_json(json& j, const Assembly& m) {
 		{"m_id",				m.getID() },
 		{"m_pn",				m.m_pn },
 		{"m_infoAssembly",		m.m_infoAssembly },
-		{"m_modelAssembly",		m.m_modelAssembly },
-		{"m_assemblyRelations",	m.m_assemblyRelations }};
+		{"m_modelAssembly",		m.m_modelAssembly } };
 }
 
 void from_json(const json& j, Assembly& m) {
@@ -123,7 +115,6 @@ void from_json(const json& j, Assembly& m) {
 	m.m_pn = j.at("m_pn");
 	m.m_infoAssembly = j.at("m_infoAssembly");
 	m.m_modelAssembly = j.at("m_modelAssembly");
-	m.m_assemblyRelations = j.at("m_asssemblyRelations");
 }
 
 DictAssemblies& Assemblies::getDictAssemblies()
