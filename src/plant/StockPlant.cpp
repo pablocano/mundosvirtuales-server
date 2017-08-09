@@ -414,6 +414,9 @@ void StockPlant::UpdateStock(const std::string & path, int caller_assembly_id)
 				// If the relation is the same as the substock, update it
 				if (substock->m_assembly_id == relation.m_child_assembly_id && substock->m_instance == relation.m_instance)
 				{
+					// Update the position of this substock
+					substock->setPosition(relation.m_position);
+
 					// Update substock
 					substock->UpdateStock(getNodePath(path), caller_assembly_id);
 
