@@ -19,7 +19,8 @@ enum StateStock
 	CONSTRUCTION,			// In construction
 	WAREHOUSE,				// In warehouse
 	PROCESS_OF_PURCHASE,	// In process of purchase
-	NEED_BUY				// Is need to buy
+	NEED_BUY,				// Is need to buy
+	NONE_STATE
 };
 
 /// <summary>
