@@ -1,10 +1,10 @@
 mkdir build32 & pushd build32
 cmake -G "Visual Studio 14 2015" ..
-cmake -D UNREAL_ENGINE_GENERATION=false ..
+cmake -D UNREAL_ENGINE_GENERATION=true ..
 popd
 mkdir build64 & pushd build64
 cmake -G "Visual Studio 14 2015 Win64" ..
-cmake -D UNREAL_ENGINE_GENERATION=false ..
+cmake -D UNREAL_ENGINE_GENERATION=true ..
 popd
 mkdir include
 mkdir bin

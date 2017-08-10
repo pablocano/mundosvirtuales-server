@@ -108,6 +108,10 @@ if (WIN32)
     set(LIBSOCI "${CMAKE_CURRENT_SOURCE_DIR}/utils/SOCI/Windows")
 endif (WIN32)
 
+if(UNREAL_ENGINE_GENERATION)
+    add_definitions(-DDISABLE_LOGGER)
+endif(UNREAL_ENGINE_GENERATION)
+
 include_directories("${LIBSOCI}/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/utils/PostgreSQL/include")
 
