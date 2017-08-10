@@ -17,9 +17,10 @@ const ModelAssembly& Assembly::getModel() const
 	return m_modelAssembly;
 }
 
-const ListAssemblyRelations & Assembly::getRelations() const
+ListAssemblyRelations Assembly::getRelations() const
 {
-	return Assemblies::loadRelationFromDB(getDBAdapter(), getID());
+	ListAssemblyRelations &listAssemblyRelations = Assemblies::loadRelationFromDB(getDBAdapter(), getID());
+	return listAssemblyRelations;
 }
 
 void Assembly::setID(int id)

@@ -63,7 +63,7 @@ public:
 	/// Gets list of relations.
 	/// </summary>
 	/// <returns>Returns list of assembly relations.</returns>
-	const ListAssemblyRelations& getRelations() const;
+	ListAssemblyRelations getRelations() const;
 
 	/// <summary>
 	/// Sets identificator this object, it is necessary for working with database.

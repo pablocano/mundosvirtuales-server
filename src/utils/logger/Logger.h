@@ -4,12 +4,21 @@
 #include <vector>
 #include <functional>
 #include <string>
+#include <chrono>
 
 #define LOGGER Logger::getInstance()
-#define LOGGER_ADD_OBSERVER(funObs) LOGGER.addObserver(funObs)
-#define LOGGER_DEBUG(source, message) LOGGER.Debug((source), (message))
-#define LOGGER_LOG(source, message) LOGGER.Log((source), (message))
-#define LOGGER_ERROR(source, message) LOGGER.Error((source), (message))
+
+#ifndef DISABLE_LOGGER
+	#define LOGGER_ADD_OBSERVER(funObs) LOGGER.addObserver(funObs)
+	#define LOGGER_DEBUG(source, message) LOGGER.Debug((source), (message))
+	#define LOGGER_LOG(source, message) LOGGER.Log((source), (message))
+	#define LOGGER_ERROR(source, message) LOGGER.Error((source), (message))
+#else
+	#define LOGGER_ADD_OBSERVER(funObs) ((void)0)
+	#define LOGGER_DEBUG(source, message) ((void)0)
+	#define LOGGER_LOG(source, message) ((void)0)
+	#define LOGGER_ERROR(source, message) ((void)0)
+#endif
 
 class Logger
 {
