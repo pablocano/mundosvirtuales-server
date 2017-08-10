@@ -54,7 +54,7 @@ public:
 	/// <summary>
 	/// Constructor.
 	/// </summary>
-	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_instance(1), m_position(), m_sn("SN"), m_canBeSelected(false), m_canShowInfo(false), m_enable(false), m_hash(), m_strHash() {}
+	StockPlant() : ObjectDB(0, "stock", nullptr), m_assembly_id(), m_instance(1), m_position(), m_sn("SN"), m_canBeSelected(true), m_canShowInfo(false), m_enable(true), m_state(5), m_hash(), m_strHash() {}
 
 	/// <summary>
 	/// Gets Assembly.
