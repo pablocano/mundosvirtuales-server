@@ -27,6 +27,8 @@ public:
 	/// <param name="lpDBAdapter"></param>
 	ObjectDB(int id, const std::string tableName, DBAdapter* lpDBAdapter) : m_id(id), m_tableName(tableName), m_lpDBAdapter(lpDBAdapter) {}
 
+	virtual ~ObjectDB() {};
+
 	/// <summary>
 	///
 	/// </summary>
