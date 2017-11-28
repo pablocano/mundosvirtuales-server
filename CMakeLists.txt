@@ -47,6 +47,7 @@ set( UTILS_SRC
 	src/plant/ModelAssembly.cpp
 	src/plant/ModelControl.cpp
 	src/plant/StockPlant.cpp
+	src/plant/procedures/Procedure.cpp
 	src/utils/AssemblyUtils.cpp
 	src/utils/Position.cpp
 	src/utils/Logger/Logger.cpp
@@ -71,6 +72,7 @@ set ( UTILS_INCLUDE
 	src/plant/ModelControl.h
 	src/plant/PlantException.h
 	src/plant/StockPlant.h
+	src/plant/procedures/Procedure.h
 	src/plant/sensors/Sensor.h
 	src/plant/sensors/SensorException.h
 	src/utils/AssemblyUtils.h
@@ -114,6 +116,7 @@ endif(UNREAL_ENGINE_GENERATION)
 
 include_directories("${LIBSOCI}/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/utils/PostgreSQL/include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/")
 
 if("${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
 	set(LIBSOCI_LIB "${LIBSOCI}/lib/x64")
