@@ -161,12 +161,23 @@ bool Procedure::NextStep(Step & step)
 	if (m_CurrentPhase == m_Phases.cend())
 		return false;
 
-	// If the current instruction is not valid, go one step forward
+	if (!m_CurrentStep.valid) 
+	{
+		m_CurrentStep.valid = true;
+		// Return the current step
+		step = *m_CurrentStep;
+		return true;
+	}
+
+
+	// Go one step forward
+	m_CurrentStep++;
+
+	// If the current instruction is not valid, go to the next phase
 	if (m_CurrentStep != m_CurrentPhase->m_Steps.cend())
 	{
-		// Return the current step and go one step forward
+		// Return the current step
 		step = *m_CurrentStep;
-		m_CurrentStep++;
 		return true;
 	}
 	else
@@ -178,14 +189,65 @@ bool Procedure::NextStep(Step & step)
 			// Reinitialize the pointer
 			m_CurrentStep = m_CurrentPhase->m_Steps.cbegin();
 
-			// Return the current step and go one step forward
+			// Return the current step
 			step = *m_CurrentStep;
-			m_CurrentStep++;
 			return true;
 		}
 		else
 			return false;
 	}
+}
+
+bool Procedure::PreviousStep(Step & step)
+{
+	// If both pointer are in the beginning, there are not previous steps
+	if (m_CurrentPhase == m_Phases.cbegin() && m_CurrentStep == m_CurrentPhase->m_Steps.cbegin())
+		return false;
+
+	// If the current instruction is not valid, go one step forward
+	if (m_CurrentStep != m_CurrentPhase->m_Steps.cbegin())
+	{
+		// Return the current step and go one step backwards
+		m_CurrentStep--;
+		step = *m_CurrentStep;
+		return true;
+	}
+	else
+	{
+		// Return the current step
+		step = *m_CurrentStep;
+
+		// If the current phase is not the first, go to the previous phase
+		if (m_CurrentPhase != m_Phases.cbegin())
+		{
+			m_CurrentPhase--;
+
+			// Re initialize the current step
+			m_CurrentStep = m_CurrentPhase->m_Steps.cend();
+		}
+		else 
+		{
+			m_CurrentStep.valid = false;
+			return false;
+		}
+	}
+}
+
+void Procedure::Reset()
+{
+	//Reset the pointers
+	m_CurrentPhase = m_Phases.cbegin();
+	m_CurrentStep = m_CurrentPhase->m_Steps.cbegin();
+}
+
+bool Procedure::HasPrevious()
+{
+	return m_CurrentStep.valid;
+}
+
+bool Procedure::HasNext()
+{
+	return m_CurrentPhase != m_Phases.cend();
 }
 
 const Phase & Procedure::CurrentPhase()

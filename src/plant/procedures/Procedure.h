@@ -113,7 +113,7 @@ struct Phase {
 	/// <summary>
 	/// The description of this phase
 	/// </summary>
-	std::string m_description;
+	std::string m_description;  
 
 private:
 	/// <summary>
@@ -121,10 +121,32 @@ private:
 	/// </summary>
 	Steps m_Steps;
 
+	/// <summary>
+	/// Friend class to allow access to all members
+	/// </summary>
 	friend class Procedure;
 };
 
 typedef std::vector<Phase> Phases;
+
+/// <summary>
+/// Helper iterator class to test if the first step has been sent
+/// </summary>
+struct StepIterator : public std::vector<Step>::const_iterator
+{
+	/// <summary>
+	/// The default constructor
+	/// </summary>
+	StepIterator() : valid(false) {}
+
+	/// <summary>
+	/// The copy constructor
+	/// </summary>
+	/// <param name="it"></param>
+	StepIterator(const std::vector<Step>::const_iterator& it) : std::vector<Step>::const_iterator(it), valid(false) {}
+
+	bool valid;
+};
 
 class Procedure 
 {
@@ -141,6 +163,30 @@ public:
 	/// <param name="step">The next step to be execute, if there is one</param>
 	/// <returns>If there is a valid step</returns>
 	bool NextStep(Step& step);
+
+	/// <summary>
+	/// Deliver the previous step
+	/// </summary>
+	/// <param name="step">The previous step</param>
+	/// <returns>If there is a previous step</returns>
+	bool PreviousStep(Step& step);
+
+	/// <summary>
+	/// Reset the procedure 
+	/// </summary>
+	void Reset();
+
+	/// <summary>
+	/// Ask if there is a previous step
+	/// </summary>
+	/// <returns>If there is a previous step before the current step </returns>
+	bool HasPrevious();
+
+	/// <summary>
+	/// Ask if there is a next step
+	/// </summary>
+	/// <returns>If there is a next step after the current step </returns>
+	bool HasNext();
 
 	/// <summary>
 	/// Return the phase of the step returned by the NextStep function
@@ -179,5 +225,5 @@ private:
 	/// <summary>
 	/// Pointer to the next step to be returned
 	/// </summary>
-	Steps::const_iterator m_CurrentStep;
+	StepIterator m_CurrentStep;
 };
