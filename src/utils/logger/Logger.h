@@ -15,9 +15,9 @@
 	#define LOGGER_ERROR(source, message) LOGGER.Error((source), (message))
 #else
 	#define LOGGER_ADD_OBSERVER(funObs) ((void)0)
-	#define LOGGER_DEBUG(source, message) ((void)0)
-	#define LOGGER_LOG(source, message) ((void)0)
-	#define LOGGER_ERROR(source, message) ((void)0)
+	#define LOGGER_DEBUG(source, message) (message)
+	#define LOGGER_LOG(source, message) (message)
+	#define LOGGER_ERROR(source, message) (message)
 #endif
 
 class Logger

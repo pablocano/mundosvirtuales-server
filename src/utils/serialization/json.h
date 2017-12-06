@@ -14360,7 +14360,7 @@ namespace std
 
 	/// specialization for std::less<value_t>
 	template <>
-	struct less<::nlohmann::detail::value_t>
+	struct less< ::nlohmann::detail::value_t >
 	{
 		/*!
 		@brief compare two value_t enum values

@@ -228,8 +228,9 @@ bool Procedure::PreviousStep(Step & step)
 		else 
 		{
 			m_CurrentStep.valid = false;
-			return false;
 		}
+
+		return true;
 	}
 }
 

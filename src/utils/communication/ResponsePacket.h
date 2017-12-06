@@ -18,6 +18,11 @@ public:
 	/// </summary>
 	ResponsePacket() : m_queueResponsePacket() {};
 
+	/// <summary>
+	/// Destructor.
+	/// </summary>
+	virtual ~ResponsePacket() {};
+
 	/* Deleting copy constructor */
 	ResponsePacket(ResponsePacket const&) = delete;
 	ResponsePacket& operator =(ResponsePacket const&) = delete;

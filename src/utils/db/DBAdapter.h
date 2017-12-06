@@ -28,6 +28,8 @@ namespace db
 	public:
 		DBAdapter(std::string _db_name, std::string _db_user, std::string _db_host = "", int _db_port = 5432, std::string _db_password = "", std::string _db_engine = "postgresql");
 
+		virtual ~DBAdapter() {};
+
 		void set_language(std::string lang);
 
 		virtual void onlyQuery(std::string query) const = 0;
