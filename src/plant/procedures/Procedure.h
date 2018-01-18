@@ -197,6 +197,11 @@ class Procedure
 public:
 
 	/// <summary>
+	/// Default Constructor
+	/// </summary>
+	Procedure() : valid(false) {}
+
+	/// <summary>
 	/// Constructor
 	/// </summary>
 	/// <param name="filename">The xml file where this procedure is stored</param>
