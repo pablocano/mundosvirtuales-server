@@ -62,6 +62,7 @@ set( UTILS_SRC
 	src/utils/network/ServerTCP.cpp
 	src/utils/network/ClientTCP.cpp
 	src/utils/platform/SystemCall.cpp
+	src/utils/pugixml/pugixml.cpp
 	src/utils/security/Cryptography.cpp
 )
 
@@ -152,6 +153,9 @@ target_link_libraries( ServerPlant utilsCore )
 
 add_executable ( test_server src/test/test_server.cpp ${UTILS_INCLUDE} ${CLIENT_INCLUDE} )
 target_link_libraries( test_server utilsCore clientPlant )
+
+add_executable ( test_general src/test/test_general.cpp ${UTILS_INCLUDE} )
+target_link_libraries( test_general utilsCore )
 
 if(WIN32)
 	string(REPLACE "/" "\\" LIBSOCI_DLL "${LIBSOCI_LIB}")

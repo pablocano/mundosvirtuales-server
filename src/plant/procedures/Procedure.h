@@ -4,6 +4,46 @@
 #include <vector>
 
 /// <summary>
+/// Helper class to manage the path to the assemblies
+/// </summary>
+struct AssemblyPath
+{
+	/// <summary>
+	/// Constructor based of a string that describes the path to an assembly
+	/// </summary>
+	/// <param name="stringPath">A string representing the path to an assembly</param>
+	AssemblyPath(std::string stringPath);
+
+	/// <summary>
+	/// Constructor based of a vertor that describes the path to an assembly
+	/// </summary>
+	/// <param name="path">A vector of pairs assembly-subassembly instance, representing the path to an assembly</param>
+	AssemblyPath(std::vector<std::pair<int, int> > path);
+
+	/// <summary>
+	/// Get the path in the string format
+	/// </summary>
+	/// <returns></returns>
+	std::string& GetStringPath() { return m_StringPath; }
+
+	/// <summary>
+	/// Get the path in a vector format
+	/// </summary>
+	/// <returns></returns>
+	std::vector<std::pair<int, int> >& GetPath() { return m_Path; }
+
+	/// <summary>
+	/// The path in form of a string
+	/// </summary>
+	std::string m_StringPath;
+
+	/// <summary>
+	/// The path in form of a vector
+	/// </summary>
+	std::vector<std::pair<int, int> > m_Path;
+};
+
+/// <summary>
 /// Represent an instruction to be executed
 /// </summary>
 struct Instruction {
@@ -46,7 +86,7 @@ struct Instruction {
 	/// <summary>
 	/// The path to the assembly related to this instruction
 	/// </summary>
-	std::vector<std::pair<int, int> > m_path;
+	AssemblyPath m_path;
 
 	/// <summary>
 	/// The id of the procedure to be executed. Only valid for a procedure instruction
@@ -107,6 +147,10 @@ typedef std::vector<Step> Steps;
 /// </summary>
 struct Phase {
 
+	/// <summary>
+	/// Defualt constructor
+	/// </summary>
+	/// <param name="description">The description of this phase</param>
 	Phase(std::string description = "") : m_description(description)
 	{}
 
@@ -155,7 +199,8 @@ public:
 	/// <summary>
 	/// Constructor
 	/// </summary>
-	Procedure();
+	/// <param name="filename">The xml file where this procedure is stored</param>
+	Procedure(std::string filename);
 
 	/// <summary>
 	/// Deliver the next step to be executed
@@ -192,7 +237,7 @@ public:
 	/// Return the phase of the step returned by the NextStep function
 	/// </summary>
 	/// <returns>The current phase</returns>
-	const Phase& CurrentPhase();
+	const Phase* CurrentPhase();
 
 	/// <summary>
 	/// 
@@ -226,4 +271,9 @@ private:
 	/// Pointer to the next step to be returned
 	/// </summary>
 	StepIterator m_CurrentStep;
+
+	/// <summary>
+	/// If this procedure is constructed correctly
+	/// </summary>
+	bool valid;
 };
