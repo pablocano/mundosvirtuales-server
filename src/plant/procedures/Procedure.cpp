@@ -7,6 +7,8 @@ Procedure::Procedure(std::string filename) : valid(false)
 	if (!doc.load_file(filename.c_str())) return;
 
 	pugi::xml_node procedureNode = doc.child("procedure");
+	m_procedure_id = procedureNode.attribute("procedureId").as_int();
+	m_assembly_id = procedureNode.attribute("assemblyId").as_int();
 
 	for (pugi::xml_node phaseNode : procedureNode.children("phase"))
 	{
@@ -376,7 +378,7 @@ AssemblyPath::AssemblyPath(std::vector<std::pair<int, int>> path)
 	}
 
 	// Obtain the string
-	std::string m_StringPath = ss.str();
+	m_StringPath = ss.str();
 
 	// Erase the last character
 	m_StringPath.erase(m_StringPath.end() - 1, m_StringPath.end());

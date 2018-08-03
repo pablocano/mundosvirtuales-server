@@ -245,7 +245,7 @@ public:
 	const Phase* CurrentPhase();
 
 	/// <summary>
-	/// 
+	/// Obtains the id of the assembly related to this procedure
 	/// </summary>
 	/// <returns></returns>
 	int GetAssemblyId();
